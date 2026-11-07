@@ -1713,3 +1713,78 @@ document.addEventListener('visibilitychange',function(){if(document.hidden)stop(
 window.__PL=PL;
 })();
 </script>
+<style>
+/* ===== compact sticky page bar (top-level pages except Home/Progress) ===== */
+.pgb{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:12px;margin:0 -18px;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 10px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:padding .25s ease}
+.pgb:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold,#D9A441),transparent);opacity:.55}
+.pgb .med{flex:none;width:46px;height:46px;transition:width .25s,height .25s}
+.pgb .med svg{width:22px;height:22px;transition:width .25s,height .25s}
+.cb h1{margin:0;font-size:30px;line-height:1.45;transition:font-size .25s}
+.pgb .cap{font-size:13px;color:var(--mut);max-height:20px;overflow:hidden;transition:max-height .25s,opacity .25s}
+.pgb.sm{padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:6px}
+.pgb.sm .med{width:32px;height:32px}.pgb.sm .med svg{width:17px;height:17px}
+.pgb.sm h1{font-size:21px}.pgb.sm .cap{max-height:0;opacity:0}
+/* ===== level ring hero ===== */
+.rh{display:flex;flex-direction:column;gap:14px}
+.rh svg.rg{flex:none}
+.rg .rp{animation:ringin 1s cubic-bezier(.3,.9,.3,1)}
+@keyframes ringin{from{stroke-dasharray:0 277}}
+.rh .stt{display:flex;gap:8px}
+.rh .stt>div{flex:1;text-align:center;padding:9px 4px;border-radius:12px;background:var(--tint)}
+.rh .stt b{display:block;font-size:20px;font-family:"Noto Serif Lao",serif}
+.rh .stt span{font-size:11px;color:var(--mut)}
+/* ===== Study: featured card ===== */
+.g.feat{position:relative;overflow:hidden;color:#fff;border:0;background:linear-gradient(135deg,#C8102E 0%,#8E0B22 100%)}
+.g.feat:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle at 100% 0,rgba(255,255,255,.2),transparent 55%),repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px)}
+.g.feat>*{position:relative}
+.g.feat .s,.g.feat .big small{color:rgba(255,255,255,.85)}
+.g.feat .bar{background:rgba(255,255,255,.25)}.g.feat .bar i{background:#FBE9B0}
+.g.feat .btn.pri{background:#FBE9B0;color:#5A3A00;border:0}
+/* ===== coloured tiles with art (Practice, Games) ===== */
+.grid .card[data-k]{position:relative;overflow:hidden;--k:#C8102E;min-height:132px;align-items:flex-start;background:linear-gradient(150deg,color-mix(in srgb,var(--k) 16%,var(--gl)),var(--gl) 75%);border-color:color-mix(in srgb,var(--k) 30%,var(--bd))}
+.grid .card[data-k="0"]{--k:#2F6DB5}.grid .card[data-k="1"]{--k:#2E8B6A}.grid .card[data-k="2"]{--k:#C98A1B}.grid .card[data-k="3"]{--k:#C8102E}.grid .card[data-k="4"]{--k:#7B4FB3}.grid .card[data-k="5"]{--k:#CC5A2B}
+.grid .card[data-k] .ic{background:var(--k)!important;color:#fff!important;box-shadow:0 4px 10px color-mix(in srgb,var(--k) 35%,transparent)}
+.grid .card[data-k] .art{position:absolute;right:-8px;bottom:-12px;width:88px;height:88px;color:var(--k);opacity:.14;transform:rotate(-14deg);pointer-events:none}
+.grid .card[data-k] .art svg{width:100%;height:100%}
+@media(prefers-reduced-motion:reduce){.rg .rp{animation:none}}
+</style>
+<script>
+(function(){
+var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
+var EM={study:'book',practice:'pen',game:'game',profile:'user',chat:'chat',notes:'note'};
+/* 1. compact header */
+var h0=head;
+head=function(title,back,cap){
+ if(back||S.tab==='home'||S.tab==='progress')return h0.apply(this,arguments);
+ cap=cap||(function(){for(var k in T.en){if(t(k)===title)return other(k)}})()||'';
+ var e=EM[S.tab];
+ return '<div class="pgb" data-pgb="1">'+(e?'<span class="med">'+ic(e,22)+'</span>':'')+'<div style="min-width:0"><h1>'+title+'</h1>'+(cap?'<div class="cap">'+esc(cap)+'</div>':'')+'</div></div>'};
+/* helpers */
+function cut(h,at){var d=0,i=at,re=/<div|<\/div>/g,m;re.lastIndex=at;while((m=re.exec(h))){if(m[0]==='<div')d++;else{d--;if(d===0)return h.slice(0,at)+'@@'+h.slice(m.index+6)+'\u0000'+h.slice(at,m.index+6)}}return null}
+function swap(h,fn){var i=h.indexOf('<div class="g hero"');if(i<0)return h;var r=cut(h,i);if(!r)return h;var parts=r.split('\u0000'),old=parts[1],rest=parts[0];return rest.replace('@@',fn(old))}
+function ring(est2,tg){var R=44,C=2*Math.PI*R,p=est2?Math.min(1,est2/tg):0;
+ return '<svg class="rg" width="112" height="112" viewBox="0 0 112 112" role="img" aria-label="'+(est2?est2.toFixed(1)+' / '+tg.toFixed(1):o('Not tested yet','ຍັງບໍ່ໄດ້ທົດສອບ'))+'"><defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#E0AA2E"/><stop offset="1" style="stop-color:var(--ac)"/></linearGradient></defs>'
+ +'<circle cx="56" cy="56" r="44" fill="none" stroke="var(--bd)" stroke-width="9"'+(est2?'':' stroke-dasharray="0.1 13" stroke-linecap="round"')+'/>'
+ +(est2?'<circle class="rp" cx="56" cy="56" r="44" fill="none" stroke="url(#rgg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+(C*p).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 56 56)"/>':'')
+ +'<text x="56" y="'+(est2?60:68)+'" text-anchor="middle" font-family="Noto Serif Lao,serif" font-weight="700" font-size="'+(est2?30:36)+'" fill="var(--fg)">'+(est2?est2.toFixed(1):'?')+'</text>'
+ +(est2?'<text x="56" y="78" text-anchor="middle" font-size="12" fill="var(--mut)">/ '+tg.toFixed(1)+'</text>':'')+'</svg>'}
+function stats(){var x=LBX.xp(),L=LBX.lv(x);return '<div class="stt"><div><b>'+streak()+'</b><span>'+o('Day streak','ມື້ຕິດຕໍ່ກັນ')+'</span></div><div><b>'+x+'</b><span>XP</span></div><div><b>'+L+'</b><span>'+o('Level','ເລເວວ')+'</span></div></div>'}
+function hero(cta,withStats){var e=window.est||0,tg=window.tgt||6.5,gap=e?(tg-e):0;
+ return '<div class="g hero rh"><div class="sinh" aria-hidden="true"></div><div class="row" style="gap:18px;align-items:center">'+ring(e,tg)
+ +'<div style="flex:1;min-width:0"><div class="s">'+o('Target band','ເປົ້າໝາຍ')+' '+tg.toFixed(1)+'</div><div class="w" style="font-size:21px;font-weight:700;line-height:1.35;margin:2px 0">'+(e?o('Estimated band','ລະດັບປັດຈຸບັນ'):o('Find your level','ຊອກຫາລະດັບຂອງເຈົ້າ'))+'</div><div class="s">'+(e?(gap>0?gap.toFixed(1)+' '+o('to go','ເຫຼືອ'):o('Target reached!','ຮອດເປົ້າໝາຍແລ້ວ!')):o('10 questions \u00b7 about 2 minutes','10 ຄຳຖາມ \u00b7 ປະມານ 2 ນາທີ'))+'</div></div></div>'
+ +(e?cta:'<button class="btn pri" data-a="retake">'+o('Take the level test','ເຮັດແບບທົດສອບລະດັບ')+'</button>')+(withStats?stats():'')+'</div>'}
+var hm0=homeV;homeV=function(){var h=hm0();return swap(h,function(old){var m=old.match(/<button class="btn pri"[\s\S]*?<\/button>/);return hero(m?m[0]:'',true)})};
+var ph0=pHub;pHub=function(){var h=ph0();if(S.view!=='hub')return h;return swap(h,function(old){var m=old.match(/<button class="btn pri"[\s\S]*?<\/button>/);return hero(m?m[0]:'',false)})};
+var pg0=progV;progV=function(){var h=pg0();if(window.est||S.lbv)return h;var i=h.indexOf('<div class="g hero"');if(i<0)return h;
+ return h.slice(0,i)+'<div class="g hero rh"><div class="sinh" aria-hidden="true"></div><div class="row" style="gap:18px;align-items:center">'+ring(0,window.tgt||6.5)+'<div style="flex:1;min-width:0"><div class="w" style="font-size:20px;font-weight:700;line-height:1.35">'+o('No band yet','ຍັງບໍ່ມີລະດັບ')+'</div><div class="s">'+o('Take the 2-minute level test to see your band and track your progress.','ເຮັດແບບທົດສອບ 2 ນາທີ ເພື່ອເບິ່ງລະດັບ ແລະ ຕິດຕາມຄວາມຄືບໜ້າ.')+'</div></div></div><button class="btn pri" data-a="retake">'+o('Take the level test','ເຮັດແບບທົດສອບລະດັບ')+'</button></div>'+h.slice(i)};
+/* post-render: featured card, coloured tiles, scroll state */
+function post(){document.body.dataset.pg=S.tab+'/'+S.view;
+ var app=document.getElementById('app');if(!app)return;
+ if(S.tab==='study'&&S.view==='hub'){var g=app.querySelector(':scope>.g');if(g)g.classList.add('feat')}
+ if((S.tab==='practice'&&S.view==='hub')||(S.tab==='game'&&S.view!=='g')){app.querySelectorAll('.grid .card').forEach(function(c,i){if(c.dataset.k!=null)return;c.dataset.k=i%6;var s=c.querySelector('.ic svg');if(s){var a=document.createElement('span');a.className='art';a.setAttribute('aria-hidden','true');a.appendChild(s.cloneNode(true));c.appendChild(a)}})}
+ var cb=app.querySelector('.pgb');if(cb)cb.classList.toggle('sm',window.scrollY>24)}
+var r0=render;render=function(){r0.apply(this,arguments);try{post()}catch(e){}};
+window.addEventListener('scroll',function(){var cb=document.querySelector('.pgb');if(cb)cb.classList.toggle('sm',window.scrollY>24)},{passive:true});
+render();
+})();
+</script>
