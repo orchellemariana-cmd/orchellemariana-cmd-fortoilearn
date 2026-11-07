@@ -1078,6 +1078,17 @@ var bk8=A.back;A.back=function(){if(S.tab==='game'){clearInterval(G.iv);if(S.rec
 var rdG=render;render=function(){if(S.tab!=='game'||S.view!=='g')clearInterval(G.iv);
 if(S.tab==='game'){document.documentElement.lang=S.lang==='lo'?'lo':'en';document.documentElement.classList.remove('cloud');clearInterval(XQ.read.iv);clearInterval(XQ.listen.iv);clearInterval(sp.iv);$('#app').innerHTML=gameV()+nav5();if(G.cf){G.cf=0;confetti()}return}rdG()};
 if(S.tab==='chat'||S.tab==='home')render();
+
+/* ===== Game: Animals & Fruits (picture <-> word matching) ===== */
+var PIC=[['cat','ແມວ','🐱'],['dog','ໝາ','🐶'],['elephant','ຊ້າງ','🐘'],['tiger','ເສືອ','🐯'],['monkey','ລິງ','🐵'],['bird','ນົກ','🐦'],['fish','ປາ','🐟'],['cow','ງົວ','🐄'],['chicken','ໄກ່','🐔'],['pig','ໝູ','🐷'],['snake','ງູ','🐍'],['horse','ມ້າ','🐴'],['rabbit','ກະຕ່າຍ','🐰'],['duck','ເປັດ','🦆'],['mango','ໝາກມ່ວງ','🥭'],['banana','ໝາກກ້ວຍ','🍌'],['coconut','ໝາກພ້າວ','🥥'],['watermelon','ໝາກໂມ','🍉'],['pineapple','ໝາກນັດ','🍍'],['apple','ໝາກແອັບເປິ້ນ','🍎'],['orange','ໝາກກ້ຽງ','🍊'],['grape','ໝາກອະງຸ່ນ','🍇'],['lemon','ໝາກນາວ','🍋']].map(function(x){return{w:x[0],lo:x[1],e:x[2]}});
+GM.pic=['Animals & Fruits','ສັດ ແລະ ໝາກໄມ້','Match the picture with the word','ຈັບຄູ່ຮູບກັບຄຳສັບ','game'];
+var gnew0=gnew;gnew=function(m){if(m!=='pic')return gnew0(m);clearInterval(G.iv);G={m:'pic',n:0,sc:0,miss:[],pick:-1,res:null,t:60,items:shuffle(PIC.slice()),b:0,mv:0,sel:-1,ok:[]};G.o=opts();S.view='g';S.audio=null;G.an='in'};
+function vPic(){var it=cur(),img=G.n%2===0;
+ var q=img?'<div style="font-size:92px;line-height:1.15" aria-label="Picture">'+it.e+'</div><div class="s">'+o('Which word matches the picture?','ຄຳໃດກົງກັບຮູບ?')+'</div>':'<div class="w" style="font-size:30px">'+it.w+'</div><div>'+it.lo+'</div><div class="s">'+o('Which picture matches the word?','ຮູບໃດກົງກັບຄຳ?')+'</div>';
+ return '<div class="g fc'+(cA==='in'?' xfl':'')+'" style="cursor:default;min-height:190px">'+q+'</div><div class="grid">'+G.o.map(function(x,j){var s='',c=cA==='in'?' xin':'';if(G.pick>=0){if(x.w===it.w){s=';border-color:var(--ok);background:var(--tint)';c=cA==='r'?' xpp':''}else if(j===G.pick){s=';border-color:var(--no)';c=cA==='r'?' xsh':''}}
+  return '<button class="tok'+c+'" style="min-height:'+(img?58:96)+'px;font-size:'+(img?18:46)+'px;display:flex;flex-direction:column;align-items:center;justify-content:center'+s+'" data-a="gpick" data-k="'+j+'" aria-label="'+x.w+'">'+(img?'<b>'+x.w+'</b><span class="s">'+x.lo+'</span>':x.e)+'</button>'}).join('')+'</div>'+(G.pick>=0?nxt():'')}
+var vc0=vChoice;vChoice=function(){return G.m==='pic'?vPic():vc0()};
+var gp0=A.gpick;A.gpick=function(d){var was=G.pick;gp0(d);if(G.m==='pic'&&was<0&&G.pick>=0){try{say(cur().w,.9)}catch(e){}}};
 })();
 </script>
 <script>
@@ -1244,7 +1255,8 @@ render();
 </script>
 <style>
 /* ===== Custom YouTube player (no YouTube chrome, no "Open in YouTube") ===== */
-#ytdock{position:absolute;left:0;top:0;width:0;height:0;overflow:hidden;visibility:hidden;z-index:1;background:#000}
+#ytdock{position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;visibility:hidden;z-index:3;background:#000}
+#ytslot.stk{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:2;box-shadow:0 -90px 0 0 var(--bg)}
 #ytdock iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0}
 #ytcov{position:absolute;left:0;top:0;right:0;bottom:0;z-index:2;background:transparent;border:0;padding:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 #ytbadge{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
@@ -1292,7 +1304,7 @@ function ypDur(){try{return YP.p&&YP.ready?(YP.p.getDuration()||0):0}catch(e){re
 function ypT(k){return t(k)}
 function ypApi(cb){if(window.YT&&YT.Player)return cb();(YP.q=YP.q||[]).push(cb);if(!YP.ld){YP.ld=1;var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);var pv=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=function(){if(pv)pv();YP.q.splice(0).forEach(function(f){f()})}}}
 function ytDock(){var d=document.getElementById('ytdock');if(d)return d;d=document.createElement('div');d.id='ytdock';d.innerHTML='<div id="ytp"></div><button id="ytcov" type="button" data-yp="pp"><span id="ytbadge"></span></button>';document.body.appendChild(d);return d}
-function ypPlace(){var d=document.getElementById('ytdock'),s=document.getElementById('ytslot');if(!d||!s||!YP.key)return;var r=s.getBoundingClientRect();if(!r.width)return;d.style.left=(r.left+window.pageXOffset)+'px';d.style.top=(r.top+window.pageYOffset)+'px';d.style.width=r.width+'px';d.style.height=r.height+'px';d.style.borderRadius=getComputedStyle(s).borderRadius}
+function ypPlace(){var d=document.getElementById('ytdock'),s=document.getElementById('ytslot');if(!d||!s||!YP.key)return;var r=s.getBoundingClientRect();if(!r.width)return;d.style.left=r.left+'px';d.style.top=r.top+'px';d.style.width=r.width+'px';d.style.height=r.height+'px';d.style.borderRadius=getComputedStyle(s).borderRadius}
 
 /* ---- player core ---- */
 function ypMake(w){YP.p=new YT.Player('ytp',{width:'100%',height:'100%',videoId:w.id,host:'https://www.youtube-nocookie.com',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3,cc_load_policy:0,enablejsapi:1,origin:/^https?:/.test(location.origin)?location.origin:undefined},events:{
@@ -1330,9 +1342,9 @@ return'<div class="g ypc" id="ypc"><div class="ypt"><span id="ypcur">0:00</span>
 +'<div class="ypseg">'+[[.5,'0.5×'],[.75,'0.75×'],[1,'1×']].map(function(x){return ypChip('rate',x[0],x[1])}).join('')+'</div>'
 +(has&&ctx!=='detail'?'<div class="ypseg">'+ypChip('ap','1',t('ypAp'),other('ypAp'))+'</div>':'')
 +'<div class="ypmsg" id="yperr" role="status"></div></div>'}
-ytCard=function(c,a,b,ap,nb){var has=a!=null&&c.ts&&c.ts.indexOf(a)>=0,ctx=S.view==='detail'?'detail':'other',box=c.v?'aspect-ratio:9/16;max-height:62vh;width:min(100%,calc(62vh*9/16));margin:0 auto':'aspect-ratio:16/9';
+ytCard=function(c,a,b,ap,nb){var has=a!=null&&c.ts&&c.ts.indexOf(a)>=0,ctx=S.view==='detail'?'detail':'other',stk=['detail','shadow','listen'].indexOf(S.view)>=0,box=c.v?(stk?'aspect-ratio:9/16;max-height:44vh;width:min(100%,calc(44vh*9/16));margin:0 auto':'aspect-ratio:9/16;max-height:62vh;width:min(100%,calc(62vh*9/16));margin:0 auto'):(stk?'aspect-ratio:16/9;margin:0 -18px;border-radius:0':'aspect-ratio:16/9');
 YP.next={c:c,a:a,ap:!!ap,ctx:ctx,key:c.id+'|'+(a==null?'':a)};
-return'<div class="g" id="ytslot" style="padding:0;overflow:hidden;background:#000;'+box+'"></div>'+ypBar(c,has,ctx)};
+return'<div class="g'+(stk?' stk':'')+'" id="ytslot" style="padding:0;overflow:hidden;background:#000;'+box+'"></div>'+ypBar(c,has,ctx)};
 
 /* ---- after every render: park the persistent player over the slot ---- */
 function ytSync(){var dock=ytDock(),slot=document.getElementById('ytslot'),n=YP.next;
@@ -1342,7 +1354,7 @@ if(n.key!==YP.key){var same=YP.key&&YP.key.split('|')[0]===n.c.id;YP.key=n.key;y
 else{YP.i=(n.c.ts&&n.a!=null)?n.c.ts.indexOf(n.a):-1}
 ypUI();requestAnimationFrame(ypPlace);setTimeout(ypPlace,250)}
 var rdYP=render;render=function(){YP.next=null;rdYP();ytSync()};
-setInterval(ypPlace,300);window.addEventListener('resize',ypPlace);window.addEventListener('orientationchange',ypPlace);
+setInterval(ypPlace,300);window.addEventListener('resize',ypPlace);window.addEventListener('orientationchange',ypPlace);window.addEventListener('scroll',function(){requestAnimationFrame(ypPlace)},{passive:true});
 
 /* ---- controls (own listeners, no page re-render) ---- */
 document.addEventListener('click',function(e){var el=e.target.closest('[data-yp]');if(!el)return;e.preventDefault();var a=el.getAttribute('data-yp'),v=el.getAttribute('data-v'),c=YP.c;
