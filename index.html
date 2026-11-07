@@ -770,9 +770,18 @@ function wdScore(){var c=W[S.q[0]];if(!c||wd.id!==S.q[0])return;var tg=c.w.split
  if(!wd.alts||!wd.alts.length){wd.res={none:1};return}
  var best=null;wd.alts.forEach(function(al){var sp=al.t.split(' ').filter(Boolean),used=[],per=tg.map(function(w){var bi=-1,bs=0;sp.forEach(function(x,k){if(used.indexOf(k)>=0)return;var s=simi(w,x);if(s>bs){bs=s;bi=k}});if(bi>=0)used.push(bi);return bs}),ts=per.reduce(function(a,b){return a+b},0)/per.length,pct=Math.round(100*(.75*ts+.25*Math.min(1,al.c||ts)));if(!best||pct>best.pct)best={pct:pct,per:per,heard:al.t}});
  wd.res=best;if(window.sfx)sfx(best.pct>=80);st.sa=st.sa||[0,0];st.sa[0]+=best.pct;st.sa[1]++;st.wk=st.wk||{};tg.forEach(function(w,i){if(best.per[i]<.8){var k=nz(w);if(k)st.wk[k]=(st.wk[k]||0)+1}});sv('st',st);bump('pron')}
-A.wrec=function(){if(S.recording){try{wd.sr&&wd.sr.stop()}catch(e){}recToggle();if(!SR)wd.res={na:1};return}
- wd={id:S.q[0],res:null};S.audio=null;S.msg='';recToggle();
- if(SR){try{var r=new SR();r.lang='en-GB';r.continuous=false;r.interimResults=false;r.maxAlternatives=3;r.onresult=function(e){wd.alts=[];var rs=e.results[0];for(var i=0;i<rs.length;i++)wd.alts.push({t:rs[i].transcript,c:rs[i].confidence||0})};r.onend=function(){wdScore();if(S.recording&&mr){try{mr.stop()}catch(e){}}else render()};r.onerror=function(){};r.start();wd.sr=r}catch(e){wd.sr=null}}};
+A.wrec=function(){
+if(S.recording&&wd.sr){try{wd.sr.stop()}catch(e){}return}
+if(!SR){if(S.recording){recToggle();wd.res={na:1};return}wd={id:S.q[0],res:null};S.audio=null;S.msg='';recToggle();return}
+if(S.recording)return;
+wd={id:S.q[0],res:null,alts:[]};S.audio=null;S.msg='';
+var r,last=null,fin=null,tm=0;
+try{r=new SR()}catch(e){wd.res={na:1};render();return}
+r.lang='en-GB';r.continuous=false;r.interimResults=true;r.maxAlternatives=3;
+r.onresult=function(e){try{var res=e.results[e.results.length-1],a=[];for(var i=0;i<res.length;i++)a.push({t:res[i].transcript,c:res[i].confidence||0});last=a;if(res.isFinal)fin=a}catch(x){}};
+r.onerror=function(e){wd.err=e&&e.error};
+r.onend=function(){clearTimeout(tm);S.recording=false;wd.sr=null;var a=fin||last||[];wd.alts=a;if(!a.length&&(wd.err==='not-allowed'||wd.err==='service-not-allowed'||wd.err==='audio-capture')){wd.res={na:1};render();return}wdScore();render()};
+try{r.start();wd.sr=r;S.recording=true;tm=setTimeout(function(){try{r.stop()}catch(e){}},12000);render()}catch(e){wd.sr=null;S.recording=false;wd.res={na:1};render()}};
 var w0=words;words=function(){var h=w0();if(!S.q.length)return h;var c=W[S.q[0]],r=wd.id===S.q[0]?wd.res:null,tg=c.w.split(' ').filter(Boolean);
  var col=r&&r.pct!=null?(r.pct>=80?'var(--ok)':'var(--no)'):'var(--mut)';
  var p='<div class="g" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px"><div class="row sp"><div style="min-width:0"><b>'+t('pr1')+'</b><div class="s">'+(S.recording?t('rec2'):t('pr2'))+'</div></div><div class="row">'+playBtn()+recBtn('wrec',60)+'</div></div>';
@@ -1157,6 +1166,22 @@ var pf2=profV;profV=function(){var h=pf2();if(!UID)return h;var u=ld('acc',{})[U
 loadSB().then(function(sb){return sb.auth.getSession()}).then(function(r){var ses=r&&r.data&&r.data.session;
 if(ses&&ses.user){var em=(ses.user.email||'').toLowerCase();if(em&&em!==UID){sbEnter(ses.user);return}sbSync(ses.user)}
 else if(UID&&(ld('acc',{})[UID]||{}).sb){try{localStorage.removeItem('sess')}catch(e){}location.reload()}}).catch(function(){})}
+
+/* ===== Leaderboard (ອັນດັບ) on Supabase ===== */
+if(SBU&&SBK){
+Object.assign(T.en,{lboff:'Sign in with an account to see the leaderboard. Your XP still counts.'});
+Object.assign(T.lo,{lboff:'\u0ec0\u0e82\u0ebb\u0ec9\u0eb2\u0eaa\u0eb9\u0ec8\u0ea5\u0eb0\u0e9a\u0ebb\u0e9a\u0e94\u0ec9\u0ea7\u0e8d\u0e9a\u0eb1\u0e99\u0e8a\u0eb5\u0ec0\u0e9e\u0eb7\u0ec8\u0ead\u0ec0\u0e9a\u0eb4\u0ec8\u0e87\u0ead\u0eb1\u0e99\u0e94\u0eb1\u0e9a. XP \u0e82\u0ead\u0e87\u0e97\u0ec8\u0eb2\u0e99\u0e8d\u0eb1\u0e87\u0e99\u0eb1\u0e9a\u0e8d\u0eb9\u0ec8.'});
+var lbPrev='';
+function lbFetch(){if(!SB||!LB.db)return;SB.from('leaderboard').select('user_id,name,xp,lvl,streak,ai,av').order('xp',{ascending:false}).limit(20).then(function(r){var ch=0;if(r.error){if(!LB.err){LB.err=true;ch=1}}else{var rows=(r.data||[]).map(function(d){return{id:d.user_id,name:d.name,xp:d.xp,lvl:d.lvl,streak:d.streak,ai:d.ai,av:d.av}}),j=JSON.stringify(rows);if(LB.err||!LB.ready||j!==lbPrev){lbPrev=j;LB.rows=rows;LB.err=false;LB.ready=true;LB.av=LB.av||{};ch=1}}if(ch&&S.tab==='progress'&&S.lbv)render()}).catch(function(){LB.err=true})}
+function lbInit(user){if(!SB||!user)return;LB.id=user.id;LB.err=false;
+LB.db={collection:function(){return{doc:function(){return{
+set:function(o){return SB.from('leaderboard').upsert({user_id:user.id,name:String(o.name||'Learner').slice(0,20),xp:o.xp|0,lvl:o.lvl|0,streak:o.streak|0,ai:typeof o.ai==='number'?o.ai:-1,av:okAv(o.av)?o.av:'',updated_at:new Date().toISOString()}).then(function(r){if(r.error)throw r.error;lbFetch()})},
+'delete':function(){return SB.from('leaderboard').delete().eq('user_id',user.id).then(function(r){if(r.error)throw r.error;lbFetch()})}}}}}};
+if(window.lbPush)window.lbPush();lbFetch()}
+var sbSync0=sbSync;sbSync=function(user){sbSync0(user);try{lbInit(user)}catch(e){}};
+var lbseg0=A.lbseg;A.lbseg=function(d){lbseg0(d);if(d&&d.v==='1')lbFetch()};
+setInterval(function(){if(!document.hidden&&S.tab==='progress'&&S.lbv)lbFetch()},15000);
+}
 
 render();
 })();
