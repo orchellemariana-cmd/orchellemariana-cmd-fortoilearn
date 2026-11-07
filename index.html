@@ -1520,6 +1520,33 @@ detV=function(){var h=dv(),c=CL[sh.c];if(c&&c.yt)return h;
 })();
 
 </script>
+<script>
+/* ===== Real offline support: service worker + offline-aware clips ===== */
+(function(){
+var lo=function(){return S.lang==='lo'};
+var o=function(a,b){return lo()?b:a};
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+ window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready}).then(function(){try{render()}catch(e){}}).catch(function(){})})}
+function toSW(m){try{navigator.serviceWorker.ready.then(function(r){if(r.active)r.active.postMessage(m)})}catch(e){}}
+function cacheClip(id){var c=CL.filter(function(x){return x.id===id})[0];if(c&&c.yt)toSW({type:'cache',urls:['https://i.ytimg.com/vi/'+c.yt+'/mqdefault.jpg']})}
+var ds=A.dsave;A.dsave=function(d){ds(d);cacheClip(CL[sh.c]&&CL[sh.c].id)};
+var os=A.osave;A.osave=function(d){os(d);cacheClip(d.id)};
+window.addEventListener('online',function(){try{render()}catch(e){}});
+window.addEventListener('offline',function(){try{render()}catch(e){}});
+var off=function(){return navigator.onLine===false};
+/* offline: replace the YouTube player with a clear message */
+var yc=ytCard;ytCard=function(c,a,b,ap,nb){if(!off())return yc(c,a,b,ap,nb);
+ return '<div class="g" style="padding:18px;display:flex;flex-direction:column;gap:8px;justify-content:center;text-align:center;min-height:160px"><b>'+o('You are offline','\u0e9a\u0ecd\u0ec8\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94')+'</b><div class="s">'+o('The video needs internet. You can still read the transcript and practise with audio.','\u0ea7\u0eb4\u0e94\u0eb5\u0ec2\u0ead\u0e95\u0ec9\u0ead\u0e87\u0ec3\u0e8a\u0ec9\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94. \u0e97\u0ec8\u0eb2\u0e99\u0e8d\u0eb1\u0e87\u0ead\u0ec8\u0eb2\u0e99\u0e9a\u0ebb\u0e94\u0e96\u0ead\u0e94\u0e84\u0ea7\u0eb2\u0ea1 \u0ec1\u0ea5\u0eb0 \u0e9d\u0eb6\u0e81\u0e94\u0ec9\u0ea7\u0e8d\u0eaa\u0ebd\u0e87\u0ec4\u0e94\u0ec9.')+'</div></div>'};
+/* offline: practise YouTube-clip sentences with read-aloud audio */
+var sa=A.shsay;A.shsay=function(d){var c=CL[sh.c];if(c&&c.yt&&off()){if((sh.step||1)<2)sh.step=2;say(c.s[sh.i],+d.r||1);return}sa(d)};
+var dl=A.dline;A.dline=function(d){var c=CL[sh.c];if(c&&c.yt&&off()){sh.i=+d.i;sh.seg=+d.i;say(c.s[sh.i],1);return}dl(d)};
+/* status card on the Offline screen */
+var ov=offV;offV=function(){var h=ov(),ready=!!(navigator.serviceWorker&&navigator.serviceWorker.controller),
+ c='<div class="g" style="padding:14px 18px;display:flex;flex-direction:column;gap:6px"><div class="'+(off()?'no':'ok')+'" role="status"><b>'+(off()?o('Offline \u2014 saved lessons still work','\u0e9a\u0ecd\u0ec8\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94 \u2014 \u0e9a\u0ebb\u0e94\u0eae\u0ebd\u0e99\u0e97\u0eb5\u0ec8\u0e9a\u0eb1\u0e99\u0e97\u0eb6\u0e81\u0ec4\u0ea7\u0ec9\u0e8d\u0eb1\u0e87\u0ec3\u0e8a\u0ec9\u0ec4\u0e94\u0ec9'):'\u2713 '+o('Online','\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94'))+'</b></div><div class="s">'+(ready?o('The app can open without internet.','\u0ec1\u0ead\u0eb1\u0e9a\u0ec0\u0e9b\u0eb5\u0e94\u0ec4\u0e94\u0ec9\u0ec2\u0e94\u0e8d\u0e9a\u0ecd\u0ec8\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94.'):o('Open the app once while online (on https) to turn on offline opening.','\u0ec0\u0e9b\u0eb5\u0e94\u0ec1\u0ead\u0eb1\u0e9a\u0e84\u0eb1\u0ec9\u0e87\u0edc\u0eb6\u0ec8\u0e87\u0ec0\u0ea1\u0eb7\u0ec8\u0ead\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94 (https) \u0ec0\u0e9e\u0eb7\u0ec8\u0ead\u0ec0\u0e9b\u0eb5\u0e94\u0ec3\u0e8a\u0ec9\u0ec2\u0edd\u0e94\u0e99\u0eb5\u0ec9.'))+'</div><div class="s">'+o('Transcripts and audio practice work offline. YouTube videos themselves need internet.','\u0e9a\u0ebb\u0e94\u0e96\u0ead\u0e94\u0e84\u0ea7\u0eb2\u0ea1 \u0ec1\u0ea5\u0eb0 \u0e81\u0eb2\u0e99\u0e9d\u0eb6\u0e81\u0e94\u0ec9\u0ea7\u0e8d\u0eaa\u0ebd\u0e87\u0ec3\u0e8a\u0ec9\u0ec4\u0e94\u0ec9\u0ec2\u0e94\u0e8d\u0e9a\u0ecd\u0ec8\u0ea1\u0eb5\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94. \u0ea7\u0eb4\u0e94\u0eb5\u0ec2\u0ead YouTube \u0e95\u0ec9\u0ead\u0e87\u0ec3\u0e8a\u0ec9\u0ead\u0eb4\u0e99\u0ec0\u0e95\u0eb5\u0ec0\u0e99\u0eb1\u0e94.')+'</div></div>',
+ i=h.indexOf('<div class="g"');return i<0?h+c:h.slice(0,i)+c+h.slice(i)};
+})();
+
+</script>
 </body></html>
 
 <style>
