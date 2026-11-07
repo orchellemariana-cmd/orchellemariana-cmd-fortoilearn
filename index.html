@@ -1255,8 +1255,8 @@ render();
 </script>
 <style>
 /* ===== Custom YouTube player (no YouTube chrome, no "Open in YouTube") ===== */
-#ytdock{position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;visibility:hidden;z-index:3;background:#000}
-#ytslot.stk{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:2;box-shadow:0 -90px 0 0 var(--bg)}
+#ytdock{position:absolute;left:0;top:0;width:0;height:0;overflow:hidden;visibility:hidden;z-index:1;background:#000}
+
 #ytdock iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0}
 #ytcov{position:absolute;left:0;top:0;right:0;bottom:0;z-index:2;background:transparent;border:0;padding:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 #ytbadge{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
@@ -1304,7 +1304,7 @@ function ypDur(){try{return YP.p&&YP.ready?(YP.p.getDuration()||0):0}catch(e){re
 function ypT(k){return t(k)}
 function ypApi(cb){if(window.YT&&YT.Player)return cb();(YP.q=YP.q||[]).push(cb);if(!YP.ld){YP.ld=1;var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);var pv=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=function(){if(pv)pv();YP.q.splice(0).forEach(function(f){f()})}}}
 function ytDock(){var d=document.getElementById('ytdock');if(d)return d;d=document.createElement('div');d.id='ytdock';d.innerHTML='<div id="ytp"></div><button id="ytcov" type="button" data-yp="pp"><span id="ytbadge"></span></button>';document.body.appendChild(d);return d}
-function ypPlace(){var d=document.getElementById('ytdock'),s=document.getElementById('ytslot');if(!d||!s||!YP.key)return;var r=s.getBoundingClientRect();if(!r.width)return;d.style.left=r.left+'px';d.style.top=r.top+'px';d.style.width=r.width+'px';d.style.height=r.height+'px';d.style.borderRadius=getComputedStyle(s).borderRadius}
+function ypPlace(){var d=document.getElementById('ytdock'),s=document.getElementById('ytslot');if(!d||!s||!YP.key)return;var r=s.getBoundingClientRect();if(!r.width)return;d.style.left=(r.left+window.pageXOffset)+'px';d.style.top=(r.top+window.pageYOffset)+'px';d.style.width=r.width+'px';d.style.height=r.height+'px';d.style.borderRadius=getComputedStyle(s).borderRadius}
 
 /* ---- player core ---- */
 function ypMake(w){YP.p=new YT.Player('ytp',{width:'100%',height:'100%',videoId:w.id,host:'https://www.youtube-nocookie.com',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3,cc_load_policy:0,enablejsapi:1,origin:/^https?:/.test(location.origin)?location.origin:undefined},events:{
@@ -1342,9 +1342,9 @@ return'<div class="g ypc" id="ypc"><div class="ypt"><span id="ypcur">0:00</span>
 +'<div class="ypseg">'+[[.5,'0.5×'],[.75,'0.75×'],[1,'1×']].map(function(x){return ypChip('rate',x[0],x[1])}).join('')+'</div>'
 +(has&&ctx!=='detail'?'<div class="ypseg">'+ypChip('ap','1',t('ypAp'),other('ypAp'))+'</div>':'')
 +'<div class="ypmsg" id="yperr" role="status"></div></div>'}
-ytCard=function(c,a,b,ap,nb){var has=a!=null&&c.ts&&c.ts.indexOf(a)>=0,ctx=S.view==='detail'?'detail':'other',stk=['detail','shadow','listen'].indexOf(S.view)>=0,box=c.v?(stk?'aspect-ratio:9/16;max-height:44vh;width:min(100%,calc(44vh*9/16));margin:0 auto':'aspect-ratio:9/16;max-height:62vh;width:min(100%,calc(62vh*9/16));margin:0 auto'):(stk?'aspect-ratio:16/9;margin:0 -18px;border-radius:0':'aspect-ratio:16/9');
+ytCard=function(c,a,b,ap,nb){var has=a!=null&&c.ts&&c.ts.indexOf(a)>=0,ctx=S.view==='detail'?'detail':'other',box=c.v?'aspect-ratio:9/16;max-height:62vh;width:min(100%,calc(62vh*9/16));margin:0 auto':'aspect-ratio:16/9';
 YP.next={c:c,a:a,ap:!!ap,ctx:ctx,key:c.id+'|'+(a==null?'':a)};
-return'<div class="g'+(stk?' stk':'')+'" id="ytslot" style="padding:0;overflow:hidden;background:#000;'+box+'"></div>'+ypBar(c,has,ctx)};
+return'<div class="g" id="ytslot" style="padding:0;overflow:hidden;background:#000;'+box+'"></div>'+ypBar(c,has,ctx)};
 
 /* ---- after every render: park the persistent player over the slot ---- */
 function ytSync(){var dock=ytDock(),slot=document.getElementById('ytslot'),n=YP.next;
