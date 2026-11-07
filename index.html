@@ -155,7 +155,7 @@ function render(){document.documentElement.lang=S.lang==='lo'?'lo':'en';var v=S.
 $('#app').innerHTML=v+(S.view==='new'?'':'<nav class="g" aria-label="Main">'+[['study','book'],['notes','note']].map(function(x){return '<button data-a="tab" data-t="'+x[0]+'" class="'+(S.tab===x[0]?'on':'')+'"'+(S.tab===x[0]?' aria-current="page"':'')+'>'+ic(x[1])+t(x[0])+'</button>'}).join('')+'</nav>')}
 function recToggle(){if(S.recording&&mr){mr.stop();return}
 if(!navigator.mediaDevices||!window.MediaRecorder){S.msg=t('nomic');render();return}
-navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){chunks=[];mr=new MediaRecorder(st);var me=mr;me.stop=function(){if(me.state!=='inactive')MediaRecorder.prototype.stop.call(me)};mr.ondataavailable=function(e){chunks.push(e.data)};mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});if(me.__discard){S.recording=false;try{render()}catch(e){}return}var r=new FileReader();r.onload=function(){S.audio=r.result;S.recording=false;if(S.view==='spq'||S.view==='speak'){try{bump('spe')}catch(e){}}keep();render()};r.readAsDataURL(new Blob(chunks,{type:mr.mimeType}))};mr.start();S.recording=true;S.msg='';keep();render()}).catch(function(){S.msg=t('nomic');render()})}
+navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){chunks=[];mr=new MediaRecorder(st);var me=mr;me.stop=function(){if(me.state!=='inactive')MediaRecorder.prototype.stop.call(me)};mr.ondataavailable=function(e){chunks.push(e.data)};mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});if(me.__discard){S.recording=false;try{render()}catch(e){}return}var r=new FileReader();r.onload=function(){S.audio=r.result;S.recording=false;if(S.view==='spq'||S.view==='speak'||S.view==='ftest'){try{bump('spe')}catch(e){}}keep();render()};r.readAsDataURL(new Blob(chunks,{type:mr.mimeType}))};mr.start();S.recording=true;S.msg='';keep();render()}).catch(function(){S.msg=t('nomic');render()})}
 function keep(){var a=$('#ft'),b=$('#fm');if(a&&S.form)S.form.text=a.value;if(b&&S.form)S.form.meaning=b.value}
 var px={},tk={};
 function startPar(i){px={i:i%PAR.length,ans:[],res:''};var n=PAR[px.i].s.map(function(_,k){return k});px.pool=shuffle(n);if(px.pool.join()===n.join())px.pool.reverse()}
@@ -971,7 +971,7 @@ A.cuesa=function(){sp.sa=!sp.sa};A.cuesay=function(){var c=CUES[(sp.k||0)%CUES.l
 var cue1=A.cue;A.cue=function(){cue1();sp.sa=0};
 
 /* ===== Speaking fixes: stop mic when leaving, Part 2 preparation timer ===== */
-function stopRec(){if(S.recording&&mr){mr.__discard=true;try{mr.stop()}catch(e){}}S.recording=false;clearInterval(sp.iv);try{clearInterval(SQ.iv)}catch(e){}clearInterval(sp.piv);sp.ph=''}
+function stopRec(){if(S.recording&&mr){mr.__discard=true;try{mr.stop()}catch(e){}}S.recording=false;clearInterval(sp.iv);try{clearInterval(SQ.iv)}catch(e){}clearInterval(sp.piv);sp.ph='';clearInterval(FT.iv);clearInterval(FT.piv);try{ftr&&ftr.stop()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}
 ['tab','jump','go'].forEach(function(k){var o=A[k];if(o)A[k]=function(d){stopRec();return o(d)}});
 var bkz=A.back;A.back=function(){stopRec();bkz()};
 var pf=function(n){return ('0'+Math.floor(n/60)).slice(-2)+':'+('0'+n%60).slice(-2)};
@@ -982,6 +982,32 @@ var sr2=A.srec;A.srec=function(){clearInterval(sp.piv);sp.ph='';sr2()};
 var spv2=speV;speV=function(){var h=spv2(),L=S.lang==='lo',k='<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><button class="mic" data-a="srec"',i=h.indexOf(k);if(i<0||S.recording)return h;
 var b=sp.ph==='prep'?'<div class="g" style="padding:16px;text-align:center"><div class="s">'+(L?'ເວລາກະກຽມ (1 ນາທີ)':'Preparation time (1 minute)')+'</div><div id="pt" style="font-size:40px;font-weight:700;font-variant-numeric:tabular-nums">'+pf(Math.max(sp.pt,0))+'</div><button class="chip" data-a="pskip" style="margin-top:6px">'+(L?'ຂ້າມ ແລະ ເລີ່ມເວົ້າ':'Skip and start speaking')+'</div></div>'.replace('</div></div>','</button></div>'):'<div class="g" style="padding:14px 18px"><button class="chip" data-a="prep">'+(L?'ເລີ່ມກະກຽມ 1 ນາທີ':'Start 1-minute preparation')+'</button><div class="s" style="margin-top:8px">'+(L?'ເວົ້າ 1–2 ນາທີ (ປະມານ 150–250 ຄຳ). ຕົວຢ່າງຄຳຕອບສັ້ນກວ່າການສອບເສັງຈິງ.':'Speak for 1\u20132 minutes (about 150\u2013250 words). The sample answer is shorter than the real test.')+'</div></div>';
 return h.slice(0,i)+b+h.slice(i)};
+
+/* ===== Full Speaking Test: examiner voice, Part 1 > 2 > 3, transcript ===== */
+var FT={},ftr,SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+var o2=function(a,b){return S.lang==='lo'?b:a};
+var pick=function(a,n){var b=a.slice(),r=[];while(r.length<n&&b.length)r.push(b.splice(Math.floor(Math.random()*b.length),1)[0]);return r};
+function ftBuild(){var st=[];pick(SP1,2).forEach(function(T){T[2].slice(0,3).forEach(function(q){st.push({p:1,q:q})})});var c=pick(CUES,1)[0];st.push({p:2,q:c[0],h:c[1]});pick(SP3,2).forEach(function(T){T[2].slice(0,2).forEach(function(q){st.push({p:3,q:q})})});return st}
+function ftAsk(){var s=FT.st[FT.i];FT.t=0;clearInterval(FT.piv);
+ if(s.p===2){FT.ph='prep';FT.pt=60;say("Now I'm going to give you a topic. "+s.q+" You have one minute to prepare.",1);FT.piv=setInterval(function(){FT.pt--;var e=$('#pt');if(e)e.textContent=pf(Math.max(FT.pt,0));if(FT.pt<=0){clearInterval(FT.piv);FT.ph='ask';say('Please begin speaking now.',1);try{render()}catch(x){}}},1000)}
+ else{FT.ph='ask';say(s.q,1)}}
+function ftV(){var h=head(o2('Full Speaking Test','ທົດສອບການເວົ້າເຕັມ'),1);
+ if(!FT.st)return h+'<div class="g" style="padding:18px"><div style="font-size:17px;font-weight:600">The examiner speaks each question.</div><div class="s" style="margin-top:8px">Part 1: 6 questions. Part 2: 1 minute to prepare, then speak up to 2 minutes. Part 3: 4 questions. About 12 minutes. Find a quiet place and allow the microphone.</div></div><button class="btn pri" data-a="ftgo">'+o2('Start test','ເລີ່ມ')+'</button>';
+ if(FT.done)return h+'<div class="g" style="padding:16px"><b>Test complete</b><div class="s">Listen to your answers and read what the app heard.</div></div>'+FT.st.map(function(s,i){return '<div class="g" style="padding:14px 18px"><div class="row sp"><span class="s">Part '+s.p+'</span>'+(FT.ans[i]?'<button class="round" style="width:34px;height:34px" data-a="ftplay" data-i="'+i+'" aria-label="Play">'+ic('play',14)+'</button>':'')+'</div><div style="font-weight:600;margin:4px 0">'+s.q+'</div><div class="s">'+(FT.tx[i]?esc(FT.tx[i]):FT.ans[i]?(SRC?'(no words detected)':'(transcript not supported in this browser)'):'(skipped)')+'</div></div>'}).join('')+'<button class="btn pri" data-a="ftgo">'+o2('Take another test','ເຮັດແບບທົດສອບໃໝ່')+'</button>';
+ var s=FT.st[FT.i],n=FT.st.length,lim=[0,60,120,90][s.p];
+ var pre=h+'<div class="bar"><i style="width:'+Math.round(FT.i/n*100)+'%"></i></div><div class="g" style="padding:18px"><div class="row sp"><span class="s">Part '+s.p+' \u00b7 '+(FT.i+1)+'/'+n+'</span><button class="round" style="width:34px;height:34px" data-a="ftsay" aria-label="Play">'+ic('play',14)+'</button></div><div style="font-size:20px;font-weight:700;margin-top:6px;line-height:1.4">'+s.q+'</div>'+(s.h?'<div class="s" style="margin-top:6px">You should say: '+s.h+'.</div>':'')+'</div>';
+ if(FT.ph==='prep')return pre+'<div class="g" style="padding:16px;text-align:center"><div class="s">Preparation time</div><div id="pt" style="font-size:40px;font-weight:700;font-variant-numeric:tabular-nums">'+pf(Math.max(FT.pt,0))+'</div><button class="chip" data-a="ftskip" style="margin-top:6px">Skip and start speaking</button></div>';
+ return pre+'<div class="g" style="padding:20px;text-align:center"><div id="tm" style="font-size:44px;font-weight:700;font-variant-numeric:tabular-nums">'+pf(FT.t||0)+'</div><div class="s">of '+pf(lim)+' max</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><button class="mic" data-a="ftrec" aria-label="Record">'+ic('mic',34)+'</button><div class="s">'+t(S.recording?'tapstop':'taprec')+'</div>'+playBtn()+(S.msg?'<div class="no" role="status">'+S.msg+'</div>':'')+'</div>'+(S.audio&&!S.recording?'<button class="btn pri" data-a="ftnext">'+(FT.i===n-1?o2('Finish','ສຳເລັດ'):o2('Next question','ຕໍ່ໄປ'))+'</button>':'')}
+A.ftgo=function(){stopRec();FT={st:ftBuild(),i:0,ans:[],tx:[],ph:'ask',t:0};S.audio=null;S.msg='';S.view='ftest';ftAsk()};
+A.ftsay=function(){say(FT.st[FT.i].q,1)};
+A.ftskip=function(){clearInterval(FT.piv);FT.ph='ask';try{speechSynthesis.cancel()}catch(e){}};
+A.ftrec=function(){if(S.recording){clearInterval(FT.iv);try{ftr&&ftr.stop()}catch(e){}recToggle();return}
+ var s=FT.st[FT.i],k=FT.i,lim=[0,60,120,90][s.p];S.audio=null;S.msg='';FT.t=0;FT.seen=0;FT.tx[k]='';try{speechSynthesis.cancel()}catch(e){}recToggle();
+ if(SRC){try{ftr=new SRC();ftr.lang='en-GB';ftr.continuous=true;ftr.interimResults=false;ftr.onresult=function(e){var x='';for(var j=0;j<e.results.length;j++)x+=e.results[j][0].transcript+' ';FT.tx[k]=x.trim()};ftr.start()}catch(e){}}
+ clearInterval(FT.iv);FT.iv=setInterval(function(){if(S.msg){clearInterval(FT.iv);return}if(S.recording)FT.seen=1;else{if(FT.seen)clearInterval(FT.iv);return}FT.t++;var e=$('#tm');if(e)e.textContent=pf(FT.t);if(FT.t>=lim){clearInterval(FT.iv);try{ftr&&ftr.stop()}catch(x){}if(mr)mr.stop()}},1000)};
+A.ftnext=function(){FT.ans[FT.i]=S.audio;S.audio=null;S.msg='';FT.i++;if(FT.i>=FT.st.length){FT.done=1;say('That is the end of the speaking test. Thank you.',1)}else ftAsk()};
+A.ftplay=function(d){try{new Audio(FT.ans[+d.i]).play()}catch(e){}};
+var phf=pHub;pHub=function(){if(S.view==='ftest')return ftV();var h=phf();return S.view==='hub'?h+drow('practice','ftest','','mic',o2('Full Speaking Test','ທົດສອບການເວົ້າເຕັມ'),o2('Examiner voice \u00b7 Part 1, 2, 3 \u00b7 transcript','ສຽງຜູ້ສອບ \u00b7 ພາກ 1, 2, 3'),'NEW'):h};
 })();
 </script>
 <script>
