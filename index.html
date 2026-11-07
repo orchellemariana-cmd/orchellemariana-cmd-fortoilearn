@@ -1323,6 +1323,180 @@ var detLO=detYT;detYT=function(){var h=detLO(),c=CL[sh.c];if(!c||!c.sl)return h;
 var shvLO=shV;shV=function(){var h=shvLO(),c=CL[sh.c];if(c&&c.sl&&c.sl[sh.i])h=h.replace('<div class="s" style="margin-top:4px">'+esc(c.lo)+'</div>',function(){return'<div class="s" style="margin-top:4px">'+esc(c.sl[sh.i])+'</div>'});return h};
 ytAttach();
 </script>
+<script>
+/* ===== Daily reminders + words/phrases/sentences of the day (added module) ===== */
+(function(){
+var lo=function(){return S.lang==='lo'};
+var o=function(a,b){return lo()?b:a};
+var pad=function(n){return(n<10?'0':'')+n};
+var ymd=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+var mins=function(t){var p=String(t||'').split(':'),h=+p[0],m=+p[1];return isNaN(h)||isNaN(m)?-1:h*60+m};
+var DAYS_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var DAYS_LO=['ອາທິດ','ຈັນ','ອັງຄານ','ພຸດ','ພະຫັດ','ສຸກ','ເສົາ'];
+
+/* ---------- stored settings ---------- */
+function RM(){var r=ld('remx',null)||{};r.daily=Object.assign({on:false,time:'08:00',k:{w:1,p:1,s:1}},r.daily||{});r.daily.k=Object.assign({w:1,p:1,s:1},r.daily.k||{});r.list=r.list||[];r.fired=r.fired||{};return r}
+function RMs(r){sv('remx',r)}
+function markIfPast(r,id,time){var n=new Date();if(mins(time)<=n.getHours()*60+n.getMinutes())r.fired[id]=ymd(n);else delete r.fired[id]}
+
+/* ---------- daily content (changes every day) ---------- */
+var PH=[
+['look forward to','ລໍຖ້າດ້ວຍຄວາມຕື່ນເຕັ້ນ','I look forward to meeting you.'],
+['take part in','ເຂົ້າຮ່ວມ','She takes part in many school activities.'],
+['in my opinion','ໃນຄວາມຄິດເຫັນຂອງຂ້ອຍ','In my opinion, learning English is important.'],
+['as a result','ດ້ວຍເຫດນັ້ນ','It rained all day. As a result, we stayed home.'],
+['on the other hand','ໃນທາງກົງກັນຂ້າມ','Cities are exciting; on the other hand, they can be noisy.'],
+['for example','ຕົວຢ່າງ','Many fruits are healthy, for example, mangoes.'],
+['be good at','ເກັ່ງໃນ','He is good at maths.'],
+['get used to','ຄຸ້ນເຄີຍກັບ','I am getting used to the cold weather.'],
+['a great deal of','ຈຳນວນຫຼາຍ','She spends a great deal of time reading.'],
+['make progress','ມີຄວາມກ້າວໜ້າ','You are making good progress in English.'],
+['keep in touch','ຕິດຕໍ່ກັນຢູ່','Let’s keep in touch by phone.'],
+['run out of','ໝົດ','We ran out of rice.'],
+['pay attention to','ເອົາໃຈໃສ່','Please pay attention to the teacher.'],
+['depend on','ຂຶ້ນກັບ','It depends on the weather.'],
+['take care of','ເບິ່ງແຍງ','I take care of my grandmother.'],
+['in the long run','ໃນໄລຍະຍາວ','Saving money helps you in the long run.'],
+['a wide range of','ຫຼາກຫຼາຍ','The market sells a wide range of food.'],
+['play an important role','ມີບົດບາດສຳຄັນ','Family plays an important role in our lives.'],
+['instead of','ແທນທີ່ຈະ','I walk instead of taking the bus.'],
+['as well as','ເຊັ່ນດຽວກັບ','She speaks Lao as well as English.'],
+['find out','ຊອກຮູ້','I want to find out more about it.'],
+['give up','ຍອມແພ້','Don’t give up on your dream.'],
+['sooner or later','ບໍ່ຊ້າກໍໄວ','Sooner or later, you will succeed.'],
+['at the moment','ໃນຕອນນີ້','I am studying at the moment.'],
+['be interested in','ສົນໃຈໃນ','I am interested in science.'],
+['come up with','ຄິດອອກ','She came up with a good idea.'],
+['on time','ຕາມເວລາ','The bus arrived on time.'],
+['such as','ເຊັ່ນ','I like fruit such as mango and papaya.'],
+['carry out','ດຳເນີນການ','They carried out a survey.'],
+['in addition','ນອກຈາກນັ້ນ','In addition, the school has a library.']];
+var SN=[
+['Practice makes perfect.','ການຝຶກຝົນເຮັດໃຫ້ເກັ່ງ.'],
+['I would like to improve my English.','ຂ້ອຍຢາກປັບປຸງພາສາອັງກິດຂອງຂ້ອຍ.'],
+['Could you speak more slowly, please?','ກະລຸນາເວົ້າຊ້າລົງໄດ້ບໍ?'],
+['What do you do in your free time?','ເຈົ້າເຮັດຫຍັງໃນເວລາຫວ່າງ?'],
+['I grew up in a small village near the river.','ຂ້ອຍເຕີບໃຫຍ່ຢູ່ບ້ານນ້ອຍໆໃກ້ແມ່ນ້ຳ.'],
+['Learning a language takes time and patience.','ການຮຽນພາສາຕ້ອງໃຊ້ເວລາ ແລະ ຄວາມອົດທົນ.'],
+['There are both advantages and disadvantages.','ມີທັງຂໍ້ດີ ແລະ ຂໍ້ເສຍ.'],
+['Technology has changed the way we communicate.','ເທັກໂນໂລຢີໄດ້ປ່ຽນວິທີທີ່ພວກເຮົາສື່ສານກັນ.'],
+['I strongly agree with this statement.','ຂ້ອຍເຫັນດີກັບຄຳກ່າວນີ້ຢ່າງແຮງ.'],
+['It is important to protect the environment.','ມັນສຳຄັນທີ່ຈະປົກປ້ອງສິ່ງແວດລ້ອມ.'],
+['Reading every day improves your vocabulary.','ການອ່ານທຸກມື້ຊ່ວຍເພີ່ມຄຳສັບຂອງເຈົ້າ.'],
+['My family is the most important thing in my life.','ຄອບຄົວແມ່ນສິ່ງທີ່ສຳຄັນທີ່ສຸດໃນຊີວິດຂອງຂ້ອຍ.'],
+['I usually get up early in the morning.','ປົກກະຕິຂ້ອຍຕື່ນເຊົ້າໃນຕອນເຊົ້າ.'],
+['Many young people move to the city to find work.','ໄວໜຸ່ມຫຼາຍຄົນຍ້າຍເຂົ້າເມືອງເພື່ອຊອກວຽກເຮັດ.'],
+['Public transport can reduce traffic and pollution.','ການຂົນສົ່ງສາທາລະນະສາມາດຫຼຸດການຈະລາຈອນຕິດຂັດ ແລະ ມົນລະພິດ.'],
+['I have been studying English for two years.','ຂ້ອຍຮຽນພາສາອັງກິດມາສອງປີແລ້ວ.'],
+['Could you repeat the question, please?','ກະລຸນາເວົ້າຄຳຖາມຄືນໃໝ່ໄດ້ບໍ?'],
+['Eating fresh fruit and vegetables keeps you healthy.','ການກິນໝາກໄມ້ ແລະ ຜັກສົດເຮັດໃຫ້ເຈົ້າມີສຸຂະພາບດີ.'],
+['In the future, I hope to study abroad.','ໃນອະນາຄົດ, ຂ້ອຍຫວັງວ່າຈະໄດ້ໄປຮຽນຕ່າງປະເທດ.'],
+['Online learning is more flexible than classroom learning.','ການຮຽນອອນລາຍຍືດຫຍຸ່ນກວ່າການຮຽນໃນຫ້ອງ.'],
+['I enjoy trying traditional food from different regions.','ຂ້ອຍມັກລອງອາຫານພື້ນເມືອງຈາກຫຼາຍພາກ.'],
+['To sum up, both sides have good points.','ສະຫຼຸບແລ້ວ, ທັງສອງຝ່າຍມີຈຸດດີ.'],
+['The population of the city is growing quickly.','ຈຳນວນປະຊາກອນຂອງເມືອງກຳລັງເພີ່ມຂຶ້ນຢ່າງໄວ.'],
+['I am responsible for cleaning the house.','ຂ້ອຍຮັບຜິດຊອບເຮັດຄວາມສະອາດເຮືອນ.'],
+['She works hard to achieve her goals.','ນາງພະຍາຍາມຢ່າງໜັກເພື່ອບັນລຸເປົ້າໝາຍ.'],
+['It was a wonderful experience that I will never forget.','ມັນເປັນປະສົບການທີ່ດີເລີດທີ່ຂ້ອຍຈະບໍ່ມີວັນລືມ.'],
+['Some people prefer to live in the countryside.','ບາງຄົນມັກຢູ່ຊົນນະບົດ.'],
+['Listening to English songs helps me learn new words.','ການຟັງເພງພາສາອັງກິດຊ່ວຍໃຫ້ຂ້ອຍຮຽນຄຳສັບໃໝ່.'],
+['I think it is better to save money than to spend it.','ຂ້ອຍຄິດວ່າການເກັບເງິນດີກວ່າການໃຊ້ຈ່າຍ.'],
+['Never stop learning, because life never stops teaching.','ຢ່າຢຸດຮຽນຮູ້, ເພາະຊີວິດບໍ່ເຄີຍຢຸດສອນ.']];
+PH=PH.map(function(x){return{en:x[0],lo:x[1],ex:x[2]}});
+SN=SN.map(function(x){return{en:x[0],lo:x[1]}});
+
+var POOL=null;
+function pools(){if(POOL)return POOL;var w=[],p=PH.slice(),seen={};
+ try{TOP.forEach(function(x){(x.w||[]).forEach(function(c){if(!c||!c.w||!c.lo||seen[c.w])return;seen[c.w]=1;var it={en:c.w,lo:c.lo,ex:c.ex||'',ipa:c.i||''};if(c.k==='phrase')p.push(it);else w.push(it)})})}catch(e){}
+ if(!w.length)w=[{en:'opportunity',lo:'ໂອກາດ',ex:'Studying abroad gives you new opportunities.',ipa:''}];
+ POOL={w:w,p:p,s:SN};return POOL}
+function dayN(d){d=d||new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
+function today(){var P=pools(),n=dayN();return{w:P.w[n%P.w.length],p:P.p[(n+3)%P.p.length],s:P.s[(n+7)%P.s.length]}}
+
+/* ---------- notifications ---------- */
+var canNote=function(){return'Notification' in window};
+function ask(cb){if(!canNote()||Notification.permission!=='default'){cb&&cb();return}
+ try{var r=Notification.requestPermission(function(){cb&&cb()});if(r&&r.then)r.then(function(){cb&&cb()})}catch(e){cb&&cb()}}
+function sys(title,body,tag){if(!canNote()||Notification.permission!=='granted')return;var op={body:body,tag:tag||'ielts-rem'};
+ try{var n=new Notification(title,op);n.onclick=function(){try{window.focus()}catch(e){}n.close()}}
+ catch(e){try{navigator.serviceWorker&&navigator.serviceWorker.getRegistration().then(function(g){if(g)g.showNotification(title,op)})}catch(x){}}}
+function toast(title,body){var e=document.getElementById('rmtoast');if(e)e.remove();e=document.createElement('div');e.id='rmtoast';e.setAttribute('role','alert');
+ e.style.cssText='position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);max-width:456px;margin:0 auto;z-index:99999;padding:14px 16px;border-radius:18px;background:var(--gl);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 28px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:8px';
+ e.innerHTML='<b style="font-size:16px">'+esc(title)+'</b><div style="white-space:pre-line;font-size:15px;line-height:1.5">'+esc(body)+'</div><div class="row" style="gap:8px"><button class="btn pri" style="flex:1" data-a="rmgo">'+o('Open','ເປີດ')+'</button><button class="btn" style="flex:1" data-a="rmx">'+o('Close','ປິດ')+'</button></div>';
+ document.body.appendChild(e)}
+function lines(k){var T=today(),L=[];
+ if(k.w)L.push(o('Word','ຄຳສັບ')+': '+T.w.en+' = '+T.w.lo);
+ if(k.p)L.push(o('Phrase','ວະລີ')+': '+T.p.en+' = '+T.p.lo);
+ if(k.s)L.push(o('Sentence','ປະໂຫຍກ')+': '+T.s.en+'\n'+T.s.lo);
+ return L.join('\n')}
+function fire(kind,item){var r=RM(),title,body;
+ if(kind==='daily'||kind==='test'){title=o('Daily English · IELTS','ຝຶກພາສາອັງກິດປະຈຳມື້ · IELTS');body=lines(kind==='test'?{w:1,p:1,s:1}:r.daily.k)}
+ else{title=(item&&item.msg)||o('Time to practise IELTS','ຮອດເວລາຝຶກ IELTS ແລ້ວ');var T=today();body=o('Today’s word','ຄຳສັບມື້ນີ້')+': '+T.w.en+' = '+T.w.lo}
+ toast(title,body);sys(title,body,kind+(item?item.id:''));try{navigator.vibrate&&navigator.vibrate([180,80,180])}catch(e){}}
+function tick(){try{var r=RM(),n=new Date(),hm=n.getHours()*60+n.getMinutes(),td=ymd(n),dw=n.getDay(),ch=0,q=[];
+ var chk=function(id,time,kind,item){var t=mins(time);if(t<0||hm<t||r.fired[id]===td)return;r.fired[id]=td;ch=1;if(hm<t+240)q.push([kind,item])};
+ if(r.daily.on)chk('d',r.daily.time,'daily');
+ r.list.forEach(function(i){if(i.on&&(i.days||[]).indexOf(dw)>=0)chk('i'+i.id,i.time,'practice',i)});
+ if(ch)RMs(r);q.forEach(function(x){fire(x[0],x[1])})}catch(e){}}
+setInterval(tick,20000);document.addEventListener('visibilitychange',function(){if(!document.hidden)tick()});window.addEventListener('focus',tick);setTimeout(tick,1500);
+
+/* ---------- today card (Home) ---------- */
+function saved(txt){try{return notes.some(function(n){return n.text===txt})}catch(e){return false}}
+function trow(lbl,type,en,loT,ex){return '<div style="display:flex;flex-direction:column;gap:2px"><div class="s">'+lbl+'</div><div class="row" style="align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:700;line-height:1.35">'+esc(en)+'</div><div class="w" style="font-size:16px;margin-top:2px">'+esc(loT)+'</div>'+(ex?'<div class="s" style="margin-top:4px">'+esc(ex)+'</div>':'')+'</div><div class="row" style="gap:6px;flex:none"><button class="round" data-a="rmsay" data-t="'+type+'" aria-label="'+o('Listen','ຟັງ')+'" style="width:38px;height:38px">'+ic('play',14)+'</button><button class="round" data-a="rmsave" data-t="'+type+'" aria-label="'+o('Save','ບັນທຶກ')+'" style="width:38px;height:38px;font-size:18px">'+(saved(en)?'✓':'+')+'</button></div></div></div>'}
+function todayCard(){var T=today();return '<div class="g" style="padding:16px 18px;display:flex;flex-direction:column;gap:14px"><div class="row sp"><b style="font-size:17px">'+o('Today','ມື້ນີ້')+'</b><button class="chip" data-a="rmopen" style="min-height:34px">'+o('Reminders','ການແຈ້ງເຕືອນ')+' ›</button></div>'+trow(o('Word of the day','ຄຳສັບປະຈຳມື້'),'word',T.w.en,T.w.lo,T.w.ex)+trow(o('Phrase of the day','ວະລີປະຈຳມື້'),'phrase',T.p.en,T.p.lo,T.p.ex)+trow(o('Sentence of the day','ປະໂຫຍກປະຈຳມື້'),'sentence',T.s.en,T.s.lo,'')+'</div>'}
+var home0=homeV;homeV=function(){var h=home0(),c='';try{c=todayCard()}catch(e){}var i=h.indexOf('<div class="g"');return i<0?h+c:h.slice(0,i)+c+h.slice(i)};
+
+/* ---------- reminders screen ---------- */
+function dname(d){return lo()?DAYS_LO[d]:DAYS_EN[d]}
+function dsum(a){a=(a||[]).slice().sort();if(a.length===7)return o('Every day','ທຸກມື້');return a.map(dname).join(', ')}
+function card(x){return '<div class="g" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">'+x+'</div>'}
+function remV(){var r=RM(),T=today(),perm=canNote()?Notification.permission:'none',h=head(t('remind'),1);S.rmd=S.rmd||[0,1,2,3,4,5,6];
+ var pm='';
+ if(perm==='granted')pm='<div class="ok">✓ '+o('Phone alerts are allowed','ອະນຸຍາດການແຈ້ງເຕືອນແລ້ວ')+'</div>';
+ else if(perm==='default')pm='<div class="s">'+o('Allow notifications so reminders can pop up on your phone.','ອະນຸຍາດການແຈ້ງເຕືອນ ເພື່ອໃຫ້ຂໍ້ຄວາມປາກົດຂຶ້ນໃນໂທລະສັບ.')+'</div><button class="btn pri" data-a="rmperm">'+o('Allow notifications','ອະນຸຍາດການແຈ້ງເຕືອນ')+'</button>';
+ else if(perm==='denied')pm='<div class="no">'+o('Notifications are blocked in your browser settings. Reminders will still show inside the app.','ການແຈ້ງເຕືອນຖືກບລັອກໃນການຕັ້ງຄ່າບຣາວເຊີ. ການແຈ້ງເຕືອນຍັງຈະສະແດງໃນແອັບ.')+'</div>';
+ else pm='<div class="s">'+o('This browser cannot show phone alerts. Reminders will show inside the app.','ບຣາວເຊີນີ້ບໍ່ສາມາດສະແດງການແຈ້ງເຕືອນໄດ້. ການແຈ້ງເຕືອນຈະສະແດງໃນແອັບ.')+'</div>';
+ h+=card(pm+'<div class="s">'+o('Reminders appear while the app is open or running in the background.','ການແຈ້ງເຕືອນຈະສະແດງເມື່ອແອັບເປີດຢູ່ ຫຼື ຢູ່ພື້ນຫຼັງ.')+'</div>');
+ var kc=function(k,l){return '<button class="chip '+(r.daily.k[k]?'on':'')+'" data-a="rmk" data-k="'+k+'" aria-pressed="'+(r.daily.k[k]?'true':'false')+'">'+l+'</button>'};
+ h+=card('<div class="row sp"><div><b style="font-size:17px">'+o('Words & sentences of the day','ຄຳສັບ ແລະ ປະໂຫຍກປະຈຳມື້')+'</b><div class="s">'+o('New ones every day, with Lao translation','ໃໝ່ທຸກມື້ ພ້ອມຄຳແປເປັນພາສາລາວ')+'</div></div>'+pswitch(r.daily.on,'rmdaily',o('Daily reminder','ແຈ້ງເຕືອນປະຈຳມື້'))+'</div>'
+  +'<div class="row sp"><span>'+o('Time','ເວລາ')+'</span><input type="time" id="rmdt" value="'+esc(r.daily.time)+'" aria-label="'+o('Time','ເວລາ')+'" style="width:auto;min-height:44px;padding:0 12px"></div>'
+  +'<div class="row" style="flex-wrap:wrap;gap:8px">'+kc('w',o('Word','ຄຳສັບ'))+kc('p',o('Phrase','ວະລີ'))+kc('s',o('Sentence','ປະໂຫຍກ'))+'</div>');
+ var rows=r.list.map(function(i){return '<div class="row" style="gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--bd)"><input type="time" data-rt="'+i.id+'" id="rmti'+i.id+'" value="'+esc(i.time)+'" aria-label="'+o('Time','ເວລາ')+'" style="width:auto;min-height:44px;padding:0 10px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis">'+esc(i.msg||o('Time to practise','ເວລາຝຶກ'))+'</div><div class="s">'+dsum(i.days)+'</div></div><button class="chip '+(i.on?'on':'')+'" data-a="rmtog" data-i="'+i.id+'" aria-pressed="'+(i.on?'true':'false')+'">'+(i.on?o('On','ເປີດ'):o('Off','ປິດ'))+'</button><button class="round" data-a="rmdel" data-i="'+i.id+'" aria-label="'+o('Delete','ລຶບ')+'" style="width:36px;height:36px;font-size:18px">×</button></div>'}).join('');
+ var dc=[0,1,2,3,4,5,6].map(function(d){var on=S.rmd.indexOf(d)>=0;return '<button class="chip '+(on?'on':'')+'" data-a="rmday" data-d="'+d+'" aria-pressed="'+(on?'true':'false')+'">'+dname(d)+'</button>'}).join('');
+ h+=card('<div><b style="font-size:17px">'+o('Practice time reminders','ການແຈ້ງເຕືອນເວລາຝຶກ')+'</b><div class="s">'+o('Pick any time you want to practise.','ເລືອກເວລາທີ່ຕ້ອງການຝຶກ.')+'</div></div>'+(rows?'<div>'+rows+'</div>':'')
+  +'<div style="display:flex;flex-direction:column;gap:10px;'+(rows?'border-top:1px solid var(--bd);padding-top:12px':'')+'"><div class="row sp"><span>'+o('Time','ເວລາ')+'</span><input type="time" id="rmt" value="'+esc(S.rmtime||'19:00')+'" aria-label="'+o('Time','ເວລາ')+'" style="width:auto;min-height:44px;padding:0 12px"></div>'
+  +'<input id="rmm" value="'+esc(S.rmmsg||'')+'" maxlength="60" placeholder="'+o('Message (optional)','ຂໍ້ຄວາມ (ບໍ່ບັງຄັບ)')+'" aria-label="'+o('Message','ຂໍ້ຄວາມ')+'" autocomplete="off">'
+  +'<div class="row" style="flex-wrap:wrap;gap:8px">'+dc+'</div><button class="btn pri" data-a="rmadd">'+o('Add reminder','ເພີ່ມການແຈ້ງເຕືອນ')+'</button></div>');
+ h+=card('<b style="font-size:17px">'+o('Preview','ຕົວຢ່າງ')+'</b><div style="white-space:pre-line;font-size:15px;line-height:1.5">'+esc(lines({w:1,p:1,s:1}))+'</div><button class="btn" data-a="rmtest">'+o('Send a test reminder','ທົດລອງສົ່ງການແຈ້ງເຕືອນ')+'</button>');
+ return h}
+
+/* ---------- wire into the app ---------- */
+var rend0=render;render=function(){if(S.tab==='profile'&&S.view==='remind'){document.documentElement.lang=lo()?'lo':'en';$('#app').innerHTML=remV()+nav5();return}rend0()};
+var prof0=profV;profV=function(){var h=prof0(),r=RM(),n=(r.daily.on?1:0)+r.list.filter(function(i){return i.on}).length,
+ b='<button data-a="rmopen" class="chip" style="min-height:36px">'+(n?n+' '+o('on','ເປີດ'):o('Off','ປິດ'))+' ›</button>',
+ re=/<button role="switch"[^>]*data-a="prem"[^>]*>[\s\S]*?<\/button>/;
+ return re.test(h)?h.replace(re,function(){return b}):h+'<div class="g row sp" style="padding:14px 18px"><b>'+o('Reminders','ການແຈ້ງເຕືອນ')+'</b>'+b+'</div>'};
+A.rmopen=function(){S.tab='profile';S.view='remind';S.rmd=S.rmd||[0,1,2,3,4,5,6];var e=document.getElementById('rmtoast');if(e)e.remove();window.scrollTo(0,0)};
+A.rmgo=function(){var e=document.getElementById('rmtoast');if(e)e.remove();S.tab='home';S.view='hub'};
+A.rmx=function(){var e=document.getElementById('rmtoast');if(e)e.remove()};
+A.rmperm=function(){ask(function(){render()})};
+A.rmdaily=function(){var r=RM();r.daily.on=!r.daily.on;if(r.daily.on){markIfPast(r,'d',r.daily.time);ask(function(){render()})}RMs(r)};
+A.rmk=function(d){var r=RM(),k=d.k;r.daily.k[k]=r.daily.k[k]?0:1;if(!r.daily.k.w&&!r.daily.k.p&&!r.daily.k.s)r.daily.k[k]=1;RMs(r)};
+A.rmday=function(d){var x=+d.d,i=S.rmd.indexOf(x);if(i>=0){if(S.rmd.length>1)S.rmd.splice(i,1)}else S.rmd.push(x)};
+A.rmadd=function(){var tm=($('#rmt')||{}).value||S.rmtime||'19:00',m=(($('#rmm')||{}).value||'').trim(),r=RM(),it={id:Date.now(),time:tm,msg:m,days:S.rmd.slice().sort(),on:1};r.list.push(it);markIfPast(r,'i'+it.id,tm);RMs(r);S.rmmsg='';ask(function(){render()})};
+A.rmtog=function(d){var r=RM();r.list.forEach(function(i){if(String(i.id)===d.i){i.on=i.on?0:1;if(i.on)markIfPast(r,'i'+i.id,i.time)}});RMs(r);if(r.list.some(function(i){return i.on}))ask(function(){render()})};
+A.rmdel=function(d){var r=RM();r.list=r.list.filter(function(i){return String(i.id)!==d.i});delete r.fired['i'+d.i];RMs(r)};
+A.rmtest=function(){ask(function(){});fire('test')};
+A.rmsay=function(d){var T=today(),x=d.t==='word'?T.w:d.t==='phrase'?T.p:T.s;say(x.en,.9)};
+A.rmsave=function(d){var T=today(),x=d.t==='word'?T.w:d.t==='phrase'?T.p:T.s;addNote(d.t,x.en,x.lo)};
+document.addEventListener('input',function(e){var i=e.target.id;if(i==='rmt')S.rmtime=e.target.value;if(i==='rmm')S.rmmsg=e.target.value});
+document.addEventListener('change',function(e){var t0=e.target,i=t0.id,r;
+ if(i==='rmdt'){r=RM();r.daily.time=t0.value||'08:00';markIfPast(r,'d',r.daily.time);RMs(r)}
+ else if(t0.getAttribute&&t0.getAttribute('data-rt')){r=RM();r.list.forEach(function(x){if(String(x.id)===t0.getAttribute('data-rt')){x.time=t0.value||x.time;markIfPast(r,'i'+x.id,x.time)}});RMs(r)}});
+try{render()}catch(e){}
+})();
+
+</script>
 </body></html>
 
 <style>
