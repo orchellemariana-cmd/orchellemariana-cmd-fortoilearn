@@ -671,12 +671,11 @@ var card='<div class="g hero"><div class="sinh"></div><div class="row sp"><div><
 var bd='<div class="g" style="padding:14px 18px"><div class="sec" style="margin:0 0 10px">'+t('badges')+'</div><div class="row" style="flex-wrap:wrap">'+BD.map(function(b){var on=b[1](x,s);return '<span class="tag" style="padding:7px 12px;font-size:13px;'+(on?'':'background:none;border:1px dashed var(--bd);color:var(--mut)')+'">'+(on?ic('ck',14)+' ':'')+b[0]+'</span>'}).join('')+'</div></div>';
 return hh+seg+card+bd+rest}
 var body;
-if(!LB.joined)body='<div class="g" style="padding:18px;display:flex;flex-direction:column;gap:12px"><div><b>'+t('joinlb')+'</b></div><div class="s">'+t('nick')+': <b>'+esc(nm())+'</b> · '+t('lbnote')+'</div>'+(LB.err?'<div class="s">'+t('lboff')+'</div>':'<button class="btn pri" data-a="lbjoin">'+t('joinlb')+'</button>')+'</div>';
-else if(LB.err)body='<div class="g" style="padding:18px"><div class="s">'+t('lboff')+'</div></div>';
+if(LB.err)body='<div class="g" style="padding:18px"><div class="s">'+t('lboff')+'</div></div>';
 else if(!LB.ready)body='<div class="s">'+t('load')+'</div>';
 else if(!LB.rows.length)body='<div class="s">'+t('lbempty')+'</div>';
 else body=lbPod(LB.rows);
-if(LB.joined&&!LB.err)body+='<button class="btn" data-a="lbleave">'+t('leavelb')+'</button>';
+if(!LB.err){body+=LB.joined?'<button class="btn" data-a="lbleave">'+t('leavelb')+'</button>':'<div class="g" style="padding:16px 18px;display:flex;flex-direction:column;gap:10px"><div class="s">'+t('nick')+': <b>'+esc(nm())+'</b> · '+t('lbnote')+'</div><button class="btn pri" data-a="lbjoin">'+t('joinlb')+'</button></div>'}
 return hh+seg+body};
 })();
 </script>
@@ -1494,6 +1493,30 @@ document.addEventListener('change',function(e){var t0=e.target,i=t0.id,r;
  if(i==='rmdt'){r=RM();r.daily.time=t0.value||'08:00';markIfPast(r,'d',r.daily.time);RMs(r)}
  else if(t0.getAttribute&&t0.getAttribute('data-rt')){r=RM();r.list.forEach(function(x){if(String(x.id)===t0.getAttribute('data-rt')){x.time=t0.value||x.time;markIfPast(r,'i'+x.id,x.time)}});RMs(r)}});
 try{render()}catch(e){}
+})();
+
+</script>
+<style>nav.g{bottom:calc(10px + env(safe-area-inset-bottom,0px))!important}</style>
+<script>
+/* ===== Clips list: real YouTube thumbnails; text-only lessons labelled honestly ===== */
+(function(){
+var lo=function(){return S.lang==='lo'};
+function thumb(c){
+ if(c&&c.yt){
+  return '<span style="width:96px;height:64px;border-radius:14px;overflow:hidden;position:relative;flex:none;background:var(--tint);display:block"><img src="https://i.ytimg.com/vi/'+encodeURIComponent(c.yt)+'/mqdefault.jpg" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display=\'none\'"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center">'+ic('play',14)+'</span></span></span>'}
+ return '<span style="width:96px;height:64px;border-radius:14px;background:var(--tint);color:var(--ac);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:none">'+ic('note',22)+'<span style="font-size:11px;font-weight:600">'+(lo()?'\u0e82\u0ecd\u0ec9\u0e84\u0ea7\u0eb2\u0ea1':'Text')+'</span></span>'}
+var cv=clipsV;
+clipsV=function(){var h=cv(),re=/<button class="g" data-a="clip" data-c="(\d+)"[\s\S]*?<\/button>/g,cards=[],m;
+ var first=h.search(/<button class="g" data-a="clip"/);if(first<0)return h;
+ var pre=h.slice(0,first),rest=h.slice(first),last=0;
+ while((m=re.exec(rest))){var c=CL[+m[1]];var card=m[0].replace(/(<button class="g" data-a="clip"[^>]*>)<span style="width:96px;height:64px[^>]*>[\s\S]*?<\/span>/,function(_,a){return a+thumb(c)});cards.push({y:c&&c.yt?0:1,h:card});last=re.lastIndex}
+ var post=rest.slice(last);
+ cards.sort(function(a,b){return a.y-b.y});
+ return pre+cards.map(function(x){return x.h}).join('')+post};
+/* detail of text-only lessons: no fake video player */
+var dv=detV;
+detV=function(){var h=dv(),c=CL[sh.c];if(c&&c.yt)return h;
+ return h.replace(/<div class="g" style="padding:0;position:relative;height:\d+px;overflow:hidden;background:var\(--tint\)">[\s\S]*?<\/button><\/div>/,function(){return '<div class="g" style="padding:14px 18px;display:flex;align-items:center;gap:12px"><button class="round" data-a="dplay" aria-label="'+t('play')+'" style="width:48px;height:48px;flex:none">'+ic('play',20)+'</button><div class="s">'+(lo()?'\u0e9a\u0ebb\u0e94\u0eae\u0ebd\u0e99\u0e9a\u0ecd\u0ec8\u0ea1\u0eb5\u0ea7\u0eb4\u0e94\u0eb5\u0ec2\u0ead \u2014 \u0e9f\u0eb1\u0e87\u0eaa\u0ebd\u0e87\u0ead\u0ec8\u0eb2\u0e99. \u0ec0\u0e9e\u0eb5\u0ec8\u0ea1\u0ea7\u0eb4\u0e94\u0eb5\u0ec2\u0ead YouTube \u0ec4\u0e94\u0ec9\u0ec2\u0e94\u0e8d \u201c+ \u0ea7\u0eb4\u0e94\u0eb5\u0ec2\u0ead YouTube\u201d.':'Text lesson with audio, no video. Add a real video with \u201c+ YouTube video\u201d.')+'</div></div>'})};
 })();
 
 </script>
