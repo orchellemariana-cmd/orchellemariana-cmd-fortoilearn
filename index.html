@@ -1658,45 +1658,53 @@ var ov=offV;offV=function(){var h=ov(),ready=SWS.state==='ready',
 @media(prefers-reduced-motion:reduce){.pan .pb,.pan .pa{animation:none}}
 </style>
 <style>
-body:has(.plp) button.round[data-a="fplay"]{display:none}
-.plon{background:var(--ac)!important;color:var(--on)!important;border-color:transparent!important}
-.rctl{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:14px}
+body:has(.pbar) button.round[data-a="fplay"]{display:none}
+.rctl{width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:14px}
 .rctl .row{justify-content:center;flex-wrap:wrap;gap:10px}
-.plr{display:flex;align-items:center;gap:14px}
-.plp{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 22px;border-radius:24px;border:1px solid var(--bd);background:var(--gl);color:var(--fg);font-weight:600;font-size:16px;transition:transform .15s}
-.plp:active{transform:scale(.96)}
-.plp svg{width:18px;height:18px}
-.eq{display:inline-flex;gap:3px;align-items:flex-end;height:24px}
-.eq i{width:4px;height:6px;border-radius:2px;background:var(--bd)}
-.plon+.eq i{background:var(--ac);animation:eqb .8s ease-in-out infinite}
-.plon+.eq i:nth-child(2){animation-delay:.15s}.plon+.eq i:nth-child(3){animation-delay:.3s}.plon+.eq i:nth-child(4){animation-delay:.45s}
-@keyframes eqb{50%{height:24px}}
-@media(prefers-reduced-motion:reduce){.plon+.eq i{animation:none;height:16px}}
+.pbar{display:flex;align-items:center;gap:14px;width:100%;max-width:340px;box-sizing:border-box;padding:8px 18px 8px 8px;border-radius:32px;border:1px solid var(--bd);background:var(--gl);box-shadow:0 4px 14px rgba(70,45,20,.08)}
+.pbtn{flex:none;width:48px;height:48px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;background:var(--ac);color:var(--on);box-shadow:0 3px 10px color-mix(in srgb,var(--ac) 40%,transparent);transition:transform .15s}
+.pbtn:active{transform:scale(.92)}
+.pbtn svg{width:20px;height:20px}
+.pbtn:not(.plon) svg{margin-left:2px}
+.ptrk{--p:0%;position:relative;flex:1;height:34px;cursor:pointer;touch-action:none}
+.ptrk:before,.ptrk:after{content:"";position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;background-image:radial-gradient(circle,currentColor 0 2.2px,transparent 2.6px);background-size:11px 6px;background-repeat:repeat-x}
+.ptrk:before{color:color-mix(in srgb,var(--mut) 55%,transparent)}
+.ptrk:after{color:var(--ac);right:auto;width:var(--p)}
+.pth{position:absolute;top:50%;left:var(--p);width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;border:2px solid var(--ac);box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:1}
+.ptime{flex:none;min-width:34px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums;color:var(--mut)}
+.plon{background:var(--ac)!important;color:var(--on)!important}
 </style>
 <script>
-/* Recorder: one player at a time (no double play), Stop button, Pause / Stop & listen controls */
+/* Recorder: one player at a time (no double play), progress player, Pause / Stop & listen */
 (function(){
-var PL={a:null,k:null,s:null,v:''};
+var PL={a:null,k:null,s:null,v:'',iv:0,dd:{s:null,d:0}};
 var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
-var SQ_='<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
-var PLY='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 001.5.86l10.5-6.5a1 1 0 000-1.72L9.5 4.64A1 1 0 008 5.5z"/></svg>';
+var SQ_='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
+var PLY='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 001.5.86l10.5-6.5a1 1 0 000-1.72L9.5 4.64A1 1 0 008 5.5z"/></svg>';
 function key(b){var a=b.getAttribute('data-a');return a==='fplay'?'rec':a==='nplay'?'n'+b.dataset.id:'f'+b.dataset.i}
+function fmt(x){x=Math.max(0,Math.floor(x||0));return Math.floor(x/60)+':'+('0'+x%60).slice(-2)}
+function dur(){var a=PL.a;if(a&&isFinite(a.duration)&&a.duration>0)return a.duration;return PL.dd.s===S.audio?PL.dd.d:0}
+function prog(){var tr=document.querySelector('.ptrk');if(!tr)return;var a=PL.k==='rec'?PL.a:null,d=dur(),c=a?a.currentTime:0,p=d?Math.min(1,c/d):0;tr.style.setProperty('--p',(p*100)+'%');var t=document.querySelector('.ptime');if(t)t.textContent=a?fmt(c):(d?fmt(d):'0:00')}
 function sync(){document.querySelectorAll('[data-a="fplay"],[data-a="nplay"],[data-a="ftplay"]').forEach(function(b){var on=PL.k===key(b);b.classList.toggle('plon',on);b.setAttribute('aria-pressed',on?'true':'false');
- if(b.hasAttribute('data-pl')){b.querySelector('.pl-i').innerHTML=on?SQ_:PLY;b.querySelector('.pl-t').textContent=on?o('Stop','ຢຸດ'):o('Listen','ຟັງ')}
- else if(b.classList.contains('round')){if(b.__h==null)b.__h=b.innerHTML;b.innerHTML=on?SQ_:b.__h}})}
-function stop(){var a=PL.a;PL.a=null;PL.k=null;PL.s=null;if(a){a.onended=a.onerror=null;try{a.pause()}catch(e){}}try{speechSynthesis.cancel()}catch(e){}sync()}
-function play(src,k){if(!src)return;if(PL.k===k){stop();return}stop();var a=new Audio(src);PL.a=a;PL.k=k;PL.s=src;PL.v=S.tab+'/'+S.view;
- var end=function(){if(PL.a===a){PL.a=null;PL.k=null;PL.s=null;sync()}};a.onended=end;a.onerror=end;
- var p=a.play();if(p&&p.catch)p.catch(end);sync()}
+ if(b.hasAttribute('data-pl')){b.innerHTML=on?SQ_:PLY;b.setAttribute('aria-label',on?o('Stop','ຢຸດ'):o('Listen','ຟັງ'))}
+ else if(b.classList.contains('round')){if(b.__h==null)b.__h=b.innerHTML;b.innerHTML=on?SQ_:b.__h}});prog()}
+function stop(){var a=PL.a;PL.a=null;PL.k=null;PL.s=null;clearInterval(PL.iv);if(a){a.onended=a.onerror=null;try{a.pause()}catch(e){}}try{speechSynthesis.cancel()}catch(e){}sync()}
+function play(src,k,at){if(!src)return;if(PL.k===k&&at==null){stop();return}stop();var a=new Audio(src);PL.a=a;PL.k=k;PL.s=src;PL.v=S.tab+'/'+S.view;
+ var end=function(){if(PL.a===a){PL.a=null;PL.k=null;PL.s=null;clearInterval(PL.iv);sync()}};a.onended=end;a.onerror=end;
+ if(at!=null){var d=dur();if(d)try{a.currentTime=at*d}catch(e){}}
+ var p=a.play();if(p&&p.catch)p.catch(end);clearInterval(PL.iv);PL.iv=setInterval(prog,100);sync()}
 A.fplay=function(){play(S.audio,'rec')};
 A.nplay=function(d){var n=notes.filter(function(x){return x.id==d.id})[0];if(n&&n.audio)play(n.audio,'n'+d.id)};
 A.ftplay=function(d){try{play(FT.ans[+d.i],'f'+d.i)}catch(e){}};
 A.rstop=function(){var b=document.querySelector('.mic[data-a="srec"],.mic[data-a="sqrec"],.mic[data-a="ftrec"]');if(b)b.click()};
+document.addEventListener('click',function(e){var tr=e.target.closest('.ptrk');if(!tr||!S.audio)return;var r=tr.getBoundingClientRect(),x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+ if(PL.k==='rec'&&PL.a){var d=dur();if(d){try{PL.a.currentTime=x*d}catch(er){}prog()}}else play(S.audio,'rec',x)});
 var rt0=recToggle;recToggle=function(){if(!S.recording)stop();return rt0.apply(this,arguments)};
+function getDur(){if(!S.audio||PL.dd.s===S.audio)return;var src=S.audio;PL.dd={s:src,d:0};try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;fetch(src).then(function(r){return r.arrayBuffer()}).then(function(b){var c=new C();return c.decodeAudioData(b).then(function(x){try{c.close()}catch(e){}return x})}).then(function(x){if(PL.dd.s===src){PL.dd.d=x.duration;prog()}}).catch(function(){})}catch(e){}}
 function ctl(){document.querySelectorAll('[data-rctl]').forEach(function(e){e.remove()});
  var b=document.querySelector('.mic[data-a="srec"],.mic[data-a="sqrec"],.mic[data-a="ftrec"]');if(!b)return;var h='';
  if(S.recording){var p=!!S.paused;h='<div class="rctl" data-rctl="1"><span class="s" role="status"><span class="rdot'+(p?'':' on')+'"></span>'+(p?o('Paused','ຢຸດຊົ່ວຄາວ'):o('Recording\u2026','ກຳລັງບັນທຶກ\u2026'))+'</span><div class="row"><button class="chip" data-a="rpause">'+(p?o('Resume','ສືບຕໍ່'):o('Pause','ຢຸດຊົ່ວຄາວ'))+'</button><button class="chip on" data-a="rstop">'+o('Stop & listen','ຢຸດ ແລະ ຟັງ')+'</button></div></div>'}
- else if(S.audio){h='<div class="rctl" data-rctl="1"><div class="plr"><button class="plp" data-a="fplay" data-pl="1" aria-pressed="false"><span class="pl-i">'+PLY+'</span><span class="pl-t">'+o('Listen','ຟັງ')+'</span></button><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div><button class="chip" data-a="rdel">'+o('Delete and record again','ລຶບແລ້ວບັນທຶກໃໝ່')+'</button></div>'}
+ else if(S.audio){getDur();h='<div class="rctl" data-rctl="1"><div class="pbar"><button class="pbtn" data-a="fplay" data-pl="1" aria-pressed="false" aria-label="'+o('Listen','ຟັງ')+'">'+PLY+'</button><div class="ptrk" role="presentation"><span class="pth"></span></div><span class="ptime">0:00</span></div><button class="chip" data-a="rdel">'+o('Delete and record again','ລຶບແລ້ວບັນທຶກໃໝ່')+'</button></div>'}
  if(h)b.insertAdjacentHTML('afterend',h)}
 var r0=render;render=function(){r0.apply(this,arguments);try{
  if(PL.k&&(PL.v!==S.tab+'/'+S.view||(PL.k==='rec'&&S.audio!==PL.s)))stop();
