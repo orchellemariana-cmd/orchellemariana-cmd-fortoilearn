@@ -1084,7 +1084,7 @@ A.rdel=function(){if(S.recording)return;S.audio=null;S.msg='';S.paused=false;sp.
 var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
 Object.assign(T.en,{game:'Games'});Object.assign(T.lo,{game:'ເກມ'});
 P.game='M6 9h12a3 3 0 013 3v3a3 3 0 01-5 2l-1-2H9l-1 2a3 3 0 01-5-2v-3a3 3 0 013-3zM8 11v3M6.5 12.5h3M15 12h.01M17 13.5h.01';
-nav5=function(){var order=['home','study','practice','game','profile'],icn=['home','book','pen','game','user'],a=S.tab==='chat'?'game':S.tab,ix=order.indexOf(a),pv=window._np==null?ix:window._np;window._np=ix;setTimeout(function(){var l=document.querySelector('nav .lens');if(l){l.style.setProperty('--i',Math.max(ix,0));l.style.opacity=ix<0?0:1}},30);return '<nav class="g" aria-label="Main"><i class="lens" style="--i:'+Math.max(pv,0)+(ix<0?';opacity:0':'')+'"></i>'+order.map(function(k,j){return '<button data-a="tab" data-t="'+k+'" class="'+(a===k?'on':'')+'"'+(a===k?' aria-current="page"':'')+'>'+ic(icn[j],20)+t(k)+'</button>'}).join('')+'</nav>'};
+nav5=function(){var order=['home','study','practice','game','fr','profile'],icn=['home','book','pen','game','chat','user'],a=S.tab==='chat'?'game':S.tab,ix=order.indexOf(a),pv=window._np==null?ix:window._np;window._np=ix;setTimeout(function(){var l=document.querySelector('nav .lens');if(l){l.style.setProperty('--i',Math.max(ix,0));l.style.opacity=ix<0?0:1}},30);return '<nav class="g" aria-label="Main"><i class="lens" style="--i:'+Math.max(pv,0)+(ix<0?';opacity:0':'')+'"></i>'+order.map(function(k,j){return '<button data-a="tab" data-t="'+k+'" class="'+(a===k?'on':'')+'"'+(a===k?' aria-current="page"':'')+'>'+ic(icn[j],20)+t(k)+'</button>'}).join('')+'</nav>'};
 var G={},cA='';
 var BEE='<svg width="54" height="42" viewBox="0 0 54 42" aria-hidden="true"><ellipse class="xwg" cx="22" cy="10" rx="9" ry="6" fill="#fff" opacity=".8" stroke="#9DB0D3"/><ellipse class="xwg" cx="34" cy="10" rx="9" ry="6" fill="#fff" opacity=".8" stroke="#9DB0D3"/><ellipse cx="27" cy="24" rx="16" ry="11" fill="#F2B632"/><path d="M20 15v18M28 14v20M36 16v16" stroke="#2A1F0A" stroke-width="4" stroke-linecap="round"/><circle cx="42" cy="22" r="2" fill="#2A1F0A"/></svg>';
 var WAVE='<svg width="130" height="40" viewBox="0 0 130 40" aria-hidden="true">'+[0,1,2,3,4,5,6].map(function(i){return '<rect class="wb" x="'+(8+i*18)+'" y="6" width="8" height="28" rx="4" fill="var(--ac)" style="animation-delay:-'+(i*.13)+'s"/>'}).join('')+'</svg>';
@@ -1119,7 +1119,7 @@ return '<div class="g fc" style="cursor:default"><div style="font-size:40px;colo
 +'<div class="row"><button class="btn" style="flex:1" data-a="back">'+o('Games','ເກມ')+'</button><button class="btn pri" style="flex:1" data-a="gstart" data-m="'+G.m+'">'+o('Play again','ຫຼິ້ນອີກ')+'</button></div>'}
 function gameV(){var L=lo();cA=G.an||'';G.an='';G.cf=cA==='fin';
 if(S.view==='g'){var m=GM[G.m];return head(L?m[1]:m[0],1,L?m[0]:m[1])+(G.fin?vRes():bar()+(G.m==='bee'?vBee():G.m==='say'?vSay():G.m==='pairs'?vPairs():vChoice()))}
-return head(t('game'),0,L?'Games':'ເກມ')+'<div class="s">'+o('Play to learn. Each game uses your vocabulary and earns XP.','ຫຼິ້ນເພື່ອຮຽນ. ທຸກເກມໃຊ້ຄຳສັບຂອງເຈົ້າ ແລະ ໄດ້ XP.')+'</div><div class="grid">'+Object.keys(GM).map(function(k){var m=GM[k];return '<button class="g card" data-a="gstart" data-m="'+k+'"><span class="ic">'+ic(m[4])+'</span><span><b style="font-size:17px">'+(L?m[1]:m[0])+'</b><div class="s">'+(L?m[3]:m[2])+'</div></span></button>'}).join('')+'<button class="g card" data-a="gchat"><span class="ic">'+ic('chat')+'</span><span><b style="font-size:17px">'+o('Tutor Chat','ສົນທະນາກັບຄູ')+'</b><div class="s">'+o('Write and get fixes','ຂຽນ ແລ້ວຮັບການແກ້ໄຂ')+'</div></span></button></div>'}
+return head(t('game'),0,L?'Games':'ເກມ')+'<div class="s">'+o('Play to learn. Each game uses your vocabulary and earns XP.','ຫຼິ້ນເພື່ອຮຽນ. ທຸກເກມໃຊ້ຄຳສັບຂອງເຈົ້າ ແລະ ໄດ້ XP.')+'</div><div class="grid">'+Object.keys(GM).map(function(k){var m=GM[k];return '<button class="g card" data-a="gstart" data-m="'+k+'"><span class="ic">'+ic(m[4])+'</span><span><b style="font-size:17px">'+(L?m[1]:m[0])+'</b><div class="s">'+(L?m[3]:m[2])+'</div></span></button>'}).join('')+'</div>'}
 A.gstart=function(d){gnew(d.m)};A.gchat=function(){openV('chat','hub')};
 A.gsay=function(d){say(cur().w,+d.r||1)};
 A.gpick=function(d){if(G.pick>=0||G.fin||!G.o)return;G.pick=+d.k;var it=cur();if(G.o[G.pick].w===it.w){G.sc++;fx(1)}else{G.miss.push(it);fx(0)}if(G.m==='rush')setTimeout(function(){if(!G.fin&&S.tab==='game'&&S.view==='g'){A.gnext();render()}},550)};
@@ -1761,7 +1761,7 @@ nav button{font-size:10px!important;min-width:0;padding:0 1px}
 nav button span,nav button{overflow-wrap:anywhere}
 </style>
 <script>
-nav5=function(){var order=['home','study','practice','progress','game','profile'],icn=['home','book','pen','chart','game','user'],a=S.tab==='chat'?'game':S.tab,ix=order.indexOf(a),pv=window._np==null?ix:window._np;window._np=ix;setTimeout(function(){var l=document.querySelector('nav .lens');if(l){l.style.setProperty('--i',Math.max(ix,0));l.style.opacity=ix<0?0:1}},30);return '<nav class="g" aria-label="Main"><i class="lens" style="--i:'+Math.max(pv,0)+(ix<0?';opacity:0':'')+'"></i>'+order.map(function(k,j){return '<button data-a="tab" data-t="'+k+'" class="'+(a===k?'on':'')+'"'+(a===k?' aria-current="page"':'')+'>'+ic(icn[j],20)+t(k)+'</button>'}).join('')+'</nav>'};
+nav5=function(){var order=['home','study','practice','game','fr','profile'],icn=['home','book','pen','game','chat','user'],a=S.tab==='chat'?'game':S.tab,ix=order.indexOf(a),pv=window._np==null?ix:window._np;window._np=ix;setTimeout(function(){var l=document.querySelector('nav .lens');if(l){l.style.setProperty('--i',Math.max(ix,0));l.style.opacity=ix<0?0:1}},30);return '<nav class="g" aria-label="Main"><i class="lens" style="--i:'+Math.max(pv,0)+(ix<0?';opacity:0':'')+'"></i>'+order.map(function(k,j){return '<button data-a="tab" data-t="'+k+'" class="'+(a===k?'on':'')+'"'+(a===k?' aria-current="page"':'')+'>'+ic(icn[j],20)+t(k)+'</button>'}).join('')+'</nav>'};
 render();
 </script>
 
@@ -1785,6 +1785,78 @@ render();
 .fr img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid #fff;box-sizing:border-box}
 .fnm{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
+<script>
+/* ===== Friends chat: text, voice messages, voice calls (Supabase + WebRTC) ===== */
+(function(){
+var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
+Object.assign(T.en,{fr:'Chat'});Object.assign(T.lo,{fr:'ສົນທະນາ'});
+P.phone='M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z';
+P.send='M22 2L11 13M22 2l-7 20-4-9-9-4z';
+var F={list:[],names:{},peer:'',msgs:[],err:'',rec:null,pid:'',au:null,init:0,sc:0},C={st:''},SG={};
+var me=function(){return window.SBUID||''};
+var myName=function(){return (ld('name','')||'').trim().slice(0,20)||'Learner'};
+var pn=function(id){return F.names[id]||o('Friend','ໝູ່')};
+var mmss=function(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+('0'+s%60).slice(-2)};
+var box=function(x){return '<div class="g s" style="padding:16px 18px">'+x+'</div>'};
+function note(id,txt){var e=document.getElementById('fnote');if(e)e.remove();e=document.createElement('button');e.id='fnote';e.className='g';e.setAttribute('data-a','fopenx');e.setAttribute('data-i',id);e.style.cssText='position:fixed;z-index:60;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);padding:12px 16px;text-align:left;border-radius:18px';e.innerHTML='<b>'+esc(pn(id))+'</b><div class="s">'+esc(txt)+'</div>';document.body.appendChild(e);setTimeout(function(){e.remove()},4500)}
+function init(){if(F.init||!window.SB||!me())return;F.init=1;var id=me();
+SB.channel('dm-'+id).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm',filter:'b=eq.'+id},function(p){var m=p.new;if(S.tab==='fr'&&F.peer===m.a){F.msgs.push(m);F.sc=1;render()}else note(m.a,m.kind==='voice'?'🎤 '+o('Voice message','ຂໍ້ຄວາມສຽງ'):m.body)}).subscribe();
+SB.channel('u:'+id).on('broadcast',{event:'sig'},function(m){onSig(m.payload)}).subscribe()}
+setInterval(init,1500);
+function loadList(){if(!window.SB||!me())return;SB.from('leaderboard').select('user_id,name').neq('user_id',me()).order('xp',{ascending:false}).limit(50).then(function(r){if(!r.error){F.list=r.data||[];F.list.forEach(function(x){F.names[x.user_id]=x.name||F.names[x.user_id]})}render()})}
+function loadMsgs(){var a=me(),b=F.peer;SB.from('dm').select('*').or('and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')').order('created_at',{ascending:false}).limit(60).then(function(r){if(r.error){F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net'}else{F.err='';F.msgs=r.data.reverse()}F.sc=1;render()})}
+function send(kind,body,dur){if(!F.peer)return;SB.from('dm').insert({a:me(),b:F.peer,kind:kind,body:body,dur:dur||null}).select().single().then(function(r){if(r.error)F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net';else{F.err='';F.msgs.push(r.data)}F.sc=1;render()})}
+/* ---- views ---- */
+function frV(){var h;
+if(!window.SB||!me())return head(t('fr'))+box(o('Sign in with an account to chat with friends.','ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ ເພື່ອສົນທະນາກັບໝູ່.'));
+if(F.err==='setup')return head(t('fr'))+box(o('Chat is not set up on the server yet. Run chat_setup.sql in Supabase.','ຍັງບໍ່ໄດ້ຕັ້ງຄ່າແຊັດໃນເຊີບເວີ. ແລ່ນ chat_setup.sql ໃນ Supabase.'));
+if(!F.peer)return head(t('fr'))+'<div class="s">'+o('Pick a friend to message or call.','ເລືອກໝູ່ເພື່ອສົ່ງຂໍ້ຄວາມ ຫຼື ໂທ.')+'</div>'+(F.list.length?'<div class="g list">'+F.list.map(function(x){return '<button data-a="fopen" data-i="'+x.user_id+'" style="display:flex;align-items:center;gap:12px;text-align:left">'+face(0)+'<b style="flex:1">'+esc(x.name||'Learner')+'</b>'+ic('chat',20)+'</button>'}).join('')+'</div>':box(o('No friends yet. Learners who join the leaderboard appear here.','ຍັງບໍ່ມີໝູ່. ຜູ້ຮຽນທີ່ເຂົ້າຮ່ວມອັນດັບຈະສະແດງຢູ່ນີ້.')));
+var rec=F.rec,mine=me();
+return head(esc(pn(F.peer)),1)+'<div class="row sp" style="margin:4px 0 10px"><span class="s">'+(F.err==='net'?o('Could not send. Try again.','ສົ່ງບໍ່ໄດ້. ລອງໃໝ່.'):'')+'</span><button class="btn pri" data-a="fcall" style="display:flex;align-items:center;gap:8px">'+ic('phone',18)+o('Call','ໂທ')+'</button></div>'
++'<div style="display:flex;flex-direction:column;gap:8px">'+(F.msgs.length?F.msgs.map(function(m){var me_=m.a===mine,st=me_?'background:var(--ac);color:var(--on)':'background:var(--glass,rgba(128,128,128,.15));border:1px solid var(--bd)';
+return '<div style="display:flex;justify-content:'+(me_?'flex-end':'flex-start')+'"><div style="'+st+';max-width:78%;padding:10px 14px;border-radius:18px;word-break:break-word">'+(m.kind==='voice'?'<button data-a="fvp" data-i="'+m.id+'" style="display:flex;align-items:center;gap:10px;color:inherit;background:none;border:0;min-height:32px"><span style="font-size:18px">'+(F.pid==m.id?'■':'▶')+'</span><span>🎤 '+mmss(m.dur||0)+'</span></button>':esc(m.body))+'</div></div>'}).join(''):'<div class="s" style="text-align:center">'+o('Say hello 👋','ທັກທາຍເລີຍ 👋')+'</div>')+'</div><div style="height:76px"></div>'
++'<div class="comp g">'+(rec?'<span style="color:#e5484d;padding:0 6px">●</span><b id="ft" style="flex:1;padding:10px 0">0:00</b><button class="round" data-a="fcan" aria-label="Cancel">✕</button><button class="round" data-a="frec" aria-label="Send voice message">'+ic('send',20)+'</button>':'<input id="fi" placeholder="'+o('Message…','ຂໍ້ຄວາມ…')+'" aria-label="Message" style="flex:1;min-width:0;background:none;border:0;color:inherit;font:inherit;padding:10px;min-height:44px"><button class="round" data-a="frec" aria-label="Voice message">'+ic('mic',20)+'</button><button class="round" data-a="fsend" aria-label="Send">'+ic('send',20)+'</button>')+'</div>'}
+var r0=render;render=function(){r0();if(S.tab!=='fr')return;var v=$('#fi'),val=v?v.value:'',foc=v&&document.activeElement===v;document.documentElement.classList.remove('cloud');$('#app').innerHTML=frV()+nav5();var n=$('#fi');if(n){n.value=val;if(foc)n.focus()}if(F.sc&&F.peer){F.sc=0;scrollTo(0,document.body.scrollHeight)}};
+/* ---- actions ---- */
+var tb=A.tab;A.tab=function(d){tb(d);if(d.t==='fr'){F.peer='';F.err='';init();loadList()}};
+var bb=A.back;A.back=function(){if(S.tab==='fr'&&F.peer){stopRec(0);F.peer='';return}bb()};
+A.fopen=function(d){F.peer=d.i;F.msgs=[];F.err='';loadMsgs()};
+A.fopenx=function(d){var e=document.getElementById('fnote');if(e)e.remove();S.tab='fr';S.view='hub';F.peer=d.i;F.msgs=[];loadMsgs()};
+A.fsend=function(){var e=$('#fi'),v=e&&e.value.trim();if(!v)return;e.value='';send('text',v.slice(0,500))};
+document.addEventListener('keydown',function(e){if(e.target.id==='fi'&&e.key==='Enter'){e.preventDefault();A.fsend()}});
+function stopRec(send_){if(F.rec){F.rec.cancel=!send_;if(F.rec.mr.state!=='inactive')F.rec.mr.stop()}}
+A.frec=function(){if(F.rec){stopRec(1);return}
+if(!navigator.mediaDevices||!window.MediaRecorder){F.err='net';return}
+navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){var ch=[],mr=new MediaRecorder(st),t0=Date.now(),r=F.rec={mr:mr,cancel:false};
+mr.ondataavailable=function(e){ch.push(e.data)};
+mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});clearInterval(F.iv);F.rec=null;var sec=Math.round((Date.now()-t0)/1000);if(!r.cancel&&sec>=1){var fr=new FileReader();fr.onload=function(){send('voice',fr.result,sec)};fr.readAsDataURL(new Blob(ch,{type:mr.mimeType}))}else render()};
+mr.start();F.iv=setInterval(function(){var s=(Date.now()-t0)/1000,e=$('#ft');if(e)e.textContent=mmss(s);if(s>=60)stopRec(1)},250);render()}).catch(function(){F.err='net';render()})};
+A.fcan=function(){stopRec(0)};
+A.fvp=function(d){if(F.au){F.au.pause();F.au=null}if(F.pid==d.i){F.pid='';return}var m=F.msgs.filter(function(x){return x.id==d.i})[0];if(!m)return;F.pid=d.i;var a=F.au=new Audio(m.body);a.onended=function(){F.pid='';render()};a.play().catch(function(){F.pid='';render()})};
+/* ---- calls ---- */
+function sig(to,p){var c=SG[to];if(!c){c=SG[to]={c:SB.channel('u:'+to)};c.p=new Promise(function(res){c.c.subscribe(function(s){if(s==='SUBSCRIBED')res()})})}p.from=me();return c.p.then(function(){return c.c.send({type:'broadcast',event:'sig',payload:p})})}
+function mkpc(){var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+pc.ontrack=function(e){if(!C.au){C.au=new Audio();C.au.autoplay=true;document.body.appendChild(C.au)}C.au.srcObject=e.streams[0];C.au.play().catch(function(){})};
+pc.onconnectionstatechange=function(){var s=pc.connectionState;if(s==='connected'&&C.st!=='live'){C.st='live';C.t0=Date.now();C.iv=setInterval(ui,1000);ui()}else if(s==='failed'||s==='closed')end(0)};return pc}
+function gathered(pc){return new Promise(function(res){if(pc.iceGatheringState==='complete')return res();pc.addEventListener('icegatheringstatechange',function(){if(pc.iceGatheringState==='complete')res()});setTimeout(res,3500)})}
+function mic(){return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}).then(function(st){C.ls=st;var pc=C.pc=mkpc();st.getTracks().forEach(function(t){pc.addTrack(t,st)});return pc})}
+function end(snd){if(C.peer&&snd)sig(C.peer,{t:'bye'});clearInterval(C.iv);clearTimeout(C.to);if(C.pc)try{C.pc.close()}catch(e){}if(C.ls)C.ls.getTracks().forEach(function(t){t.stop()});if(C.au)C.au.remove();C={st:''};ui()}
+function ui(){var e=document.getElementById('fcall');if(!C.st){if(e)e.remove();return}if(!e){e=document.createElement('div');e.id='fcall';e.style.cssText='position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center';document.body.appendChild(e)}
+var s=C.st==='in'?o('Incoming voice call','ມີສາຍໂທເຂົ້າ'):C.st==='out'?o('Calling…','ກຳລັງໂທ…'):C.st==='live'?mmss((Date.now()-C.t0)/1000):o('Connecting…','ກຳລັງເຊື່ອມຕໍ່…');
+var b=function(a,c,i,l){return '<button data-a="'+a+'" aria-label="'+l+'" style="width:68px;height:68px;border-radius:50%;border:0;background:'+c+';color:#fff;display:flex;align-items:center;justify-content:center">'+i+'</button>'};
+e.innerHTML='<div style="width:96px;height:96px;border-radius:50%;background:var(--ac);color:var(--on);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700">'+esc((C.name||'?').charAt(0).toUpperCase())+'</div><h1 style="margin:0">'+esc(C.name)+'</h1><div class="s">'+s+'</div><div class="row" style="gap:28px;justify-content:center;margin-top:24px">'+(C.st==='in'?b('fdec','#d92d3f',ic('phone',28),o('Decline','ປະຕິເສດ'))+b('facc','#1f9d55',ic('phone',28),o('Accept','ຮັບສາຍ')):b('fmute',C.mute?'#888':'#444','<span style="font-size:26px">'+(C.mute?'🔇':'🎙')+'</span>',o('Mute','ປິດສຽງ'))+b('fend','#d92d3f',ic('phone',28),o('End','ວາງສາຍ')))+'</div>'}
+function onSig(p){if(!p)return;
+if(p.t==='offer'){if(C.st){sig(p.from,{t:'bye'});return}C.st='in';C.peer=p.from;C.name=p.name||pn(p.from);C.offer=p.sdp;F.names[p.from]=C.name;if(navigator.vibrate)navigator.vibrate([300,150,300]);C.to=setTimeout(function(){if(C.st==='in')end(1)},40000);ui()}
+else if(p.t==='answer'&&C.st==='out'&&p.from===C.peer){C.st='conn';C.pc.setRemoteDescription(p.sdp).catch(function(){end(1)});ui()}
+else if(p.t==='bye'&&p.from===C.peer)end(0)}
+A.fcall=function(){if(C.st||!F.peer)return;C.peer=F.peer;C.name=pn(F.peer);C.st='out';ui();
+mic().then(function(pc){return pc.createOffer().then(function(x){return pc.setLocalDescription(x)}).then(function(){return gathered(pc)}).then(function(){return sig(C.peer,{t:'offer',name:myName(),sdp:pc.localDescription})})}).then(function(){C.to=setTimeout(function(){if(C.st==='out')end(1)},40000)}).catch(function(){end(0);alert(o('Could not start the call. Allow microphone access.','ເລີ່ມການໂທບໍ່ໄດ້. ອະນຸຍາດໄມໂຄຣໂຟນ.'))})};
+A.facc=function(){if(C.st!=='in')return;clearTimeout(C.to);C.st='conn';ui();
+mic().then(function(pc){return pc.setRemoteDescription(C.offer).then(function(){return pc.createAnswer()}).then(function(x){return pc.setLocalDescription(x)}).then(function(){return gathered(pc)}).then(function(){return sig(C.peer,{t:'answer',sdp:pc.localDescription})})}).catch(function(){end(1)})};
+A.fdec=function(){end(1)};A.fend=function(){end(1)};
+A.fmute=function(){C.mute=!C.mute;if(C.ls)C.ls.getAudioTracks().forEach(function(t){t.enabled=!C.mute});ui()};
+})();
+</script>
 </body></html>
 
 <style>
