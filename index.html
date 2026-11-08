@@ -1238,48 +1238,58 @@ var ss1=shScore;shScore=function(){ss1();if(sh.res&&sh.res.pct!=null)sfx(sh.res.
 (function(){
 var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
 var GCID=(window.APP_CONFIG&&APP_CONFIG.googleClientId)||'';
-var HSB=!!(window.APP_CONFIG&&APP_CONFIG.supabaseUrl&&APP_CONFIG.supabaseKey);var AU=window.AU={m:'in',e:'',n:'',p:'',show:0,err:'',busy:0,t:HSB?'ph':'em',pn:'',cc:'+856',ps:'num',oc:'',full:'',cd:0},GP=null;
+var HSB=!!(window.APP_CONFIG&&APP_CONFIG.supabaseUrl&&APP_CONFIG.supabaseKey),REC=/type=recovery/.test(location.hash);var AU=window.AU={m:'in',e:'',n:'',p:'',p2:'',show:0,err:'',busy:0,t:HSB?'ph':'em',pm:'in',pn:'',cc:'+856',ps:'num',oc:'',full:'',cd:0,rec:0},GP=null;
 var gv=function(i,k){var e=$('#'+i);if(e)AU[k]=e.value};
-var keep=function(){gv('ae','e');gv('ap','p');gv('an','n');gv('aph','pn');gv('apc','cc');gv('aotp','oc')};
+var keep=function(){gv('ae','e');gv('ap','p');gv('ap2','p2');gv('an','n');gv('aph','pn');gv('apc','cc');gv('aotp','oc')};
 function hpw(pw,salt){var enc=new TextEncoder();if(window.crypto&&crypto.subtle)return crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){return crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:100000,hash:'SHA-256'},k,256)}).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return('0'+x.toString(16)).slice(-2)}).join('')});var h=5381,s=salt+pw;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Promise.resolve('f'+(h>>>0).toString(16))}
 var rnd=function(){var a=new Uint8Array(12);try{crypto.getRandomValues(a)}catch(e){for(var i=0;i<12;i++)a[i]=Math.random()*256}return Array.from(a).map(function(x){return('0'+x.toString(16)).slice(-2)}).join('')};
 function enter(email,name,first){try{if(first)Object.keys(localStorage).forEach(function(k){if(GK.indexOf(k)<0&&k.indexOf('u:')!==0)localStorage.setItem('u:'+email+':'+k,localStorage.getItem(k))});var nk='u:'+email+':name';if(name&&localStorage.getItem(nk)==null)localStorage.setItem(nk,JSON.stringify(name));localStorage.setItem('sess',email);localStorage.removeItem('guest')}catch(e){}location.reload()}
 var fail=function(m){AU.err=m;AU.busy=0;render()};
 var G_SVG='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
-function authV(){var up=AU.m==='up',first=!AU.seen,ph=HSB&&AU.t==='ph',otp=ph&&AU.ps==='otp';AU.seen=1;
+function authV(){var up=AU.m==='up',first=!AU.seen,rec=!!AU.rec,ph=HSB&&AU.t==='ph'&&!rec,pm=AU.pm,ps=AU.ps;AU.seen=1;
 var P={u:'<path d="M20 21v-1a6 6 0 00-6-6h-4a6 6 0 00-6 6v1"/><circle cx="12" cy="7.5" r="4"/>',m:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',l:'<rect x="4" y="10.5" width="16" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>',e:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',x:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',p:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',s:'<path d="M12 3l8 3v6c0 5-3.4 8-8 9-4.6-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/>'};
 var ic=function(k,s){return '<svg class="aic" width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[k]+'</svg>'};
 var fld=function(id,k,pl,type,val,ac,extra){return '<label class="afi" for="'+id+'">'+ic(k)+'<input id="'+id+'" type="'+type+'" value="'+esc(val)+'" placeholder="'+pl+'" aria-label="'+pl+'" autocomplete="'+ac+'" autocapitalize="none" spellcheck="false">'+(extra||'')+'</label>'};
 var eye='<button type="button" class="aeye" data-a="apw" aria-label="'+(AU.show?o('Hide password','ເຊື່ອງລະຫັດຜ່ານ'):o('Show password','ສະແດງລະຫັດຜ່ານ'))+'">'+ic(AU.show?'x':'e',20)+'</button>';
 var arrow='<b class="aarr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></b>';
 var sub=function(act,lb){return '<button class="asub"'+(AU.busy?' disabled':'')+' data-a="'+act+'"><span>'+(AU.busy?o('Please wait…','ກະລຸນາລໍຖ້າ…'):lb)+'</span>'+(AU.busy?'<i class="asp"></i>':arrow)+'</button>'};
+var seg=function(act,mode){return '<div class="aseg '+(mode==='up'?'up':'in')+(first?'':' sw')+'" role="tablist"><i></i>'+[['in',o('Sign in','ເຂົ້າສູ່ລະບົບ')],['up',o('Sign up','ລົງທະບຽນ')]].map(function(x){return '<button data-a="'+act+'" data-m="'+x[0]+'" role="tab" aria-selected="'+(mode===x[0])+'" class="'+(mode===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div>'};
+var dots=function(n){var L=[o('Phone','ເບີໂທ'),o('Code','ລະຫັດ'),o('Password','ລະຫັດຜ່ານ')];return '<div class="adots">'+L.map(function(t,i){return '<span class="'+(i<n?'on':'')+(i===n-1?' cur':'')+'"><i></i><em>'+t+'</em></span>'}).join('')+'</div>'};
+var head=function(k,t,d){return '<div class="aotph">'+ic(k,22)+'<div><b>'+t+'</b><div class="s">'+d+'</div></div></div>'};
 var CC=[['🇱🇦','+856'],['🇹🇭','+66'],['🇻🇳','+84'],['🇰🇭','+855'],['🇲🇲','+95'],['🇨🇳','+86'],['🇰🇷','+82'],['🇯🇵','+81'],['🇸🇬','+65'],['🇦🇺','+61'],['🇬🇧','+44'],['🇺🇸','+1']];
+var phoneRow='<div class="aph"><label class="afi apcc" for="apc"><select id="apc" aria-label="'+o('Country code','ລະຫັດປະເທດ')+'">'+CC.map(function(c){return '<option value="'+c[1]+'"'+(AU.cc===c[1]?' selected':'')+'>'+c[0]+' '+c[1]+'</option>'}).join('')+'</select></label>'+fld('aph','p',o('Phone number','ເບີໂທລະສັບ'),'tel',AU.pn,'tel-national')+'</div>';
+var pt=AU.show?'text':'password';
 var msg=(AU.err?'<div class="no aerr" role="alert">'+AU.err+'</div>':'')+(AU.info?'<div class="ok ainfo" role="status">'+AU.info+'</div>':'');
-var body;
-if(otp){body='<div class="astep"><div class="aotph">'+ic('s',22)+'<div><b>'+o('Enter the 6-digit code','ໃສ່ລະຫັດ 6 ຕົວເລກ')+'</b><div class="s">'+o('We sent an SMS to ','ພວກເຮົາສົ່ງ SMS ຫາ ')+'<span dir="ltr">'+esc(AU.full)+'</span></div></div></div>'
+var hint6='<div class="s ahint">'+o('At least 6 characters','ຢ່າງໜ້ອຍ 6 ຕົວ')+'</div>';
+var body,guard=!rec&&(!ph||(ps==='num'&&pm!=='fp'));
+if(rec||(ph&&ps==='pw')){body=(rec?'':dots(3))+'<div class="astep">'+head('l',(rec||pm==='fp')?o('Set a new password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):o('Create your password','ສ້າງລະຫັດຜ່ານຂອງເຈົ້າ'),rec?o('Choose a new password for your account.','ເລືອກລະຫັດຜ່ານໃໝ່ສຳລັບບັນຊີຂອງເຈົ້າ.'):o('Phone confirmed. Use it with this password to sign in next time.','ຢືນຢັນເບີແລ້ວ. ໃຊ້ເບີນີ້ກັບລະຫັດຜ່ານນີ້ເພື່ອເຂົ້າສູ່ລະບົບຄັ້ງຕໍ່ໄປ.'))
++fld('ap','l',o('Password','ລະຫັດຜ່ານ'),pt,AU.p,'new-password',eye)+fld('ap2','l',o('Confirm password','ຢືນຢັນລະຫັດຜ່ານ'),pt,AU.p2,'new-password')+hint6+'</div>'
++msg+sub('apwsave',(pm==='up'&&!rec)?o('Create account','ສ້າງບັນຊີ'):o('Save password','ບັນທຶກລະຫັດຜ່ານ'))}
+else if(ph&&ps==='otp'){body=dots(2)+'<div class="astep">'+head('s',o('Enter the 6-digit code','ໃສ່ລະຫັດ 6 ຕົວເລກ'),o('We sent an SMS to ','ພວກເຮົາສົ່ງ SMS ຫາ ')+'<span dir="ltr">'+esc(AU.full)+'</span>')
 +'<label class="afi aotpw" for="aotp"><input id="aotp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="'+esc(AU.oc)+'" placeholder="······" aria-label="'+o('6-digit code','ລະຫັດ 6 ຕົວເລກ')+'" autocomplete="one-time-code"></label></div>'
 +msg+sub('averify',o('Verify','ຢືນຢັນ'))
 +'<div class="alnks"><button class="alnk" id="arsd" data-a="aresend"'+(AU.cd>0?' disabled':'')+'>'+(AU.cd>0?o('Resend in ','ສົ່ງໃໝ່ໃນ ')+AU.cd+'s':o('Resend code','ສົ່ງລະຫັດໃໝ່'))+'</button><button class="alnk" data-a="apback">'+o('Change number','ປ່ຽນເບີ')+'</button></div>'}
-else if(ph){body='<div class="aph"><label class="afi apcc" for="apc"><select id="apc" aria-label="'+o('Country code','ລະຫັດປະເທດ')+'">'+CC.map(function(c){return '<option value="'+c[1]+'"'+(AU.cc===c[1]?' selected':'')+'>'+c[0]+' '+c[1]+'</option>'}).join('')+'</select></label>'
-+fld('aph','p',o('Phone number','ເບີໂທລະສັບ'),'tel',AU.pn,'tel-national')+'</div>'
-+'<div class="s ahint">'+o('We will text you a 6-digit code. New here? Your account is created automatically.','ພວກເຮົາຈະສົ່ງລະຫັດ 6 ຕົວເລກທາງ SMS. ຄົນໃໝ່? ບັນຊີຈະຖືກສ້າງໃຫ້ອັດຕະໂນມັດ.')+'</div>'
-+msg+sub('aphsend',o('Send code','ສົ່ງລະຫັດ'))}
-else{body='<div class="aseg '+(up?'up':'in')+(first?'':' sw')+'" role="tablist"><i></i>'+[['in',o('Sign in','ເຂົ້າສູ່ລະບົບ')],['up',o('Sign up','ສະໝັກສະມາຊິກ')]].map(function(x){return '<button data-a="am" data-m="'+x[0]+'" role="tab" aria-selected="'+(AU.m===x[0])+'" class="'+(AU.m===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div>'
+else if(ph&&pm==='fp'){body=dots(1)+head('p',o('Reset password','ຕັ້ງລະຫັດຜ່ານໃໝ່'),o('Enter your account phone number. We will text you a code.','ໃສ່ເບີໂທຂອງບັນຊີ. ພວກເຮົາຈະສົ່ງລະຫັດທາງ SMS.'))+phoneRow+msg+sub('aphsend',o('Send code','ສົ່ງລະຫັດ'))
++'<div class="alnks"><button class="alnk" data-a="apbk">'+o('Back to sign in','ກັບຄືນເຂົ້າສູ່ລະບົບ')+'</button></div>'}
+else if(ph&&pm==='up'){body=seg('apm','up')+dots(1)+'<div class="anm">'+fld('an','u',o('Your name','ຊື່ຂອງເຈົ້າ'),'text',AU.n,'name')+'</div>'+phoneRow
++'<div class="s ahint">'+o('We will text a 6-digit code to confirm your number, then you create a password.','ພວກເຮົາຈະສົ່ງລະຫັດ 6 ຕົວເລກເພື່ອຢືນຢັນເບີ ແລ້ວເຈົ້າສ້າງລະຫັດຜ່ານ.')+'</div>'+msg+sub('aphsend',o('Send code','ສົ່ງລະຫັດ'))}
+else if(ph){body=seg('apm','in')+phoneRow+fld('ap','l',o('Password','ລະຫັດຜ່ານ'),pt,AU.p,'current-password',eye)
++'<div class="aforg"><button class="alnk" data-a="afp">'+o('Forgot password?','ລືມລະຫັດຜ່ານ?')+'</button></div>'+msg+sub('aplogin',o('Sign in','ເຂົ້າສູ່ລະບົບ'))}
+else{body=seg('am',AU.m)
 +(up?'<div class="anm">'+fld('an','u',o('Your name','ຊື່ຂອງເຈົ້າ'),'text',AU.n,'name')+'</div>':'')
 +fld('ae','m',o('Email','ອີເມວ'),'email',AU.e,'email')
-+fld('ap','l',o('Password','ລະຫັດຜ່ານ'),AU.show?'text':'password',AU.p,up?'new-password':'current-password',eye)
-+(up?'<div class="s ahint">'+o('At least 6 characters','ຢ່າງໜ້ອຍ 6 ຕົວ')+'</div>':'')
++fld('ap','l',o('Password','ລະຫັດຜ່ານ'),pt,AU.p,up?'new-password':'current-password',eye)
++(up?hint6:(HSB?'<div class="aforg"><button class="alnk" data-a="aefp">'+o('Forgot password?','ລືມລະຫັດຜ່ານ?')+'</button></div>':''))
 +msg+sub('asubmit',up?o('Create account','ສ້າງບັນຊີ'):o('Sign in','ເຂົ້າສູ່ລະບົບ'))}
 return '<div class="au'+(first?' ain':'')+'">'
 +'<div class="alang"><button data-a="lang" data-l="lo" class="'+(lo()?'on':'')+'">ລາວ</button><button data-a="lang" data-l="en" class="'+(lo()?'':'on')+'">EN</button></div>'
 +'<div class="ahero"><svg class="awr" width="110" height="100" viewBox="0 0 110 100" aria-hidden="true"><path d="M0 8C38 12 78 36 108 90C68 74 30 80 0 100Z" fill="#B3263E"/></svg></div>'
 +'<div class="acard">'
-+'<button class="agbtn" data-a="agoogle">'+G_SVG+'<span>'+o('Continue with Google','ສືບຕໍ່ດ້ວຍ Google')+'</span></button>'
-+'<div class="aor">'+(ph?o('or use your phone number','ຫຼື ໃຊ້ເບີໂທລະສັບ'):o('or use email','ຫຼື ໃຊ້ອີເມວ'))+'</div>'
++(guard?'<button class="agbtn" data-a="agoogle">'+G_SVG+'<span>'+o('Continue with Google','ສືບຕໍ່ດ້ວຍ Google')+'</span></button><div class="aor">'+(ph?o('or use your phone number','ຫຼື ໃຊ້ເບີໂທລະສັບ'):o('or use email','ຫຼື ໃຊ້ອີເມວ'))+'</div>':'')
 +body
-+(HSB&&!otp?'<button class="alnk amth" data-a="at" data-t="'+(ph?'em':'ph')+'">'+(ph?o('Use email instead','ໃຊ້ອີເມວແທນ'):o('Use phone number instead','ໃຊ້ເບີໂທລະສັບແທນ'))+'</button>':'')
++(HSB&&guard?'<button class="alnk amth" data-a="at" data-t="'+(ph?'em':'ph')+'">'+(ph?o('Use email instead','ໃຊ້ອີເມວແທນ'):o('Use phone number instead','ໃຊ້ເບີໂທລະສັບແທນ'))+'</button>':'')
 +'</div>'
-+'<button class="agst" data-a="aguest">'+o('Continue as guest','ສືບຕໍ່ໂດຍບໍ່ມີບັນຊີ')+'</button>'
++(rec?'':'<button class="agst" data-a="aguest">'+o('Continue as guest','ສືບຕໍ່ໂດຍບໍ່ມີບັນຊີ')+'</button>')
 +'<div class="s" style="text-align:center">'+o('Accounts and progress are saved on this device.','ບັນຊີ ແລະ ຄວາມຄືບໜ້າ ຖືກບັນທຶກໄວ້ໃນອຸປະກອນນີ້.')+'</div></div>'}
 function loadG(){return GP||(GP=new Promise(function(res,rej){var s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=1;s.onload=res;s.onerror=rej;document.head.appendChild(s)}))}
 A.am=function(d){keep();AU.m=d.m;AU.err=''};A.apw=function(){keep();AU.show=!AU.show};
@@ -1297,7 +1307,7 @@ if(!(window.google&&google.accounts&&google.accounts.oauth2)){AU.err=o('Google i
 var bad=function(){fail(o('Google sign-in did not finish. Please try again.','ການເຂົ້າສູ່ລະບົບດ້ວຍ Google ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.'))};
 google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid email profile',callback:function(r){if(!r||!r.access_token)return bad();fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}}).then(function(x){return x.json()}).then(function(u){if(!u.email)throw 0;var e=u.email.toLowerCase(),ac=ld('acc',{}),first=!Object.keys(ac).length;if(!ac[e]){ac[e]={n:u.name||e.split('@')[0],g:1};sv('acc',ac)}enter(e,ac[e].n,first)}).catch(bad)},error_callback:bad}).requestAccessToken()};
 A.pout=function(){try{localStorage.removeItem('sess');localStorage.removeItem('guest')}catch(e){}location.reload()};
-document.addEventListener('keydown',function(e){if(S.tab==='auth'&&e.key==='Enter'&&/^a[enp]$/.test(e.target.id||'')){A.asubmit();render()}});
+document.addEventListener('keydown',function(e){if(S.tab==='auth'&&e.key==='Enter'&&/^a[enp]$/.test(e.target.id||'')&&!(HSB&&(AU.t==='ph'||AU.rec))){A.asubmit();render()}});
 var pf=profV;profV=function(){var h=pf();if(!UID)return h;var u=ld('acc',{})[UID]||{};return h+'<div class="g" style="padding:14px 18px"><div class="s">'+o('Signed in as','ເຂົ້າສູ່ລະບົບດ້ວຍ')+(u.g?' · Google':'')+'</div><b>'+esc(UID)+'</b></div>'};
 var rdA=render;render=function(){if(S.tab==='auth'){document.documentElement.lang=lo()?'lo':'en';document.documentElement.classList.remove('cloud');$('#app').innerHTML=authV();if(GCID)loadG().catch(function(){});return}rdA()};
 if(!UID&&!localStorage.getItem('guest')){S.tab='auth'}
@@ -1315,7 +1325,7 @@ if(m.indexOf('password')>=0)return o('Password must be at least 6 characters.','
 if(m.indexOf('rate')>=0||m.indexOf('too many')>=0)return o('Too many tries. Please wait a minute.','ລອງຫຼາຍເກີນໄປ. ລໍຖ້າໜຶ່ງນາທີ.');
 return o('Could not reach the server. Check your internet and try again.','ເຊື່ອມຕໍ່ເຊີບເວີບໍ່ໄດ້. ກວດອິນເຕີເນັດ ແລ້ວລອງໃໝ່.')}
 function sbEnter(u,nm){var em=(u.email||'').toLowerCase(),ac=ld('acc',{}),first=!Object.keys(ac).length,md=u.user_metadata||{},name=nm||md.name||md.full_name||em.split('@')[0];ac[em]={n:name,sb:1};sv1('acc',ac);enter(em,name,first)}
-function sbEnterPhone(u){var k='+'+String(u.phone||'').replace(/^\+/,''),ac=ld('acc',{}),first=!Object.keys(ac).length,md=u.user_metadata||{},name=md.name||o('Learner','ຜູ້ຮຽນ');ac[k]={n:name,sb:1,ph:1};sv1('acc',ac);enter(k,name,first)}
+function sbEnterPhone(u,nm){var k='+'+String(u.phone||'').replace(/^\+/,''),ac=ld('acc',{}),first=!Object.keys(ac).length,md=u.user_metadata||{},name=nm||md.name||o('Learner','ຜູ້ຮຽນ');ac[k]={n:name,sb:1,ph:1};sv1('acc',ac);enter(k,name,first)}
 function collect(){var d={};SYK.forEach(function(k){var v=ld(k,null);if(v==null)return;if(k==='notes'&&Array.isArray(v))v=v.map(function(n){var c=Object.assign({},n);delete c.audio;return c});var j=JSON.stringify(v);if(j.length>200000)return;d[k]=v});return d}
 function push(){if(!SB||!SBUID||!SYNCON)return Promise.resolve();SYS='sync';var ts=new Date().toISOString();return SB.from('progress').upsert({user_id:SBUID,data:collect(),updated_at:ts}).then(function(r){if(r.error)throw r.error;try{localStorage.setItem('sbts:'+UID,ts)}catch(e){}SYS='ok'}).catch(function(){SYS='err'})}
 function merge(rem,rts){var last='';try{last=localStorage.getItem('sbts:'+UID)||''}catch(e){}var newer=rts>last,ch=0;
@@ -1341,31 +1351,52 @@ if(up&&(!r.data.session||(u&&u.identities&&!u.identities.length))){if(u&&u.ident
 sbEnter(u,nm)}).catch(function(){fail(sbMsg(null))})};
 A.agoogle=function(){AU.err='';AU.info='';loadSB().then(function(sb){return sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href.split('#')[0].split('?')[0]}})}).then(function(r){if(r&&r.error)fail(sbMsg(r.error))}).catch(function(){fail(sbMsg(null))})};
 A.at=function(d){keep();AU.t=d.t;AU.err='';AU.info=''};
-var cdT=0;function cdStart(){clearInterval(cdT);AU.cd=30;cdT=setInterval(function(){AU.cd=Math.max(0,AU.cd-1);var b=document.getElementById('arsd');if(b){b.disabled=AU.cd>0;b.textContent=AU.cd>0?o('Resend in ','ສົ່ງໃໝ່ໃນ ')+AU.cd+'s':o('Resend code','ສົ່ງລະຫັດໃໝ່')}if(!AU.cd)clearInterval(cdT)},1000)}
-function phMsg(e,v){var m=((e&&e.message)||'').toLowerCase(),c=((e&&e.code)||'').toLowerCase();
-if(c==='phone_provider_disabled'||m.indexOf('provider')>=0||m.indexOf('twilio')>=0||m.indexOf('sms')>=0&&m.indexOf('rate')<0&&!v)return o('SMS sign-in is not set up yet. The app owner must enable Phone login in Supabase.','ຍັງບໍ່ໄດ້ຕັ້ງຄ່າການເຂົ້າສູ່ລະບົບດ້ວຍ SMS. ເຈົ້າຂອງແອັບຕ້ອງເປີດ Phone ໃນ Supabase.');
-if(c.indexOf('rate')>=0||m.indexOf('rate')>=0||m.indexOf('too many')>=0||m.indexOf('seconds')>=0)return o('Too many tries. Please wait a minute.','ລອງຫຼາຍເກີນໄປ. ລໍຖ້າໜຶ່ງນາທີ.');
-if(v)return o('Wrong or expired code. Try again or resend.','ລະຫັດບໍ່ຖືກ ຫຼື ໝົດອາຍຸ. ລອງໃໝ່ ຫຼື ສົ່ງໃໝ່.');
+A.apm=function(d){keep();AU.pm=d.m;AU.ps='num';AU.err='';AU.info=''};
+A.afp=function(){keep();AU.pm='fp';AU.ps='num';AU.err='';AU.info=''};
+var cdT=0;
+A.apbk=function(){keep();clearInterval(cdT);AU.cd=0;AU.pm='in';AU.ps='num';AU.p='';AU.p2='';AU.oc='';AU.err='';AU.info=''};
+function cdStart(){clearInterval(cdT);AU.cd=30;cdT=setInterval(function(){AU.cd=Math.max(0,AU.cd-1);var b=document.getElementById('arsd');if(b){b.disabled=AU.cd>0;b.textContent=AU.cd>0?o('Resend in ','ສົ່ງໃໝ່ໃນ ')+AU.cd+'s':o('Resend code','ສົ່ງລະຫັດໃໝ່')}if(!AU.cd)clearInterval(cdT)},1000)}
+function normPh(){var raw=(AU.pn||'').trim(),dg=raw.replace(/\D/g,''),full;if(raw.charAt(0)==='+')full='+'+dg;else{dg=dg.replace(/^0+/,'');var cd=AU.cc.slice(1);if(dg.indexOf(cd)===0&&dg.length>cd.length+7)dg=dg.slice(cd.length);full=AU.cc+dg}return /^\+\d{8,15}$/.test(full)?full:''}
+function phMsg(e,k){var m=((e&&e.message)||'').toLowerCase(),c=((e&&e.code)||'').toLowerCase();
+if(k==='l'&&(m.indexOf('invalid login')>=0||c==='invalid_credentials'))return o('Wrong phone number or password. Forgot it? Tap Forgot password.','ເບີໂທ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກ. ລືມບໍ? ແຕະ ລືມລະຫັດຜ່ານ.');
+if(c.indexOf('rate')>=0||m.indexOf('rate')>=0||m.indexOf('too many')>=0||m.indexOf('security purposes')>=0)return o('Too many tries. Please wait a minute.','ລອງຫຼາຍເກີນໄປ. ລໍຖ້າໜຶ່ງນາທີ.');
+if(c==='phone_provider_disabled'||m.indexOf('provider')>=0||m.indexOf('twilio')>=0)return o('SMS is not set up yet. The app owner must enable Phone login in Supabase.','ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ SMS. ເຈົ້າຂອງແອັບຕ້ອງເປີດ Phone ໃນ Supabase.');
+if(k==='f'&&(m.indexOf('not allowed')>=0||m.indexOf('not found')>=0||c==='otp_disabled'))return o('No account found with this phone number.','ບໍ່ພົບບັນຊີທີ່ໃຊ້ເບີໂທນີ້.');
+if(k==='v')return o('Wrong or expired code. Try again or resend.','ລະຫັດບໍ່ຖືກ ຫຼື ໝົດອາຍຸ. ລອງໃໝ່ ຫຼື ສົ່ງໃໝ່.');
 if(m.indexOf('invalid')>=0&&m.indexOf('phone')>=0)return o('That phone number does not look right.','ເບີໂທລະສັບບໍ່ຖືກຕ້ອງ.');
 return sbMsg(e)}
-function phSend(again){keep();AU.err='';AU.info='';var raw=(AU.pn||'').trim(),dg=raw.replace(/\D/g,''),full;
-if(!again){if(raw.charAt(0)==='+')full='+'+dg;else{dg=dg.replace(/^0+/,'');var cd=AU.cc.slice(1);if(dg.indexOf(cd)===0&&dg.length>cd.length+7)dg=dg.slice(cd.length);full=AU.cc+dg}
-if(!/^\+\d{8,15}$/.test(full))return fail(o('Please enter a valid phone number.','ກະລຸນາໃສ່ເບີໂທລະສັບທີ່ຖືກຕ້ອງ.'));AU.full=full}
-else full=AU.full;
+function phSend(again){keep();AU.err='';AU.info='';
+if(!again){if(AU.pm==='up'&&!AU.n.trim())return fail(o('Please enter your name.','ກະລຸນາໃສ່ຊື່ຂອງເຈົ້າ.'));var full=normPh();if(!full)return fail(o('Please enter a valid phone number.','ກະລຸນາໃສ່ເບີໂທລະສັບທີ່ຖືກຕ້ອງ.'));AU.full=full}
 AU.busy=1;render();
-loadSB().then(function(sb){return sb.auth.signInWithOtp({phone:full,options:{shouldCreateUser:true,channel:'sms'}})}).then(function(r){if(r.error)return fail(phMsg(r.error));AU.busy=0;AU.ps='otp';AU.oc='';AU.err='';AU.info=again?o('A new code was sent.','ສົ່ງລະຫັດໃໝ່ແລ້ວ.'):'';cdStart();render();setTimeout(function(){var x=document.getElementById('aotp');if(x)x.focus()},80)}).catch(function(){fail(sbMsg(null))})}
+loadSB().then(function(sb){return sb.auth.signInWithOtp({phone:AU.full,options:{shouldCreateUser:AU.pm==='up',channel:'sms'}})}).then(function(r){if(r.error)return fail(phMsg(r.error,AU.pm==='fp'?'f':''));AU.busy=0;AU.ps='otp';AU.oc='';AU.err='';AU.info=again?o('A new code was sent.','ສົ່ງລະຫັດໃໝ່ແລ້ວ.'):'';cdStart();render();setTimeout(function(){var x=document.getElementById('aotp');if(x)x.focus()},80)}).catch(function(){fail(sbMsg(null))})}
 A.aphsend=function(){if(!AU.busy)phSend(false)};
 A.aresend=function(){if(!AU.busy&&AU.cd<=0)phSend(true)};
 A.apback=function(){keep();clearInterval(cdT);AU.cd=0;AU.ps='num';AU.oc='';AU.err='';AU.info=''};
 A.averify=function(){if(AU.busy)return;keep();AU.err='';AU.info='';var code=(AU.oc||'').replace(/\D/g,'');
 if(code.length<6)return fail(o('Enter the 6-digit code.','ໃສ່ລະຫັດ 6 ຕົວເລກ.'));
 AU.busy=1;render();
-loadSB().then(function(sb){return sb.auth.verifyOtp({phone:AU.full,token:code,type:'sms'})}).then(function(r){if(r.error){AU.oc='';return fail(phMsg(r.error,1))}var u=r.data&&r.data.user;if(!u)return fail(phMsg(null,1));clearInterval(cdT);sbEnterPhone(u)}).catch(function(){fail(sbMsg(null))})};
+loadSB().then(function(sb){return sb.auth.verifyOtp({phone:AU.full,token:code,type:'sms'})}).then(function(r){if(r.error){AU.oc='';return fail(phMsg(r.error,'v'))}clearInterval(cdT);AU.busy=0;AU.ps='pw';AU.p='';AU.p2='';AU.show=0;AU.err='';AU.info='';render();setTimeout(function(){var x=document.getElementById('ap');if(x)x.focus()},80)}).catch(function(){fail(sbMsg(null))})};
+A.apwsave=function(){if(AU.busy)return;keep();AU.err='';AU.info='';
+if((AU.p||'').length<6)return fail(o('Password must be at least 6 characters.','ລະຫັດຜ່ານຕ້ອງມີຢ່າງໜ້ອຍ 6 ຕົວ.'));
+if(AU.p!==AU.p2)return fail(o('Passwords do not match.','ລະຫັດຜ່ານບໍ່ກົງກັນ.'));
+AU.busy=1;render();var nm=AU.n.trim(),upd={password:AU.p};if(AU.pm==='up'&&!AU.rec&&nm)upd.data={name:nm};
+loadSB().then(function(sb){return sb.auth.updateUser(upd)}).then(function(r){if(r.error){var m=(r.error.message||'').toLowerCase();return fail(m.indexOf('different')>=0||m.indexOf('same')>=0?o('Choose a different password.','ເລືອກລະຫັດຜ່ານທີ່ແຕກຕ່າງ.'):sbMsg(r.error))}var u=r.data&&r.data.user;if(!u)return fail(sbMsg(null));AU.rec=0;try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}if(u.phone&&!u.email)sbEnterPhone(u,nm);else sbEnter(u,nm)}).catch(function(){fail(sbMsg(null))})};
+A.aplogin=function(){if(AU.busy)return;keep();AU.err='';AU.info='';var full=normPh();
+if(!full)return fail(o('Please enter a valid phone number.','ກະລຸນາໃສ່ເບີໂທລະສັບທີ່ຖືກຕ້ອງ.'));
+if(!AU.p)return fail(o('Please enter your password.','ກະລຸນາໃສ່ລະຫັດຜ່ານ.'));
+AU.busy=1;render();
+loadSB().then(function(sb){return sb.auth.signInWithPassword({phone:full,password:AU.p})}).then(function(r){if(r.error)return fail(phMsg(r.error,'l'));sbEnterPhone(r.data.user)}).catch(function(){fail(sbMsg(null))})};
+A.aefp=function(){if(AU.busy)return;keep();AU.err='';AU.info='';var e=AU.e.trim().toLowerCase();
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e))return fail(o('Enter your email above, then tap Forgot password.','ໃສ່ອີເມວຂ້າງເທິງກ່ອນ ແລ້ວແຕະ ລືມລະຫັດຜ່ານ.'));
+AU.busy=1;render();
+loadSB().then(function(sb){return sb.auth.resetPasswordForEmail(e,{redirectTo:location.href.split('#')[0].split('?')[0]})}).then(function(r){if(r.error)return fail(sbMsg(r.error));AU.busy=0;AU.info=o('Reset link sent. Check your email.','ສົ່ງລິ້ງຕັ້ງລະຫັດໃໝ່ແລ້ວ. ກວດອີເມວ.');render()}).catch(function(){fail(sbMsg(null))})};
 document.addEventListener('input',function(e){if(S.tab==='auth'&&e.target.id==='aotp'){var v=e.target.value.replace(/\D/g,'').slice(0,6);if(v!==e.target.value)e.target.value=v;AU.oc=v;if(v.length===6&&!AU.busy)A.averify()}});
-document.addEventListener('keydown',function(e){if(S.tab==='auth'&&e.key==='Enter'){if(e.target.id==='aph')A.aphsend();else if(e.target.id==='aotp')A.averify()}});
+document.addEventListener('keydown',function(e){if(S.tab!=='auth'||e.key!=='Enter'||!(HSB&&(AU.t==='ph'||AU.rec)))return;var id=e.target.id,f=function(x){var n=document.getElementById(x);if(n)n.focus()};
+if(id==='aotp')A.averify();else if(id==='ap2')A.apwsave();else if(id==='ap')AU.rec||AU.ps==='pw'?f('ap2'):A.aplogin();else if(id==='aph')AU.pm==='in'?f('ap'):A.aphsend();else if(id==='an')f('aph')});
 var po1=A.pout;A.pout=function(){Promise.resolve(SB&&SB.auth.signOut()).catch(function(){}).then(po1)};
 var pf2=profV;profV=function(){var h=pf2();if(!UID)return h;var u=ld('acc',{})[UID]||{};if(!u.sb)return h;return h+'<div class="s" style="text-align:center">'+(SYS==='ok'?'☁ '+o('Progress saved to your account','ບັນທຶກຄວາມຄືບໜ້າໃສ່ບັນຊີແລ້ວ'):SYS==='err'?o('Offline — will sync when connected','ອອບລາຍ — ຈະຊິງຄ໌ເມື່ອມີອິນເຕີເນັດ'):'☁ …')+'</div>'};
 loadSB().then(function(sb){return sb.auth.getSession()}).then(function(r){var ses=r&&r.data&&r.data.session;
+if(REC){if(ses&&ses.user){AU.rec=1}else{AU.err=o('This reset link has expired. Request a new one.','ລິ້ງນີ້ໝົດອາຍຸແລ້ວ. ກະລຸນາຂໍໃໝ່.')}S.tab='auth';render();return}
 if(ses&&ses.user){var em=(ses.user.email||'').toLowerCase();if(!em&&ses.user.phone){var pk='+'+String(ses.user.phone).replace(/^\+/,'');if(pk!==UID){sbEnterPhone(ses.user);return}sbSync(ses.user);return}if(em&&em!==UID){sbEnter(ses.user);return}sbSync(ses.user)}
 else if(UID&&(ld('acc',{})[UID]||{}).sb){try{localStorage.removeItem('sess')}catch(e){}location.reload()}}).catch(function(){})}
 
@@ -2297,6 +2328,17 @@ body:has(.au){background:#FDF6EA}
 .alnk:disabled{color:var(--cmut);font-weight:600}
 .alnk:not(:disabled):active{background:var(--csoft)}
 .amth{align-self:center;margin-top:-2px}
+.adots{display:flex;gap:8px}
+.adots span{flex:1;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--cmut)}
+.adots i{display:block;position:relative;height:5px;border-radius:3px;background:var(--csoft);overflow:hidden}
+.adots .on i:after{content:"";position:absolute;inset:0;border-radius:3px;background:linear-gradient(90deg,#F0405F,#C8102E);transform-origin:left;animation:afill .5s cubic-bezier(.2,.9,.3,1.1) both}
+.adots em{font-style:normal}
+.adots .cur{color:#C8102E;font-weight:700}
+:root[data-theme="dark"] .adots .cur{color:#F0647A}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .adots .cur{color:#F0647A}}
+@keyframes afill{from{transform:scaleX(0)}}
+.aforg{display:flex;justify-content:flex-end;margin-top:-6px}
+.aforg .alnk{min-height:36px;padding:0 8px;font-size:14px}
 @media(prefers-reduced-motion:reduce){.au,.au *,.au:before,.au:after{animation:none!important;transition:none!important}}
 </style>
 <style>
