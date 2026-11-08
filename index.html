@@ -1290,6 +1290,37 @@ if(window.lbPush)window.lbPush();lbFetch()}
 var sbSync0=sbSync;sbSync=function(user){sbSync0(user);try{lbInit(user)}catch(e){}};
 var lbseg0=A.lbseg;A.lbseg=function(d){lbseg0(d);if(d&&d.v==='1')lbFetch()};
 setInterval(function(){if(!document.hidden&&S.tab==='progress'&&S.lbv)lbFetch()},15000);
+
+/* ===== Follow notifications: tell someone when you follow them ===== */
+var fwo=function(a,b){return S.lang==='lo'?b:a};
+function fwBanner(id,title,body,go,auto){var e=document.getElementById(id);if(e)e.remove();e=document.createElement('div');e.id=id;e.setAttribute('role','status');
+ e.style.cssText='position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);max-width:456px;margin:0 auto;z-index:99999;padding:14px 16px;border-radius:18px;background:var(--gl);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 28px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:8px';
+ e.innerHTML='<b style="font-size:16px">'+esc(title)+'</b><div style="font-size:15px;line-height:1.5">'+esc(body)+'</div>'+(go?'<div class="row" style="gap:8px"><button class="btn pri" style="flex:1" data-a="fwgo">'+fwo('View','ເບິ່ງ')+'</button><button class="btn" style="flex:1" data-a="fwx">'+fwo('Close','ປິດ')+'</button></div>':'');
+ document.body.appendChild(e);if(auto)setTimeout(function(){if(e.parentNode)e.remove()},auto)}
+A.fwgo=function(){var e=document.getElementById('fwtoast');if(e)e.remove();S.tab='progress';S.lbv=true;render()};
+A.fwx=function(){var e=document.getElementById('fwtoast');if(e)e.remove()};
+function fwSys(title,body){try{if('Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification(title,{body:body,tag:'ielts-follow'})}catch(e){}}
+function fwSend(id,name){if(!SB||!LB.id||!id||id===LB.id)return;
+ SB.from('follows').upsert({follower_id:LB.id,followee_id:id,follower_name:nm()},{onConflict:'follower_id,followee_id',ignoreDuplicates:true}).then(function(r){
+  if(r.error)throw r.error;
+  fwBanner('fwok',fwo('Following','ກຳລັງຕິດຕາມ'),fwo('You followed '+name+'. They have been notified.','ທ່ານຕິດຕາມ '+name+' ແລ້ວ. ເຂົາເຈົ້າໄດ້ຮັບການແຈ້ງເຕືອນແລ້ວ.'),0,2800)
+ }).catch(function(){})}
+var fwA=A.fol;A.fol=function(d){var was=(ld('fol',[])||[]).indexOf(d.i)>=0;fwA(d);
+ if(!was&&(ld('fol',[])||[]).indexOf(d.i)>=0){var row=(LB.rows||[]).filter(function(r){return r.id===d.i})[0];fwSend(d.i,(row&&row.name)||'Learner')}};
+var fwBusy=false;
+function fwPoll(){if(!SB||!LB.id||fwBusy||document.hidden)return;
+ var seen=ld('fwseen',null);
+ if(!seen){sv('fwseen',new Date().toISOString());return}
+ fwBusy=true;
+ SB.from('follows').select('follower_id,follower_name,created_at').eq('followee_id',LB.id).gt('created_at',seen).order('created_at',{ascending:true}).limit(20).then(function(r){
+  fwBusy=false;if(r.error||!r.data||!r.data.length)return;
+  sv('fwseen',r.data[r.data.length-1].created_at);
+  var names=r.data.map(function(x){return String(x.follower_name||'Learner').slice(0,20)}),first=names[0],more=names.length-1;
+  var who=more>0?first+(S.lang==='lo'?' ແລະ ອີກ '+more+' ຄົນ':' and '+more+' other'+(more>1?'s':'')):first;
+  var title=fwo('New follower','ຜູ້ຕິດຕາມໃໝ່'),body=who+fwo(' started following you',' ເລີ່ມຕິດຕາມທ່ານ');
+  fwBanner('fwtoast',title,body,1);fwSys(title,body);try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(e){}
+ }).catch(function(){fwBusy=false})}
+setInterval(fwPoll,20000);document.addEventListener('visibilitychange',function(){if(!document.hidden)fwPoll()});setTimeout(fwPoll,3000);
 }
 
 render();
