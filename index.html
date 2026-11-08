@@ -2115,7 +2115,7 @@ document.addEventListener('visibilitychange',function(){if(document.hidden&&VP.a
 var DN={};
 function sig(to,p){var c=SG[to];if(c&&c.c.state!=='joined'&&c.c.state!=='joining'){try{sb().removeChannel(c.c)}catch(e){}c=SG[to]=null}if(!c){c=SG[to]={c:sb().channel('u:'+to)};c.p=new Promise(function(res,rej){c.c.subscribe(function(s){if(s==='SUBSCRIBED')res();else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){delete SG[to];rej(new Error(s))}})})}p.from=me();return c.p.then(function(){return c.c.send({type:'broadcast',event:'sig',payload:p})})}
 /* Paste your own TURN server here for the most reliable calls, e.g. [{urls:'turn:YOUR_HOST:443?transport=tcp',username:'USER',credential:'PASS'}] */
-var ICE_EXTRA=[];
+var ICE_EXTRA=[{urls:'stun:stun.relay.metered.ca:80'},{urls:['turn:global.relay.metered.ca:80','turn:global.relay.metered.ca:80?transport=tcp','turn:global.relay.metered.ca:443','turns:global.relay.metered.ca:443?transport=tcp'],username:'d7b3eee657e3489c593985b4',credential:'0q2YlVp4F9ZbM5vL'}];
 var ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:global.stun.twilio.com:3478']}];
 /* TURN via Metered (free): create an app at metered.ca, then paste the two values below.
    TURN_APP e.g. 'myapp' (from myapp.metered.live)  ·  TURN_KEY = your API key */
