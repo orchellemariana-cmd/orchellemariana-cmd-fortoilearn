@@ -1304,9 +1304,12 @@ function fwSend(id,name){if(!SB||!LB.id||!id||id===LB.id)return;
  SB.from('follows').upsert({follower_id:LB.id,followee_id:id,follower_name:nm()},{onConflict:'follower_id,followee_id',ignoreDuplicates:true}).then(function(r){
   if(r.error)throw r.error;
   fwBanner('fwok',fwo('Following','ກຳລັງຕິດຕາມ'),fwo('You followed '+name+'. They have been notified.','ທ່ານຕິດຕາມ '+name+' ແລ້ວ. ເຂົາເຈົ້າໄດ້ຮັບການແຈ້ງເຕືອນແລ້ວ.'),0,2800)
- }).catch(function(){})}
+ }).catch(function(e){fwBanner('fwok',fwo('Followed, but not notified','ຕິດຕາມແລ້ວ ແຕ່ບໍ່ໄດ້ແຈ້ງ'),String((e&&e.message)||e||'Error').slice(0,140),0,6000)})}
+function fwUnsend(id){if(!SB||!LB.id||!id)return;SB.from('follows').delete().eq('follower_id',LB.id).eq('followee_id',id).then(function(){},function(){})}
 var fwA=A.fol;A.fol=function(d){var was=(ld('fol',[])||[]).indexOf(d.i)>=0;fwA(d);
- if(!was&&(ld('fol',[])||[]).indexOf(d.i)>=0){var row=(LB.rows||[]).filter(function(r){return r.id===d.i})[0];fwSend(d.i,(row&&row.name)||'Learner')}};
+ var now=(ld('fol',[])||[]).indexOf(d.i)>=0;
+ if(!was&&now){var row=(LB.rows||[]).filter(function(r){return r.id===d.i})[0];fwSend(d.i,(row&&row.name)||'Learner')}
+ else if(was&&!now)fwUnsend(d.i)};
 var fwBusy=false;
 function fwPoll(){if(!SB||!LB.id||fwBusy||document.hidden)return;
  var seen=ld('fwseen',null);
