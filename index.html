@@ -1793,7 +1793,7 @@ Object.assign(T.en,{fr:'Chat'});Object.assign(T.lo,{fr:'ສົນທະນາ'})
 P.phone='M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z';
 P.send='M22 2L11 13M22 2l-7 20-4-9-9-4z';
 var F={list:[],names:{},peer:'',msgs:[],err:'',rec:null,pid:'',au:null,init:0,sc:0},C={st:''},SG={};
-var me=function(){return window.SBUID||''};
+var me=function(){return window.SBUID||(window.LB&&LB.id)||''};
 var myName=function(){return (ld('name','')||'').trim().slice(0,20)||'Learner'};
 var pn=function(id){return F.names[id]||o('Friend','ໝູ່')};
 var mmss=function(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+('0'+s%60).slice(-2)};
@@ -1804,8 +1804,8 @@ SB.channel('dm-'+id).on('postgres_changes',{event:'INSERT',schema:'public',table
 SB.channel('u:'+id).on('broadcast',{event:'sig'},function(m){onSig(m.payload)}).subscribe()}
 setInterval(init,1500);
 function loadList(){if(!window.SB||!me())return;SB.from('leaderboard').select('user_id,name').neq('user_id',me()).order('xp',{ascending:false}).limit(50).then(function(r){if(!r.error){F.list=r.data||[];F.list.forEach(function(x){F.names[x.user_id]=x.name||F.names[x.user_id]})}render()})}
-function loadMsgs(){var a=me(),b=F.peer;SB.from('dm').select('*').or('and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')').order('created_at',{ascending:false}).limit(60).then(function(r){if(r.error){F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net'}else{F.err='';F.msgs=r.data.reverse()}F.sc=1;render()})}
-function send(kind,body,dur){if(!F.peer)return;SB.from('dm').insert({a:me(),b:F.peer,kind:kind,body:body,dur:dur||null}).select().single().then(function(r){if(r.error)F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net';else{F.err='';F.msgs.push(r.data)}F.sc=1;render()})}
+function loadMsgs(){var a=me(),b=F.peer;if(!window.SB||!a){F.err='net';F.sc=1;render();return}SB.from('dm').select('*').or('and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')').order('created_at',{ascending:false}).limit(60).then(function(r){if(r.error){F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net'}else{F.err='';F.msgs=r.data.reverse()}F.sc=1;render()})}
+function send(kind,body,dur){if(!F.peer)return;if(!window.SB||!me()){F.err='net';render();return}SB.from('dm').insert({a:me(),b:F.peer,kind:kind,body:body,dur:dur||null}).select().single().then(function(r){if(r.error)F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net';else{F.err='';F.msgs.push(r.data)}F.sc=1;render()})}
 /* ---- views ---- */
 function frV(){var h;
 if(!window.SB||!me())return head(t('fr'))+box(o('Sign in with an account to chat with friends.','ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ ເພື່ອສົນທະນາກັບໝູ່.'));
