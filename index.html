@@ -2037,7 +2037,7 @@ function fxParse(b){var m=/^\[\[(img|file|stk|gift)\]\]([\s\S]*)$/.exec(String(b
 function lbl(p){var x=fxParse(p);if(!x)return p;return x.t==='img'?'📷 '+o('Photo','ຮູບ'):x.t==='file'?'📎 '+(x.v.split('|')[0]||o('File','ໄຟລ໌')):x.t==='stk'?'😊 '+o('Sticker','ສະຕິກເກີ'):'🎁 '+o('Gift','ຂອງຂວັນ')}
 function fxSize(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'}
 function fxStk(i){var k=STK[i];return '<span class="fx-s"><span class="fx-se">'+k[0]+'</span><span class="fx-st">'+esc(k[1])+'</span></span>'}
-function fxCls(m){var x=fxParse(m.body);return x?(x.t==='img'?' med':x.t==='stk'?' stkm':''):''}
+function fxCls(m){var x=fxParse(m.body);return x?(x.t==='img'?' fxmed':x.t==='stk'?' stkm':''):''}
 function fxBody(m){var x=fxParse(m.body);if(!x)return null;
 if(x.t==='img')return OKI.test(x.v)?'<img class="fx-img" data-a="fimg" data-i="'+m.id+'" src="'+x.v+'" alt="'+o('Photo','ຮູບ')+'">':'📷';
 if(x.t==='file'){var p=x.v.split('|'),nm=p[0]||'file',sz=+p[1]||0,u=p.slice(2).join('|');return '<a class="fx-file"'+(OKD.test(u)?' href="'+u+'" download="'+esc(nm)+'"':'')+'><span class="fx-fi">'+FSVG(FMENU[1][3],24)+'</span><span class="fx-fn"><b>'+esc(nm)+'</b><i>'+fxSize(sz)+'</i></span></a>'}
@@ -2076,7 +2076,7 @@ var cs4=document.createElement('style');cs4.textContent='.fx-sk{display:flex;ali
 +'.fx-st{font-size:15px;font-weight:800;color:#E4405C;text-align:center;-webkit-text-stroke:3px #fff;paint-order:stroke fill;line-height:1.1}'
 +'.fx-cb.stkm,.fx-crow.me .fx-cb.stkm{background:none;box-shadow:none;padding:2px 4px}.fx-cb.stkm .fx-se{font-size:76px;display:block;animation:fxbounce 2.6s ease-in-out infinite}.fx-cb.stkm .fx-st{font-size:19px}'
 +'@keyframes fxbounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}'
-+'.fx-cb.med{padding:5px;border-radius:24px;overflow:hidden}.fx-img,#fr .fx-cb img.fx-img,.fx-cb.med img.fx-img{display:block!important;width:min(240px,62vw)!important;height:auto!important;max-width:100%!important;max-height:320px!important;object-fit:cover!important;border-radius:19px!important;border:0!important;aspect-ratio:auto}'
++'.fx-cb.fxmed{padding:5px;border-radius:24px;overflow:hidden}.fx-img,#fr .fx-cb img.fx-img,.fx-cb.fxmed img.fx-img{display:block!important;width:min(240px,62vw)!important;height:auto!important;max-width:none!important;max-height:320px!important;object-fit:cover!important;border-radius:19px!important;border:0!important;aspect-ratio:auto}'
 +'.fx-file{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:190px}.fx-fi{width:44px;height:44px;border-radius:14px;background:var(--csoft);color:var(--ac);display:flex;align-items:center;justify-content:center;flex:none}.fx-crow.me .fx-fi{background:var(--ccard)}'
 +'.fx-fn{display:flex;flex-direction:column;min-width:0}.fx-fn b{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}.fx-fn i{font-style:normal;font-size:13px;color:#8C7A72}'
 +'.fx-gift{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 14px;text-align:center}.fx-gift .fx-ge{font-size:54px;animation:fxbounce 2.6s ease-in-out infinite}.fx-gift b{font-size:18px}.fx-gift i{font-style:normal;font-size:13px;color:#8C7A72}'
