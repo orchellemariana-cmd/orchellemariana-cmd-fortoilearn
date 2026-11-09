@@ -1310,7 +1310,7 @@ return '<div class="wm">'+(m==='psay'?'<div class="psyt"><button class="round" d
 function res(an){var s=nstar(),sv='';
 for(var i=0;i<3;i++)sv+='<span class="'+(i<s&&an==='fin'?'xstp':'')+'" style="display:inline-block;animation-delay:'+(.15+i*.25)+'s">'+STAR2(i<s)+'</span>';
 var m=G.miss.length?'<div class="wm-rv"><h3>'+L('Words to review','ຄຳທີ່ຄວນທົບທວນ')+'</h3>'+G.miss.slice(0,8).map(function(w){return '<div class="r"><b>'+esc(w.w)+'</b><span>'+esc(w.lo)+'</span></div>'}).join('')+'<button class="wm-b" data-a="gsave">'+(G.saved?L('Saved','ບັນທຶກແລ້ວ'):L('Save to My notes','ບັນທຶກໃສ່ບັນທຶກຂອງຂ້ອຍ'))+'</button></div>':'';
-return '<div class="wm">'+hd()+'<section class="wm-rs"><div class="tr"><img src="'+AS().trophy+'" alt=""></div><div class="wm-st">'+sv+'</div><div class="wm-sn">'+(G.m==='pairs'?G.mv+' '+o('moves','ຄັ້ງ'):G.sc+(G.m==='rush'?'':'/10'))+'</div><span class="wm-xp">+'+(G.m==='psay'?G.sc*10:10)+' XP</span></section>'+m
+return '<div class="wm">'+hd()+'<section class="wm-rs"><div class="tr"><img src="'+AS().trophy+'" alt=""></div><div class="wm-st">'+sv+'</div><div class="wm-sn">'+(G.m==='pairs'?G.mv+' '+o('moves','ຄັ້ງ'):G.sc+(G.m==='rush'?'':'/10'))+'</div><span class="wm-xp">+'+(G.m==='psay'?G.sc*10:10)+' XP</span></section>'+(G.over?'<div class="wm-fb no"><b>'+L('Game over','ຈົບເກມ')+'</b><div>'+L('You said','ເຈົ້າເວົ້າ')+' “'+esc(G.over.said)+'” · '+L('the word was','ຄຳແມ່ນ')+' <b>'+esc(G.over.w)+'</b> ('+esc(G.over.lo)+')</div></div>':'')+m
 +'<div class="wm-bt"><button class="wm-b" data-a="back">'+L('Chapters','ບົດ')+'</button><button class="wm-b pri" data-a="gstart" data-m="'+G.m+'">'+L('Play again','ຫຼິ້ນອີກ')+'</button></div></div>'}
 
 /* ===== Picture Say engine: pictures float up and fade; mic is always on ===== */
@@ -1325,12 +1325,13 @@ function psyInit(){if(G.ps)psyStop();if(!document.getElementById('psy-css')){var
  G.ps={total:10,spawned:0,res:0,live:[],last:0,raf:0,sr:null,denied:0,seq:0,lanes:[26,50,74],lastLane:-1,shown:''};G.n=0;G.hint=0;G.o=[];
  G.ps.wait=1;G.ps.raf=requestAnimationFrame(psyTick)}
 function psySR(){var P=G.ps;if(!P||P.stop||!SR||P.sr||P.denied||P.nomic)return;try{var r=new SR();r.lang='en-GB';r.continuous=true;r.interimResults=true;r.maxAlternatives=3;
- r.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++)for(var j=0;j<e.results[i].length;j++)psyHear(e.results[i][j].transcript)};
+ var used={};r.onresult=function(e){if(!psyAct()||P.wait)return;for(var i=e.resultIndex;i<e.results.length;i++){if(used[i])continue;var rs=e.results[i],hit=0,txs=[];for(var j=0;j<rs.length;j++){txs.push(rs[j].transcript);if(psyHear(rs[j].transcript))hit=1}if(hit){used[i]=1;continue}if(rs.isFinal){used[i]=1;psyWrong(txs[0])}}};
  r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed'))P.denied=1};
  r.onend=function(){if(P.sr===r)P.sr=null;if(psyAct()&&G.ps===P&&!P.denied)setTimeout(function(){if(psyAct()&&G.ps===P)psySR()},250)};
  P.sr=r;r.start()}catch(e){P.sr=null}}
-function psyHear(tx){var P=G.ps;if(!psyAct()||!tx)return;var toks=String(tx).toLowerCase().split(/[^a-z]+/).filter(Boolean),all=psyNz(tx);
- P.live.forEach(function(it){if(it.s!=='go')return;var w=it.d.w;if(all===w||toks.some(function(t){return t===w||simi(t,w)>=.8}))psyOk(it)})}
+function psyHear(tx){var P=G.ps;if(!psyAct()||!tx)return false;var toks=String(tx).toLowerCase().split(/[^a-z]+/).filter(Boolean),all=psyNz(tx);
+ var hit=false;P.live.forEach(function(it){if(it.s!=='go')return;var w=it.d.w;if(all===w||toks.some(function(t){return t===w||simi(t,w)>=.8})){psyOk(it);hit=true}});return hit}
+function psyWrong(tx){var P=G.ps;if(!psyAct()||P.nomic||!tx||!/[a-z]/i.test(tx))return;var it=P.live.filter(function(x){return x.s==='go'})[0];if(!it)return;G.miss.push(it.d);G.over={said:String(tx).trim(),w:it.d.w,lo:it.d.lo};psyStop();fin();render()}
 function psyOk(it){if(it.s!=='go')return;it.s='ok';it.t1=Date.now();G.ps.lastEnd=it.t1;it.y=it.cy||0;G.sc++;G.ps.res++;try{bump('psay')}catch(e){}try{sfx(1)}catch(e){}}
 A.psytap=function(d){if(!psyTap())return;var it=G.ps&&G.ps.live.filter(function(x){return String(x.id)===String(d.id)})[0];if(it)psyOk(it)};
 function psySpawn(now){var P=G.ps,d=G.items[P.spawned%G.items.length],lane=0,k;for(k=0;k<3;k++){lane=(P.lastLane+1+k)%3;if(!P.live.some(function(x){return x.s==='go'&&x.lane===lane}))break}
