@@ -2246,7 +2246,7 @@ FSVG=function(p,z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 24 24"
 function fxParse(b){var m=/^\[\[(img|file|stk|gift)\]\]([\s\S]*)$/.exec(String(b||''));return m?{t:m[1],v:m[2]}:null}
 function lbl(p){var x=fxParse(p);if(!x)return p;return x.t==='img'?'📷 '+o('Photo','ຮູບ'):x.t==='file'?'📎 '+(x.v.split('|')[0]||o('File','ໄຟລ໌')):x.t==='stk'?'😊 '+o('Sticker','ສະຕິກເກີ'):'🎁 '+o('Gift','ຂອງຂວັນ')}
 function fxSize(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'}
-function fxStk(i){var k=STK[i];if(k[2])return '<span class="fx-s"><img class="fx-si" src="'+((window.GXS||{})[k[2]]||'')+'" alt=""><span class="fx-st">'+esc(typeof o==='function'?o(k[1],k[3]||k[1]):k[1])+'</span></span>';return '<span class="fx-s"><span class="fx-se">'+k[0]+'</span><span class="fx-st">'+esc(k[1])+'</span></span>'}
+function fxStk(i){var k=STK[i];if(k[2])return '<span class="fx-s"><img class="fx-si" src="'+((window.GXS||{})[k[2]]||'')+'" alt=""><span class="fx-st">'+esc(typeof o==='function'?o(k[1],k[3]||k[1]):k[1])+'</span></span>';return '<span class="fx-s"><span class="fx-se'+(k[4]?' sa-'+k[4]:'')+'">'+k[0]+'</span><span class="fx-st">'+esc(typeof o==='function'?o(k[1],k[3]||k[1]):k[1])+'</span></span>'}
 function fxCls(m){var x=fxParse(m.body);return x?(x.t==='img'?' fxmed':x.t==='stk'?' stkm':''):''}
 function fxBody(m){var x=fxParse(m.body);if(!x)return null;
 if(x.t==='img')return OKI.test(x.v)?'<img class="fx-img" data-a="fimg" data-i="'+m.id+'" src="'+x.v+'" alt="'+o('Photo','ຮູບ')+'">':'📷';
@@ -2254,7 +2254,7 @@ if(x.t==='file'){var p=x.v.split('|'),nm=p[0]||'file',sz=+p[1]||0,u=p.slice(2).j
 if(x.t==='stk')return STK[+x.v]?fxStk(+x.v):'😊';
 var g=GFT[+x.v];return g?'<div class="fx-gift"><span class="fx-ge">'+g[0]+'</span><b>'+o(g[1],g[2])+'</b><i>'+(m.a===me()?o('You sent a gift','ເຈົ້າສົ່ງຂອງຂວັນ'):o('sent you a gift','ສົ່ງຂອງຂວັນໃຫ້ເຈົ້າ'))+'</i></div>':'🎁'}
 function fxPop(){
-if(F.sheet){var st=F.sheet==='stk',arr=st?STK:GFT;return '<div class="fx-ov dim" data-a="fclose"></div><div class="fx-sheet"><div class="fx-sh"><b>'+(st?o('Stickers','ສະຕິກເກີ'):o('Send a gift','ສົ່ງຂອງຂວັນ'))+'</b><button class="round" data-a="fclose" aria-label="Close">'+ic('x',18)+'</button></div><div class="fx-grid">'+arr.map(function(x,i){return '<button class="fx-gi" data-a="'+(st?'fstk':'fgift')+'" data-k="'+i+'">'+(st?fxStk(i):'<span class="fx-ge">'+x[0]+'</span><span class="fx-gl">'+o(x[1],x[2])+'</span>')+'</button>'}).join('')+'</div></div>'}
+if(F.sheet){var st=F.sheet==='stk',arr=st?STK:GFT;return '<div class="fx-ov dim" data-a="fclose"></div><div class="fx-sheet"><div class="fx-sh"><b>'+(st?o('Stickers','ສະຕິກເກີ'):o('Send a gift','ສົ່ງຂອງຂວັນ'))+'</b><button class="round" data-a="fclose" aria-label="Close">'+ic('x',18)+'</button></div>'+(st?fxTabs():'')+'<div class="fx-grid">'+arr.map(function(x,i){if(st&&F.stkm&&F.stkm!=='all'&&STKMOOD[i]!==F.stkm)return '';return '<button class="fx-gi" data-a="'+(st?'fstk':'fgift')+'" data-k="'+i+'">'+(st?fxStk(i):'<span class="fx-ge">'+x[0]+'</span><span class="fx-gl">'+o(x[1],x[2])+'</span>')+'</button>'}).join('')+'</div></div>'}
 if(F.menu)return '<div class="fx-ov" data-a="fplus"></div><div class="fx-menu">'+FMENU.map(function(x){return '<button class="fx-mi" data-a="'+x[0]+'"><span class="fx-mic">'+FSVG(x[3],22)+'</span>'+o(x[1],x[2])+'</button>'}).join('')+'</div>';
 return ''}
 function fxToast(t){var e=document.getElementById('fsoon');if(e)e.remove();e=document.createElement('div');e.id='fsoon';e.textContent=t;e.style.cssText='position:fixed;z-index:9996;left:50%;bottom:calc(130px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:10px 20px;border-radius:20px;background:#3A2220;color:#fff;font-size:15px;max-width:90%;text-align:center';document.body.appendChild(e);setTimeout(function(){e.remove()},2200)}
@@ -2294,7 +2294,54 @@ var cs4=document.createElement('style');cs4.textContent='.fx-sk{display:flex;ali
 +'.fx-view .fx-vx{position:absolute;left:14px;top:calc(env(safe-area-inset-top,0px) + 10px);width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;padding:0}.fx-view img{width:auto;height:auto;border:0;border-radius:12px;object-fit:contain}'
 +'@media(prefers-reduced-motion:reduce){.fx-menu,.fx-sheet,.fx-ov.dim,.fx-cb.stkm .fx-se,.fx-gift .fx-ge{animation:none}}';document.head.appendChild(cs4);
 
-A.femo=function(){var e=$('#fi');if(e){e.value+='😊';e.focus()}};
+
+/* ---- sticker button + moods + animated stickers ---- */
+var STKMOOD=['happy','study','cheer','cheer','love','happy','study','sleepy','cheer','study','funny','happy','study','study','funny','study','happy','funny'];
+[
+['😄','Happy!','','ດີໃຈ!','bounce','happy'],['🥳','Party time!','','ມ່ວນແທ້!','jump','happy'],['😊','Smile','','ຍິ້ມ','pulse','happy'],['🌞','Good morning!','','ສະບາຍດີຕອນເຊົ້າ!','spin','happy'],['🤩','Amazing!','','ສຸດຍອດ!','pulse','happy'],['😁','Yay!','','ເຍ້!','jump','happy'],
+['❤️','Love you!','','ຮັກເຈົ້າ!','beat','love'],['😍','Love it!','','ຮັກເລີຍ!','beat','love'],['🥰','So sweet!','','ໜ້າຮັກ!','float','love'],['😘','Kiss!','','ຈຸບ!','jump','love'],['🤗','Hug!','','ກອດ!','wiggle','love'],['💕','Miss you!','','ຄິດຮອດ!','beat','love'],
+['😢','So sad','','ເສົ້າໃຈ','float','sad'],['😭','Crying','','ຮ້ອງໄຫ້','shake','sad'],['🥺','Please…','','ຂໍຮ້ອງ…','pulse','sad'],['😔','Sorry','','ຂໍໂທດ','float','sad'],['💔','Heartbroken','','ໃຈຮ້າວ','shake','sad'],
+['😠','Grr!','','ກຣ໊ວ!','shake','angry'],['😡','So angry!','','ໂມໂຫຫຼາຍ!','shake','angry'],['🙄','Seriously?','','ແທ້ບໍ?','wiggle','angry'],['😤','Hmph!','','ຮຶ!','pulse','angry'],
+['😂','LOL!','','ຂຳແທ້!','wiggle','funny'],['🤪','Silly!','','ຕະຫຼົກ!','spin','funny'],['😜','Just joking!','','ຫຼິ້ນໆ!','wiggle','funny'],['🤭','Oops!','','ອຸຍ!','jump','funny'],['😎','Cool!','','ເທ່!','float','funny'],
+['😮','Wow!','','ວ້າວ!','pop','wow'],['🤯','Mind blown!','','ຕົກໃຈ!','shake','wow'],['😱','Oh no!','','ໂອ້ ບໍ່!','shake','wow'],['🤔','Hmm…','','ຂໍຄິດກ່ອນ…','wiggle','wow'],
+['🥱','Sleepy','','ງ່ວງ','float','sleepy'],['😪','Tired','','ເມື່ອຍ','float','sleepy'],['🛌','Good night!','','ຝັນດີ!','float','sleepy'],['🌙','Sweet dreams','','ຝັນດີນະ','swing','sleepy'],
+['👏','Bravo!','','ເກັ່ງຫຼາຍ!','clap','cheer'],['🏆','Winner!','','ຊະນະ!','jump','cheer'],['🔥','On fire!','','ໄຟລຸກ!','flame','cheer'],['👍','Great!','','ດີຫຼາຍ!','jump','cheer'],['✨','Sparkle','','ແວວວາວ','spin','cheer'],['🚀','Let\'s go!','','ໄປເລີຍ!','rocket','cheer'],
+['🧠','Think!','','ຄິດ!','pulse','study'],['✏️','Write it!','','ຂຽນ!','wiggle','study'],['🎧','Listen!','','ຟັງ!','bounce','study'],['🗣️','Speak!','','ເວົ້າ!','pulse','study'],['🔤','ABC','','ກ ຂ ຄ','bounce','study'],['⏰','Time\'s up!','','ໝົດເວລາ!','shake','study']
+].forEach(function(k){STK.push(k);STKMOOD.push(k[5])});
+var MOODS=[['all','🌈','All','ທັງໝົດ'],['happy','😄','Happy','ມ່ວນ'],['love','😍','Love','ຮັກ'],['sad','😢','Sad','ເສົ້າ'],['angry','😡','Angry','ໂມໂຫ'],['funny','😂','Funny','ຕະຫຼົກ'],['wow','😮','Wow','ວ້າວ'],['sleepy','😴','Sleepy','ງ່ວງ'],['cheer','🎉','Cheer','ເຊຍ'],['study','📚','Study','ຮຽນ']];
+function fxTabs(){var c=F.stkm||'all';return '<div class="fx-tabs">'+MOODS.map(function(m){return '<button class="fx-tab'+(m[0]===c?' on':'')+'" data-a="fmood" data-m="'+m[0]+'" aria-label="'+m[2]+'"><span>'+m[1]+'</span><i>'+o(m[2],m[3])+'</i></button>'}).join('')+'</div>'}
+A.fmood=function(d){F.stkm=d.m||'all'};
+A.femo=function(){F.menu=0;F.sheet=F.sheet==='stk'?'':'stk'};
+var cs5=document.createElement('style');cs5.textContent=
+'.fx-grid{max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}.fx-gi .fx-se{font-size:44px}'
++'.fx-tabs{display:flex;gap:8px;overflow-x:auto;margin:0 -4px 12px;padding:2px 4px;scrollbar-width:none}.fx-tabs::-webkit-scrollbar{display:none}'
++'.fx-tab{flex:none;border:0;border-radius:18px;background:var(--csoft);color:var(--cfg);padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700}.fx-tab span{font-size:18px;line-height:1}.fx-tab i{font-style:normal}.fx-tab.on{background:#C8102E;color:#fff}'
++'.fx-se{display:inline-block;transform-origin:50% 70%}'
++'.fx-se.sa-bounce{animation:sabounce 1.6s ease-in-out infinite}.fx-se.sa-jump{animation:sajump 1.3s ease-in-out infinite}.fx-se.sa-shake{animation:sashake .7s ease-in-out infinite}'
++'.fx-se.sa-wiggle{animation:sawig 1.4s ease-in-out infinite}.fx-se.sa-pulse{animation:sapulse 1.5s ease-in-out infinite}.fx-se.sa-beat{animation:sabeat 1.1s ease-in-out infinite}'
++'.fx-se.sa-spin{animation:saspin 3.2s linear infinite}.fx-se.sa-float{animation:safloat 3s ease-in-out infinite}.fx-se.sa-pop{animation:sapop 1.6s cubic-bezier(.3,1.6,.5,1) infinite}'
++'.fx-se.sa-swing{animation:saswing 2.4s ease-in-out infinite}.fx-se.sa-clap{animation:saclap .6s ease-in-out infinite}.fx-se.sa-flame{animation:saflame .9s ease-in-out infinite}.fx-se.sa-rocket{animation:sarocket 1.4s ease-in-out infinite}'
++'.fx-cb.stkm .fx-se[class*=sa-]{animation-duration:inherit}'
++'.fx-cb.stkm .fx-se.sa-bounce{animation:sabounce 1.6s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-jump{animation:sajump 1.3s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-shake{animation:sashake .7s ease-in-out infinite}'
++'.fx-cb.stkm .fx-se.sa-wiggle{animation:sawig 1.4s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-pulse{animation:sapulse 1.5s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-beat{animation:sabeat 1.1s ease-in-out infinite}'
++'.fx-cb.stkm .fx-se.sa-spin{animation:saspin 3.2s linear infinite}.fx-cb.stkm .fx-se.sa-float{animation:safloat 3s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-pop{animation:sapop 1.6s cubic-bezier(.3,1.6,.5,1) infinite}'
++'.fx-cb.stkm .fx-se.sa-swing{animation:saswing 2.4s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-clap{animation:saclap .6s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-flame{animation:saflame .9s ease-in-out infinite}.fx-cb.stkm .fx-se.sa-rocket{animation:sarocket 1.4s ease-in-out infinite}'
++'@keyframes sabounce{0%,100%{transform:translateY(0) scale(1,1)}40%{transform:translateY(-10px) scale(.95,1.06)}60%{transform:translateY(0) scale(1.08,.92)}}'
++'@keyframes sajump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-14px) rotate(-8deg)}60%{transform:translateY(-14px) rotate(8deg)}80%{transform:translateY(0)}}'
++'@keyframes sashake{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-4px) rotate(-6deg)}40%{transform:translateX(4px) rotate(6deg)}60%{transform:translateX(-3px) rotate(-4deg)}80%{transform:translateX(3px) rotate(4deg)}}'
++'@keyframes sawig{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}'
++'@keyframes sapulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}'
++'@keyframes sabeat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}60%{transform:scale(1)}}'
++'@keyframes saspin{to{transform:rotate(360deg)}}'
++'@keyframes safloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}'
++'@keyframes sapop{0%,60%,100%{transform:scale(1)}75%{transform:scale(1.3)}85%{transform:scale(.92)}}'
++'@keyframes saswing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}'
++'@keyframes saclap{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.2) rotate(-6deg)}}'
++'@keyframes saflame{0%,100%{transform:scale(1,1) rotate(-2deg)}25%{transform:scale(1.08,1.15) rotate(2deg)}50%{transform:scale(.95,1.05) rotate(-3deg)}75%{transform:scale(1.1,1.1) rotate(3deg)}}'
++'@keyframes sarocket{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(6px,-8px) rotate(6deg)}}'
++'@media(prefers-reduced-motion:reduce){.fx-se[class*=sa-],.fx-cb.stkm .fx-se[class*=sa-]{animation:none!important}}';
+document.head.appendChild(cs5);
+
 /* ---- actions ---- */
 var tb=A.tab;A.tab=function(d){tb(d);if(d.t==='fr'){F.peer='';F.err='';init();loadList()}};
 var bb=A.back;A.back=function(){var pv=document.querySelector('.fx-view');if(pv){pv.remove();return}if(S.tab==='fr'&&F.peer){stopRec(0);vpStop();F.peer='';loadList();return}bb()};
