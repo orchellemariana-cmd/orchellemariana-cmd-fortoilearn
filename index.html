@@ -2093,7 +2093,7 @@ var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
 Object.assign(T.en,{fr:'Chat'});Object.assign(T.lo,{fr:'ສົນທະນາ'});
 P.phone='M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z';
 P.send='M22 2L11 13M22 2l-7 20-4-9-9-4z';
-var F={list:[],cv:{},un:{},names:{},av:{},avq:{},lv:[],peer:'',msgs:[],err:'',rec:null,pid:'',au:null,init:0,sc:0},C={st:''},SG={},VP={a:null,id:'',m:null,rate:1,iv:0};
+var F={list:[],cv:{},un:{},names:{},av:{},avq:{},lv:[],peer:'',msgs:[],err:'',rec:null,pid:'',au:null,init:0,sc:0,rd:{},ls:{},on:{}},C={st:''},SG={},VP={a:null,id:'',m:null,rate:1,iv:0};
 var sb=function(){return window.frCtx?frCtx().sb:null};var me=function(){return window.frCtx?frCtx().uid:''};
 var myName=function(){return (ld('name','')||'').trim().slice(0,20)||'Learner'};
 var pn=function(id){return F.names[id]||o('Friend','ໝູ່')};
@@ -2132,13 +2132,45 @@ var box=function(x){return '<div class="g s" style="padding:16px 18px">'+x+'</di
 function note(id,txt){var e=document.getElementById('fnote');if(e)e.remove();e=document.createElement('button');e.id='fnote';e.className='g';e.setAttribute('data-a','fopenx');e.setAttribute('data-i',id);e.style.cssText='position:fixed;z-index:9995;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);padding:10px 16px 10px 12px;text-align:left;border-radius:18px;display:flex;align-items:center;gap:12px';e.innerHTML=avImg(id,40)+'<span style="min-width:0"><b>'+esc(pn(id))+'</b><div class="s" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(txt)+'</div></span>';document.body.appendChild(e);setTimeout(function(){e.remove()},4500)}
 function init(){if(F.init||!sb()||!me())return;F.init=1;var id=me();
 sb().channel('dm-'+id).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm',filter:'b=eq.'+id},function(p){var m=p.new;bump(m);if(S.tab==='fr'&&F.peer===m.a){F.msgs.push(m);markRead(m.a,m.created_at);F.sc=1;render()}else{if(!(S.tab==='fr'&&!F.peer))note(m.a,m.kind==='voice'?o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(m.dur||0):lbl(m.body));if(S.tab==='fr')render()}}).subscribe();
-sigSub()}
+presInit();sigSub()}
 setInterval(init,1500);
 function sigSub(){var s=sb(),id=me();if(!s||!id)return;if(F.sgc){try{s.removeChannel(F.sgc)}catch(e){}}F.sgc=s.channel('u:'+id).on('broadcast',{event:'sig'},function(m){onSig(m.payload)});F.sgc.subscribe()}
 function sigOk(){return F.sgc&&(F.sgc.state==='joined'||F.sgc.state==='joining')}
 setInterval(function(){if(F.init&&!document.hidden&&!sigOk())sigSub()},4000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&F.init)setTimeout(function(){if(!sigOk())sigSub()},700)});window.addEventListener('online',function(){if(F.init)setTimeout(sigSub,500)});
-function markRead(pr,ts){F.un[pr]=0;if(!ts)return;var rd=ld('frread',{});if(!rd[pr]||ts>rd[pr]){rd[pr]=ts;sv('frread',rd)}}
+
+/* ---- read receipts (blue ticks), online status, last seen ---- */
+var TK1='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+TK2='<svg width="19" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12.5L6 17L15.5 7M8.5 14.5L10.5 17L20.5 7"/></svg>';
+function tkT(id,ts){var t=Date.parse(ts)||0,seen=t&&t<=(F.rd[id]||0),dlv=seen||F.on[id]||(F.ls[id]||0)>t;
+return '<span class="fx-tk'+(seen?' rd':'')+'" role="img" aria-label="'+(seen?o('Read','ອ່ານແລ້ວ'):dlv?o('Delivered','ສົ່ງເຖິງແລ້ວ'):o('Sent','ສົ່ງແລ້ວ'))+'">'+(dlv?TK2:TK1)+'</span>'}
+function avW(id,z){var d=Math.max(11,Math.round(z*.26));return '<span class="fx-avw">'+avImg(id,z)+(F.on[id]?'<i class="fx-dot" style="width:'+d+'px;height:'+d+'px"></i>':'')+'</span>'}
+function stTxt(id){if(F.on[id])return o('Online','ອອນລາຍ');var t=F.ls[id];if(!t)return o('Offline','ອອຟລາຍ');var d=new Date(t),n=new Date(),y=new Date(n.getTime()-864e5),hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+if(d.toDateString()===n.toDateString())return o('Last seen today at '+hm,'ເຫັນຄັ້ງລ່າສຸດມື້ນີ້ ເວລາ '+hm);
+if(d.toDateString()===y.toDateString())return o('Last seen yesterday at '+hm,'ເຫັນຄັ້ງລ່າສຸດມື້ວານ ເວລາ '+hm);
+return o('Last seen ','ເຫັນຄັ້ງລ່າສຸດ ')+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()}
+function setRd(id,ts){var t=Date.parse(ts)||0;if(t>(F.rd[id]||0)){F.rd[id]=t;if(S.tab==='fr')render()}}
+function pushRead(pr,ts){var s=sb();if(!s||!me()||F.rdOff||document.hidden)return;var t=Date.parse(ts)||0;F.rdP=F.rdP||{};if(!t||t<=(F.rdP[pr]||0))return;F.rdP[pr]=t;
+s.from('dm_read').upsert({user_id:me(),peer_id:pr,read_at:ts},{onConflict:'user_id,peer_id'}).then(function(r){if(r&&r.error){F.rdP[pr]=0;if(/dm_read|relation|schema|exist/i.test(r.error.message||''))F.rdOff=1}}).catch(function(){F.rdP[pr]=0})}
+function loadRd(ids){var s=sb();if(!s||!me()||F.rdOff||!ids||!ids.length)return;
+s.from('dm_read').select('user_id,read_at').in('user_id',ids).eq('peer_id',me()).then(function(r){if(r.error){if(/dm_read|relation|schema|exist/i.test(r.error.message||''))F.rdOff=1;return}var ch=0;(r.data||[]).forEach(function(u){var t=Date.parse(u.read_at)||0;if(t>(F.rd[u.user_id]||0)){F.rd[u.user_id]=t;ch=1}});if(ch&&S.tab==='fr')render()}).catch(function(){})}
+function loadLs(ids){var s=sb();if(!s||F.lsOff||!ids||!ids.length)return;
+s.from('user_presence').select('user_id,last_seen').in('user_id',ids).then(function(r){if(r.error){if(/user_presence|relation|schema|exist/i.test(r.error.message||''))F.lsOff=1;return}var ch=0;(r.data||[]).forEach(function(u){var t=Date.parse(u.last_seen)||0;if(t!==F.ls[u.user_id]){F.ls[u.user_id]=t;ch=1}});if(ch&&S.tab==='fr')render()}).catch(function(){})}
+function beat(){var s=sb(),id=me();if(!s||!id||F.lsOff)return;s.from('user_presence').upsert({user_id:id,last_seen:new Date().toISOString()},{onConflict:'user_id'}).then(function(r){if(r&&r.error&&/user_presence|relation|schema|exist/i.test(r.error.message||''))F.lsOff=1}).catch(function(){})}
+function presInit(){var s=sb(),id=me();if(!s||!id)return;
+try{var ch=s.channel('presence:app',{config:{presence:{key:id}}});
+ch.on('presence',{event:'sync'},function(){var st=ch.presenceState(),on={};Object.keys(st).forEach(function(k){on[k]=1});if(Object.keys(on).sort().join()!==Object.keys(F.on).sort().join()){F.on=on;if(S.tab==='fr')render()}});
+ch.subscribe(function(status){if(status==='SUBSCRIBED'&&!document.hidden){try{ch.track({t:Date.now()})}catch(e){}}});F.pc=ch}catch(e){}
+try{s.channel('rd-'+id).on('postgres_changes',{event:'*',schema:'public',table:'dm_read',filter:'peer_id=eq.'+id},function(p){var r=p.new;if(r&&r.user_id)setRd(r.user_id,r.read_at)}).subscribe()}catch(e){}
+beat();setInterval(function(){if(!document.hidden)beat()},45000);
+setInterval(function(){if(document.hidden||S.tab!=='fr'||!F.peer)return;F.pt=(F.pt||0)+1;loadRd([F.peer]);if(F.pt%5===0)loadLs([F.peer])},6000);
+document.addEventListener('visibilitychange',function(){beat();if(document.hidden){try{F.pc&&F.pc.untrack()}catch(e){}}else{try{F.pc&&F.pc.track({t:Date.now()})}catch(e){}if(S.tab==='fr'&&F.peer){var lm=F.msgs.filter(function(x){return x.a===F.peer}).pop();if(lm)markRead(F.peer,lm.created_at)}}});
+window.addEventListener('pagehide',function(){beat();try{F.pc&&F.pc.untrack()}catch(e){}})}
+var rs=document.createElement('style');rs.textContent='.fx-avw{position:relative;display:inline-flex;flex:none}.fx-dot{position:absolute;right:1px;bottom:1px;border-radius:50%;background:#22c55e;border:2px solid #fff;box-sizing:border-box}'
++'.fx-ps{font-size:13px;line-height:1.2;margin-top:2px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fx-ps.on{color:#16a34a;font-weight:600}'
++'.fx-ct{display:inline-flex;align-items:center;gap:4px}.fx-tk{display:inline-flex;align-items:center;color:#8C7A72}.fx-tk.rd{color:#34B7F1}'
++'button .fx-tk{vertical-align:-4px;margin-right:4px}';document.head.appendChild(rs);
+function markRead(pr,ts){F.un[pr]=0;if(!ts)return;pushRead(pr,ts);var rd=ld('frread',{});if(!rd[pr]||ts>rd[pr]){rd[pr]=ts;sv('frread',rd)}}
 function bump(m){var mine=m.a===me(),pr=mine?m.b:m.a;F.cv[pr]={ts:m.created_at,k:m.kind,d:m.dur,p:m.kind==='text'?String(m.body).slice(0,80):'',mine:mine};if(!mine&&!(S.tab==='fr'&&F.peer===pr))F.un[pr]=(F.un[pr]||0)+1;if(!F.list.some(function(u){return u.user_id===pr})){F.list.push({user_id:pr,name:F.names[pr]||''});loadList()}}
 function fxSk(){var r='<div class="fx-sk"><i class="fx-sa"></i><span><i class="fx-sl" style="width:46%"></i><i class="fx-sl" style="width:68%"></i></span></div>';return '<div class="s" style="margin:18px 4px 6px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12px">'+o('Friends','ໝູ່')+'</div><div class="g" style="padding:6px 14px">'+r+r+r+'</div>'}
 function fxSave(){try{var av={},n=0;(F.list||[]).forEach(function(u){var x=F.av[u.user_id];if(x&&x.av&&n<20&&(F.cv[u.user_id]||n<10)){av[u.user_id]=x.av;n++}});sv('frcache',{uid:me(),t:Date.now(),list:F.list.map(function(u){var x=F.av[u.user_id]||{};return {user_id:u.user_id,name:u.name||F.names[u.user_id]||'',ai:x.ai}}),cv:F.cv,av:av})}catch(e){}}
@@ -2153,8 +2185,8 @@ if(r.error&&/dm|relation|schema|preview/i.test(r.error.message||''))F.err='setup
 (r.data||[]).forEach(function(m){var mine=m.a===id,pr=mine?m.b:m.a;if(!F.cv[pr])F.cv[pr]={ts:m.created_at,k:m.kind,d:m.dur,p:m.preview||'',mine:mine};if(!mine&&(!rd[pr]||m.created_at>rd[pr]))F.un[pr]=(F.un[pr]||0)+1});
 var ids=Object.keys(F.cv),seen={},L=[];(a[1].data||[]).forEach(function(u){if(u.user_id===id||seen[u.user_id])return;seen[u.user_id]=1;L.push(u);F.names[u.user_id]=u.name||F.names[u.user_id];var x=F.av[u.user_id];F.av[u.user_id]={ai:u.ai,av:x&&x.av,ok:x&&x.ok?1:0}});
 ids.forEach(function(i){if(!seen[i]){L.push({user_id:i,name:F.names[i]||''});if(!F.av[i])F.av[i]={ok:0}}});
-F.list=L;F.ld=0;render();loadAvs()}).catch(function(){F.ld=0;if(S.tab==='fr'&&!F.peer)render()})}
-function loadMsgs(){var a=me(),b=F.peer;loadAv(b);if(!sb()||!a){F.err='net';F.sc=1;render();return}sb().from('dm').select('*').or('and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')').order('created_at',{ascending:false}).limit(30).then(function(r){if(r.error){F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net'}else{F.err='';F.msgs=r.data.reverse();var lm=F.msgs.filter(function(x){return x.a===F.peer}).pop();markRead(F.peer,lm&&lm.created_at)}F.sc=1;render()})}
+F.list=L;F.ld=0;render();loadAvs();var pids=Object.keys(F.cv);if(pids.length)loadRd(pids)}).catch(function(){F.ld=0;if(S.tab==='fr'&&!F.peer)render()})}
+function loadMsgs(){var a=me(),b=F.peer;loadAv(b);loadRd([b]);loadLs([b]);if(!sb()||!a){F.err='net';F.sc=1;render();return}sb().from('dm').select('*').or('and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')').order('created_at',{ascending:false}).limit(30).then(function(r){if(r.error){F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net'}else{F.err='';F.msgs=r.data.reverse();var lm=F.msgs.filter(function(x){return x.a===F.peer}).pop();markRead(F.peer,lm&&lm.created_at)}F.sc=1;render()})}
 function send(kind,body,dur){if(!F.peer)return;if(!sb()||!me()){F.err='net';render();return}sb().from('dm').insert({a:me(),b:F.peer,kind:kind,body:body,dur:dur||null}).select().single().then(function(r){if(r.error)F.err=/dm|relation|schema/i.test(r.error.message||'')?'setup':'net';else{F.err='';F.msgs.push(r.data);bump(r.data)}F.sc=1;render()})}
 /* ---- views ---- */
 function frV(){var h;
@@ -2164,8 +2196,8 @@ if(!F.peer){var L=F.list.slice().sort(function(x,y){var a=F.cv[x.user_id],b=F.cv
 tm=function(ts){var d=new Date(ts),n=new Date();if(isNaN(d))return '';if(d.toDateString()===n.toDateString())return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]},
 row=function(x,last){var id=x.user_id,c=F.cv[id],u=F.un[id]||0,nm_=x.name||pn(id),k=0;for(var i=0;i<id.length;i++)k+=id.charCodeAt(i);
 var pv=c?(c.mine?o('You: ','ເຈົ້າ: '):'')+(c.k==='voice'?o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(c.d||0):lbl(c.p)):o('Tap to say hello','ແຕະເພື່ອທັກທາຍ');
-return '<button data-a="fopen" data-i="'+id+'" style="display:flex;align-items:center;gap:14px;width:100%;padding:12px 4px;background:none;border:0;border-radius:0;box-shadow:none;text-align:left;color:inherit;'+(last?'':'border-bottom:1px solid var(--bd);')+'">'+avImg(id,52)
-+'<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b style="font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(nm_)+'</b><span style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'+(u?'font-weight:600;color:var(--fg)':'color:var(--mut)')+'">'+(c&&c.k==='voice'?MICSVG:'')+esc(pv)+'</span></span>'
+return '<button data-a="fopen" data-i="'+id+'" style="display:flex;align-items:center;gap:14px;width:100%;padding:12px 4px;background:none;border:0;border-radius:0;box-shadow:none;text-align:left;color:inherit;'+(last?'':'border-bottom:1px solid var(--bd);')+'">'+avW(id,52)
++'<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b style="font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(nm_)+'</b><span style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'+(u?'font-weight:600;color:var(--fg)':'color:var(--mut)')+'">'+(c&&c.mine?tkT(id,c.ts):'')+(c&&c.k==='voice'?MICSVG:'')+esc(pv)+'</span></span>'
 +'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:44px"><span style="font-size:12px;color:'+(u?'var(--ac)':'var(--mut)')+'">'+(c?tm(c.ts):'')+'</span>'+(u?'<span style="min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:var(--ac);color:var(--on);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">'+u+'</span>':'<span style="height:22px"></span>')+'</span></button>'},
 sec=function(ti,arr){return arr.length?'<div class="s" style="margin:18px 4px 6px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12px">'+ti+'</div><div class="g" style="padding:2px 14px">'+arr.map(function(x,i){return row(x,i===arr.length-1)}).join('')+'</div>':''},
 rc=L.filter(function(x){return F.cv[x.user_id]}),fr=L.filter(function(x){return !F.cv[x.user_id]});
@@ -2177,11 +2209,11 @@ tmx=function(ts){var d=new Date(ts);return isNaN(d)?'':('0'+d.getHours()).slice(
 dl=function(ts){var d=new Date(ts),n=new Date();if(isNaN(d))return '';return (d.toDateString()===n.toDateString()?o('Today','ມື້ນີ້'):d.getDate()+' '+MON[d.getMonth()])+', '+tmx(ts)},
 LD='',fc=0,cl=ld('calllog',[]).filter(function(c){return c.p===F.peer}),dsep=function(t){var k=new Date(t).toDateString();return LD!==(LD=k)?'<div class="fx-cdate"><span>'+dl(t)+'</span></div>':''},bub=function(m,i){var fr_=!F.sn[m.id];F.sn[m.id]=1;var me_=m.a===mine,pv=F.msgs[i-1],vo=m.kind==='voice',
 sep=(LD!==(LD=new Date(m.created_at).toDateString()))?'<div class="fx-cdate"><span>'+dl(m.created_at)+'</span></div>':'';
-return sep+'<div class="fx-crow'+(me_?' me':'')+(fr_?' fresh':'')+'"'+(fr_?' style="--d:'+(fc++)+'"':'')+'>'+avImg(me_?mine:F.peer,46)+'<div class="fx-cw"><div class="fx-cb'+(vo?' vo':'')+fxCls(m)+'">'+(vo?vmHTML(m,me_):(fxBody(m)||esc(m.body)))+'</div><div class="fx-ct">'+tmx(m.created_at)+'</div></div></div>'};
+return sep+'<div class="fx-crow'+(me_?' me':'')+(fr_?' fresh':'')+'"'+(fr_?' style="--d:'+(fc++)+'"':'')+'>'+avImg(me_?mine:F.peer,46)+'<div class="fx-cw"><div class="fx-cb'+(vo?' vo':'')+fxCls(m)+'">'+(vo?vmHTML(m,me_):(fxBody(m)||esc(m.body)))+'</div><div class="fx-ct">'+tmx(m.created_at)+(me_?tkT(F.peer,m.created_at):'')+'</div></div></div>'};
 var chips=[['Photo','ຮູບ','M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M9 9.5a1 1 0 100-.01'],['File','ໄຟລ໌','M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5'],['Sticker','ສະຕິກເກີ','M12 3a9 9 0 100 18 9 9 0 000-18zM8.5 10v1M15.5 10v1M8 14.5c1 1.6 2.4 2.3 4 2.3s3-.7 4-2.3'],['Gift','ຂອງຂວັນ','M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1-3-5-3-5-1s3 1 5 1zM12 7c1-3 5-3 5-1s-3 1-5 1z']],
 chp=chips.map(function(c){return '<button class="fx-cchip" data-a="fsoon" aria-label="'+o(c[0],c[1])+'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+c[2]+'"/></svg>'+o(c[0],c[1])+'</button>'}).join('');
 return '<div id="fr" class="fx-chatroom">'
-+'<div class="fx-chd"><button class="round" data-a="back" aria-label="Back">'+ic('back',20)+'</button>'+avImg(F.peer,56)+'<div class="fx-chn"><b>'+esc(pn(F.peer))+'</b></div><button class="round fx-chcall" data-a="fcall" aria-label="'+o('Call','ໂທ')+'">'+ic('phone',20)+'</button></div>'
++'<div class="fx-chd"><button class="round" data-a="back" aria-label="Back">'+ic('back',20)+'</button>'+avW(F.peer,56)+'<div class="fx-chn"><b>'+esc(pn(F.peer))+'</b><div class="fx-ps'+(F.on[F.peer]?' on':'')+'">'+esc(stTxt(F.peer))+'</div></div><button class="round fx-chcall" data-a="fcall" aria-label="'+o('Call','ໂທ')+'">'+ic('phone',20)+'</button></div>'
 +'<div id="fms" class="fx-cms">'+(F.msgs.length||cl.length?F.msgs.map(function(m,i){return{t:new Date(m.created_at).getTime(),m:m,i:i}}).concat(cl.map(function(c){return{t:c.t,c:c}})).sort(function(a,b){return a.t-b.t}).map(function(x){return x.c?dsep(x.t)+callPill(x.c):bub(x.m,x.i)}).join(''):'<div class="s" style="text-align:center;margin:auto">'+o('Say hello 👋','ທັກທາຍເລີຍ 👋')+'</div>')+(F.err==='net'?'<div class="s" style="text-align:center;color:#d92d3f">'+o('Could not send. Try again.','ສົ່ງບໍ່ໄດ້. ລອງໃໝ່.')+'</div>':'')+'</div>'
 +(rec?'':fxPop())
 +'<div class="fx-ccomp">'+(rec?'<button class="round vx" data-a="fcan" aria-label="'+o('Delete','ລຶບ')+'">'+TRASHSVG+'</button><div class="vrb"><span class="rd" aria-hidden="true"></span><b id="ft">0:00</b><div id="flv" class="vl" aria-hidden="true">'+lvBars()+'</div></div><button class="vs" data-a="frec" aria-label="'+o('Send voice message','ສົ່ງຂໍ້ຄວາມສຽງ')+'">'+SENDSVG+'</button>'
