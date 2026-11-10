@@ -1445,13 +1445,13 @@ background:linear-gradient(180deg,var(--cgl1),var(--cgl2) 58%,var(--cgl3));color
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .cgl{--cgl1:#241A1C;--cgl2:#2D1D21;--cgl3:#3A2328;--cgl-g1:#4A2D33;--cgl-g2:#3D262B;--cgl-fg:#F3EFE6;--cgl-pe:#F0647A;--cgl-glow:rgba(240,100,122,.2)}}
 :root[data-theme="dark"] .cgl{--cgl1:#241A1C;--cgl2:#2D1D21;--cgl3:#3A2328;--cgl-g1:#4A2D33;--cgl-g2:#3D262B;--cgl-fg:#F3EFE6;--cgl-pe:#F0647A;--cgl-glow:rgba(240,100,122,.2)}
 .cgl-glow{position:absolute;top:2%;left:50%;width:84vmin;height:84vmin;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,var(--cgl-glow),transparent 66%)}
-.cgl-msg{position:absolute;left:0;right:0;top:19%;padding:0 24px;text-align:center;opacity:0;animation:cglpop .5s .4s cubic-bezier(.3,1.5,.5,1) forwards}
+.cgl-msg{position:absolute;left:0;right:0;top:10%;padding:0 24px;text-align:center;z-index:3;opacity:0;animation:cglpop .5s .4s cubic-bezier(.3,1.5,.5,1) forwards}
 .cgl-msg b{display:block;font-size:clamp(24px,7.4vw,34px);line-height:1.25;font-weight:800;letter-spacing:-.01em;overflow-wrap:anywhere}
 .cgl-msg span{display:block;margin-top:8px;font-size:15px;font-weight:600;opacity:.72}
-.cgl-gr{position:absolute;left:-6%;right:-6%;bottom:0;height:25%;border-radius:50% 50% 0 0/28px 28px 0 0;background:linear-gradient(180deg,var(--cgl-g1),var(--cgl-g2));box-shadow:inset 0 5px 0 rgba(255,255,255,.35)}
+.cgl-gr{position:absolute;left:-6%;right:-6%;bottom:0;height:22%;z-index:1;border-radius:50% 50% 0 0/28px 28px 0 0;background:linear-gradient(180deg,var(--cgl-g1),var(--cgl-g2));box-shadow:inset 0 5px 0 rgba(255,255,255,.35)}
 .cgl-gr::before{content:"";position:absolute;left:0;right:0;top:36%;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 18px,transparent 18px 38px);animation:cglgrd .6s linear infinite}
 .cgl-pe{position:absolute;top:-24px;width:10px;height:14px;border-radius:70% 0 70% 0;background:var(--cgl-pe);opacity:.8;animation:cglpe 2.8s linear infinite}
-.cgl-girl{position:absolute;left:50%;bottom:calc(25% - 18px);width:min(36vw,150px,24vh);transform:translateX(-50%)}
+.cgl-girl{position:absolute;left:50%;bottom:calc(22% - 16px);z-index:2;width:min(56vw,230px,33vh);transform:translateX(-50%)}
 .cgl-svg{display:block;width:100%;height:auto;overflow:visible}
 .cgl-skip{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;font-weight:600;opacity:0;animation:cglsk .4s 1.2s forwards}
 .cgl-bob{animation:cglBob .5s ease-in-out infinite}
@@ -1485,6 +1485,26 @@ background:linear-gradient(180deg,var(--cgl1),var(--cgl2) 58%,var(--cgl3));color
 @keyframes cglPt{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-8deg)}}
 @keyframes cglBl{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.08)}}
 @keyframes cglSh{0%,50%,100%{transform:scaleX(1)}25%,75%{transform:scaleX(.88)}}
+
+.cgl{--cgl-h1:rgba(244,180,186,.75);--cgl-h2:rgba(236,154,163,.8);--cgl-ck-bg:rgba(255,255,255,.88);--cgl-ck-fg:#B3263E;--cgl-bar:rgba(179,38,62,.15)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .cgl{--cgl-h1:rgba(74,45,51,.9);--cgl-h2:rgba(90,52,60,.9);--cgl-ck-bg:rgba(255,255,255,.12);--cgl-ck-fg:#F3EFE6;--cgl-bar:rgba(255,255,255,.14)}}
+:root[data-theme="dark"] .cgl{--cgl-h1:rgba(74,45,51,.9);--cgl-h2:rgba(90,52,60,.9);--cgl-ck-bg:rgba(255,255,255,.12);--cgl-ck-fg:#F3EFE6;--cgl-bar:rgba(255,255,255,.14)}
+.cgl-h1,.cgl-h2{position:absolute;left:0;right:0;pointer-events:none}
+.cgl-h1{bottom:calc(22% - 2px);height:120px;background:radial-gradient(ellipse 170px 100px at 50% 100%,var(--cgl-h1) 98%,transparent 100%) 0 0/340px 100% repeat-x;animation:cglhill 22s linear infinite}
+.cgl-h2{bottom:calc(22% - 2px);height:70px;background:radial-gradient(ellipse 100px 56px at 50% 100%,var(--cgl-h2) 98%,transparent 100%) 0 0/200px 100% repeat-x;animation:cglhill2 10s linear infinite}
+@keyframes cglhill{to{background-position-x:-340px}}@keyframes cglhill2{to{background-position-x:-200px}}
+.cgl-cl{position:absolute;left:0;width:64px;height:20px;border-radius:20px;background:var(--cgl-glow);opacity:.9;animation:cglgo 26s linear infinite}
+.cgl-cl::before,.cgl-cl::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.cgl-cl::before{width:30px;height:30px;left:10px;top:-14px}.cgl-cl::after{width:22px;height:22px;left:34px;top:-9px}
+.cgl-ck{position:absolute;bottom:30%;padding:7px 14px;border-radius:999px;background:var(--cgl-ck-bg);color:var(--cgl-ck-fg);font-weight:800;font-size:14px;line-height:1;white-space:nowrap;box-shadow:0 6px 16px rgba(179,38,62,.16);opacity:0;animation:cglck 4s ease-out infinite}
+@keyframes cglck{0%{opacity:0;transform:translateY(0) scale(.7)}15%{opacity:1;transform:translateY(-4vh) scale(1)}80%{opacity:.9}100%{opacity:0;transform:translateY(-30vh) scale(1.06)}}
+.cgl-bar{display:block;position:relative;width:min(52vw,210px);height:8px;margin:18px auto 0;border-radius:99px;background:var(--cgl-bar);overflow:hidden}
+.cgl-bar u{position:absolute;top:0;bottom:0;left:-40%;width:40%;border-radius:99px;background:linear-gradient(90deg,#F5566F,#C8102E);animation:cglbar 1.1s ease-in-out infinite}
+@keyframes cglbar{to{left:100%}}
+.cgl:not(.cgl-load) .cgl-bar u{animation:none;left:0;width:100%;transition:width .5s ease-out}
+.cgl:not(.cgl-load) .cgl-girl{animation:cglhop .6s ease-in-out infinite}
+@keyframes cglhop{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-14px)}}
+.cgl.rm .cgl-bar u{left:0;width:45%}.cgl.rm .cgl-ck{display:none}
 .cgl-load{cursor:progress}.cgl-load .cgl-skip{display:none}
 .cgl.rm,.cgl.rm *{animation:none!important}
 .cgl.rm{opacity:1}
@@ -1541,7 +1561,9 @@ var G=['<svg class="cgl-svg" viewBox="0 0 120 194" aria-hidden="true" focusable=
 var el=document.createElement('div');
 el.id='cglWalk';el.className='cgl cgl-load'+(rm?' rm':'');
 el.setAttribute('role','status');el.setAttribute('aria-live','polite');
-el.innerHTML='<div class="cgl-glow"></div>'+pe+'<div class="cgl-msg"><b></b><span></span></div><div class="cgl-gr"></div><div class="cgl-girl">'+G+'</div><div class="cgl-skip">'+o('Tap to skip','ແຕະເພື່ອຂ້າມ')+'</div>';
+var ck='';[['Hello',6,0],['ສະບາຍດີ',68,-1.1],['IELTS',3,-2.2],['Learn',74,-3]].forEach(function(c){ck+='<i class="cgl-ck" style="left:'+c[1]+'%;animation-delay:'+c[2]+'s">'+c[0]+'</i>'});
+var cl='<i class="cgl-cl" style="top:30%;animation-delay:-4s"></i><i class="cgl-cl" style="top:41%;transform:scale(.7);animation-duration:34s;animation-delay:-18s"></i>';
+el.innerHTML='<div class="cgl-glow"></div>'+cl+pe+'<div class="cgl-msg"><b></b><span></span><i class="cgl-bar"><u></u></i></div><div class="cgl-h1"></div><div class="cgl-h2"></div>'+ck+'<div class="cgl-gr"></div><div class="cgl-girl">'+G+'</div><div class="cgl-skip">'+o('Tap to skip','ແຕະເພື່ອຂ້າມ')+'</div>';
 document.body.appendChild(el);return el}
 function cglSet(el,a,b){el.querySelector('.cgl-msg b').textContent=a;el.querySelector('.cgl-msg span').textContent=b}
 /* girl walks in place as a loading animation while sign in / sign up is running */
@@ -1579,7 +1601,7 @@ var head=function(k,t,d){return '<div class="aotph">'+ic(k,22)+'<div><b>'+t+'</b
 var CC=[['🇱🇦','+856'],['🇹🇭','+66'],['🇻🇳','+84'],['🇰🇭','+855'],['🇲🇲','+95'],['🇨🇳','+86'],['🇰🇷','+82'],['🇯🇵','+81'],['🇸🇬','+65'],['🇦🇺','+61'],['🇬🇧','+44'],['🇺🇸','+1']];
 var phoneRow='<div class="aph"><label class="afi apcc" for="apc"><select id="apc" aria-label="'+o('Country code','ລະຫັດປະເທດ')+'">'+CC.map(function(c){return '<option value="'+c[1]+'"'+(AU.cc===c[1]?' selected':'')+'>'+c[0]+' '+c[1]+'</option>'}).join('')+'</select></label>'+fld('aph','p',o('Phone number','ເບີໂທລະສັບ'),'tel',AU.pn,'tel-national')+'</div>';
 var pt=AU.show?'text':'password';
-var msg=(AU.err?'<div class="no aerr" role="alert">'+AU.err+'</div>':'')+(AU.info?'<div class="ok ainfo" role="status">'+AU.info+'</div>':'');
+var msg=(AU.err?'<div class="no aerr" role="alert">'+AU.err+'</div>':'')+(AU.info?'<div class="ok ainfo" role="status">'+AU.info+'</div>':'')+(AU.cf&&AU.m==='in'&&!ph&&!rec?'<div class="alnks"><button class="alnk" data-a="arsem">'+o('Resend confirmation email','ສົ່ງອີເມວຢືນຢັນອີກຄັ້ງ')+'</button></div>':'');
 var hint6='<div class="s ahint">'+o('At least 6 characters','ຢ່າງໜ້ອຍ 6 ຕົວ')+'</div>';
 var body,guard=!rec&&(!ph||(ps==='num'&&pm!=='fp'));
 if(rec||(ph&&ps==='pw')){body=(rec?'':dots(3))+'<div class="astep">'+head('l',(rec||pm==='fp')?o('Set a new password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):o('Create your password','ສ້າງລະຫັດຜ່ານຂອງເຈົ້າ'),rec?o('Choose a new password for your account.','ເລືອກລະຫັດຜ່ານໃໝ່ສຳລັບບັນຊີຂອງເຈົ້າ.'):o('Phone confirmed. Use it with this password to sign in next time.','ຢືນຢັນເບີແລ້ວ. ໃຊ້ເບີນີ້ກັບລະຫັດຜ່ານນີ້ເພື່ອເຂົ້າສູ່ລະບົບຄັ້ງຕໍ່ໄປ.'))
@@ -1666,8 +1688,8 @@ if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e))return fail(o('Please enter a valid 
 if(up&&AU.p.length<6)return fail(o('Password must be at least 6 characters.','ລະຫັດຜ່ານຕ້ອງມີຢ່າງໜ້ອຍ 6 ຕົວ.'));
 if(!up&&!AU.p)return fail(o('Please enter your password.','ກະລຸນາໃສ່ລະຫັດຜ່ານ.'));
 AU.busy=1;render();var nm=AU.n.trim();
-loadSB().then(function(sb){return up?sb.auth.signUp({email:e,password:AU.p,options:{data:{name:nm},emailRedirectTo:location.href.split('#')[0]}}):sb.auth.signInWithPassword({email:e,password:AU.p})}).then(function(r){if(r.error)return fail(sbMsg(r.error));var u=r.data&&r.data.user;
-if(up&&(!r.data.session||(u&&u.identities&&!u.identities.length))){if(u&&u.identities&&!u.identities.length)return fail(sbMsg({message:'already registered'}));cglHide();AU.busy=0;AU.m='in';AU.p='';AU.info=o('Account created. Check your email to confirm it, then sign in.','ສ້າງບັນຊີແລ້ວ. ກວດອີເມວເພື່ອຢືນຢັນ ແລ້ວເຂົ້າສູ່ລະບົບ.');render();return}
+loadSB().then(function(sb){return up?sb.auth.signUp({email:e,password:AU.p,options:{data:{name:nm},emailRedirectTo:location.href.split('#')[0]}}):sb.auth.signInWithPassword({email:e,password:AU.p})}).then(function(r){if(r.error){if(/not confirmed/i.test(r.error.message||''))AU.cf=e;return fail(sbMsg(r.error))}var u=r.data&&r.data.user;
+if(up&&(!r.data.session||(u&&u.identities&&!u.identities.length))){if(u&&u.identities&&!u.identities.length)return fail(sbMsg({message:'already registered'}));cglHide();AU.busy=0;AU.m='in';AU.p='';AU.cf=e;AU.err='';AU.info=o('Account created! We sent a confirmation link to '+esc(e)+'. Open it, then come back and sign in. Check spam too.','ສ້າງບັນຊີແລ້ວ! ພວກເຮົາສົ່ງລິ້ງຢືນຢັນໄປທີ່ '+esc(e)+'. ເປີດລິ້ງ ແລ້ວກັບມາເຂົ້າສູ່ລະບົບ. ກວດໃນສະແປມນຳ.');render();return}
 sbEnter(u,nm)}).catch(function(){fail(sbMsg(null))})};
 A.agoogle=function(){AU.err='';AU.info='';loadSB().then(function(sb){return sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href.split('#')[0].split('?')[0]}})}).then(function(r){if(r&&r.error)fail(sbMsg(r.error))}).catch(function(){fail(sbMsg(null))})};
 A.at=function(d){keep();AU.t=d.t;AU.err='';AU.info=''};
@@ -1710,6 +1732,8 @@ A.aefp=function(){if(AU.busy)return;keep();AU.err='';AU.info='';var e=AU.e.trim(
 if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e))return fail(o('Enter your email above, then tap Forgot password.','ໃສ່ອີເມວຂ້າງເທິງກ່ອນ ແລ້ວແຕະ ລືມລະຫັດຜ່ານ.'));
 AU.busy=1;render();
 loadSB().then(function(sb){return sb.auth.resetPasswordForEmail(e,{redirectTo:location.href.split('#')[0].split('?')[0]})}).then(function(r){if(r.error)return fail(sbMsg(r.error));AU.busy=0;AU.info=o('Reset link sent. Check your email.','ສົ່ງລິ້ງຕັ້ງລະຫັດໃໝ່ແລ້ວ. ກວດອີເມວ.');render()}).catch(function(){fail(sbMsg(null))})};
+A.arsem=function(){if(AU.busy)return;keep();var e=AU.cf||AU.e.trim().toLowerCase();AU.err='';AU.info='';AU.busy=1;render();
+loadSB().then(function(sb){return sb.auth.resend({type:'signup',email:e,options:{emailRedirectTo:location.href.split('#')[0]}})}).then(function(r){AU.busy=0;if(r.error)return fail(sbMsg(r.error));AU.info=o('Confirmation email sent again. Check your inbox and spam.','ສົ່ງອີເມວຢືນຢັນອີກຄັ້ງແລ້ວ. ກວດກ່ອງຈົດໝາຍ ແລະ ສະແປມ.');render()}).catch(function(){fail(sbMsg(null))})};
 ['asubmit','aplogin','apwsave'].forEach(function(k){var f=A[k];if(f)A[k]=function(){var r=f.apply(this,arguments);if(AU.busy)cglLoad();return r}});
 document.addEventListener('input',function(e){if(S.tab==='auth'&&e.target.id==='aotp'){var v=e.target.value.replace(/\D/g,'').slice(0,6);if(v!==e.target.value)e.target.value=v;AU.oc=v;if(v.length===6&&!AU.busy)A.averify()}});
 document.addEventListener('keydown',function(e){if(S.tab!=='auth'||e.key!=='Enter'||!(HSB&&(AU.t==='ph'||AU.rec)))return;var id=e.target.id,f=function(x){var n=document.getElementById(x);if(n)n.focus()};
