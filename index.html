@@ -139,7 +139,7 @@ window.APP_CONFIG=Object.assign({supabaseUrl:"https://rneabdfokqwchzylhalf.supab
 </script>
 <script>
 var $=function(s){return document.querySelector(s)};
-var UID=(function(){try{return localStorage.getItem('sess')||''}catch(e){return ''}})(),GK=['lang','theme','acc','sess','guest'];
+var UID=(function(){var v='';try{v=localStorage.getItem('sess')||''}catch(e){}if(!v){try{v=sessionStorage.getItem('sess')||''}catch(e){}}return v})(),GK=['lang','theme','acc','sess','guest'];
 var K=function(k){return UID&&GK.indexOf(k)<0?'u:'+UID+':'+k:k};
 var keepKey=function(k){if(k==='acc'||k==='sess'||k==='guest')return false;if(k==='lang'||k==='theme')return true;return UID?k.indexOf('u:'+UID+':')===0:k.indexOf('u:')!==0};
 var ld=function(k,d){try{var v=JSON.parse(localStorage.getItem(K(k)));return v==null?d:v}catch(e){return d}};
@@ -1585,7 +1585,11 @@ el.addEventListener('click',go);
 setTimeout(go,rm?1200:1500);
 }catch(e){reload()}
 }
-function enter(email,name,first){try{if(first)Object.keys(localStorage).forEach(function(k){if(GK.indexOf(k)<0&&k.indexOf('u:')!==0)localStorage.setItem('u:'+email+':'+k,localStorage.getItem(k))});var nk='u:'+email+':name';if(name&&localStorage.getItem(nk)==null)localStorage.setItem(nk,JSON.stringify(name));localStorage.setItem('sess',email);localStorage.removeItem('guest')}catch(e){}cglWalkIn(email,name,first)}
+function enter(email,name,first){
+try{localStorage.setItem('sess',email);localStorage.removeItem('guest')}catch(e){try{sessionStorage.setItem('sess',email)}catch(x){}}
+try{if(first){var full=0;Object.keys(localStorage).forEach(function(k){if(full||GK.indexOf(k)<0&&k.indexOf('u:')===0||GK.indexOf(k)>=0||k.indexOf('sb-')===0)return;try{localStorage.setItem('u:'+email+':'+k,localStorage.getItem(k))}catch(e){full=1}})}}catch(e){}
+try{var nk='u:'+email+':name';if(name&&localStorage.getItem(nk)==null)localStorage.setItem(nk,JSON.stringify(name))}catch(e){}
+cglWalkIn(email,name,first)}
 var fail=function(m){cglHide();AU.err=m;AU.busy=0;render()};
 var G_SVG='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
 function authV(){var up=AU.m==='up',first=!AU.seen,rec=!!AU.rec,ph=HSB&&AU.t==='ph'&&!rec,pm=AU.pm,ps=AU.ps;AU.seen=1;
@@ -1648,7 +1652,7 @@ A.agoogle=function(){AU.err='';if(!GCID){AU.err=o('Google sign-in is not set up 
 if(!(window.google&&google.accounts&&google.accounts.oauth2)){AU.err=o('Google is still loading or is blocked. Check your internet and try again.','Google ຍັງໂຫຼດບໍ່ສຳເລັດ ຫຼື ຖືກບລັອກ. ກວດອິນເຕີເນັດ ແລ້ວລອງໃໝ່.');loadG().then(render,render);return}
 var bad=function(){fail(o('Google sign-in did not finish. Please try again.','ການເຂົ້າສູ່ລະບົບດ້ວຍ Google ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.'))};
 google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid email profile',callback:function(r){if(!r||!r.access_token)return bad();fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}}).then(function(x){return x.json()}).then(function(u){if(!u.email)throw 0;var e=u.email.toLowerCase(),ac=ld('acc',{}),first=!Object.keys(ac).length;if(!ac[e]){ac[e]={n:u.name||e.split('@')[0],g:1};sv('acc',ac)}enter(e,ac[e].n,first)}).catch(bad)},error_callback:bad}).requestAccessToken()};
-A.pout=function(){try{localStorage.removeItem('sess');localStorage.removeItem('guest')}catch(e){}location.reload()};
+A.pout=function(){try{localStorage.removeItem('sess');localStorage.removeItem('guest')}catch(e){}try{sessionStorage.removeItem('sess')}catch(e){}location.reload()};
 document.addEventListener('keydown',function(e){if(S.tab==='auth'&&e.key==='Enter'&&/^a[enp]$/.test(e.target.id||'')&&!(HSB&&(AU.t==='ph'||AU.rec))){A.asubmit();render()}});
 var pf=profV;profV=function(){var h=pf();if(!UID)return h;var u=ld('acc',{})[UID]||{};return h+'<div class="g" style="padding:14px 18px"><div class="s">'+o('Signed in as','ເຂົ້າສູ່ລະບົບດ້ວຍ')+(u.g?' · Google':'')+'</div><b>'+esc(UID)+'</b></div>'};
 var rdA=render;render=function(){if(S.tab==='auth'){document.documentElement.lang=lo()?'lo':'en';document.documentElement.classList.remove('cloud');$('#app').innerHTML=authV();if(GCID)loadG().catch(function(){});return}rdA()};
@@ -1658,7 +1662,10 @@ var SBU=(window.APP_CONFIG&&APP_CONFIG.supabaseUrl)||'',SBK=(window.APP_CONFIG&&
 window.frCtx=function(){var id=SBUID||'';try{if(!id&&typeof LB!=='undefined'&&LB.id)id=LB.id}catch(e){}return{sb:SB,uid:id}};
 var SYK=['name','notes','done','st','tgt','tdate','goal','est','onb','rem','wi','wifi','ytc','pav','chat','chtopic','draft','lbjoin'];
 var sv1=sv;
-function loadSB(){return SBP||(SBP=new Promise(function(res,rej){if(window.supabase&&supabase.createClient){res();return}var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';s.async=1;s.onload=res;s.onerror=rej;document.head.appendChild(s)}).then(function(){SB=supabase.createClient(SBU,SBK,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return SB}).catch(function(e){SBP=null;throw e}))}
+var SBS={getItem:function(k){try{var v=localStorage.getItem(k);if(v!=null)return v}catch(e){}try{return sessionStorage.getItem(k)}catch(e){return null}},
+setItem:function(k,v){try{localStorage.setItem(k,v);try{sessionStorage.removeItem(k)}catch(e){}return}catch(e){}try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.setItem(k,v)}catch(e){}},
+removeItem:function(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}};
+function loadSB(){return SBP||(SBP=new Promise(function(res,rej){if(window.supabase&&supabase.createClient){res();return}var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';s.async=1;s.onload=res;s.onerror=rej;document.head.appendChild(s)}).then(function(){SB=supabase.createClient(SBU,SBK,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:SBS}});return SB}).catch(function(e){SBP=null;throw e}))}
 function sbMsg(e){var m=((e&&e.message)||'').toLowerCase();
 if(m.indexOf('invalid login')>=0)return o('Wrong email or password.','ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກ.');
 if(m.indexOf('already registered')>=0||m.indexOf('already been registered')>=0)return o('This email already has an account. Try signing in.','ອີເມວນີ້ມີບັນຊີແລ້ວ. ລອງເຂົ້າສູ່ລະບົບ.');
@@ -1743,7 +1750,7 @@ var pf2=profV;profV=function(){var h=pf2();if(!UID)return h;var u=ld('acc',{})[U
 loadSB().then(function(sb){return sb.auth.getSession()}).then(function(r){var ses=r&&r.data&&r.data.session;
 if(REC){if(ses&&ses.user){AU.rec=1}else{AU.err=o('This reset link has expired. Request a new one.','ລິ້ງນີ້ໝົດອາຍຸແລ້ວ. ກະລຸນາຂໍໃໝ່.')}S.tab='auth';render();return}
 if(ses&&ses.user){var em=(ses.user.email||'').toLowerCase();if(!em&&ses.user.phone){var pk='+'+String(ses.user.phone).replace(/^\+/,'');if(pk!==UID){sbEnterPhone(ses.user);return}sbSync(ses.user);return}if(em&&em!==UID){sbEnter(ses.user);return}sbSync(ses.user)}
-else if(UID&&(ld('acc',{})[UID]||{}).sb){try{localStorage.removeItem('sess')}catch(e){}location.reload()}}).catch(function(){})}
+else if(UID&&(ld('acc',{})[UID]||{}).sb){try{localStorage.removeItem('sess')}catch(e){}try{sessionStorage.removeItem('sess')}catch(e){}location.reload()}}).catch(function(){})}
 
 /* ===== Leaderboard (ອັນດັບ) on Supabase ===== */
 if(SBU&&SBK){
