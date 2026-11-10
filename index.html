@@ -2145,7 +2145,7 @@ TK2='<svg width="19" height="17" viewBox="0 0 24 24" fill="none" stroke="current
 function tkT(id,ts){var t=Date.parse(ts)||0,seen=t&&t<=(F.rd[id]||0),dlv=seen||F.on[id]||(F.ls[id]||0)>t;
 return '<span class="fx-tk'+(seen?' rd':'')+'" role="img" aria-label="'+(seen?o('Read','ອ່ານແລ້ວ'):dlv?o('Delivered','ສົ່ງເຖິງແລ້ວ'):o('Sent','ສົ່ງແລ້ວ'))+'">'+(dlv?TK2:TK1)+'</span>'}
 function avW(id,z){var d=Math.max(11,Math.round(z*.26));return '<span class="fx-avw">'+avImg(id,z)+(F.on[id]?'<i class="fx-dot" style="width:'+d+'px;height:'+d+'px"></i>':'')+'</span>'}
-function stTxt(id){if(F.on[id])return o('Online','ອອນລາຍ');var t=F.ls[id];if(!t)return o('Offline','ອອຟລາຍ');var d=new Date(t),n=new Date(),y=new Date(n.getTime()-864e5),hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+function stTxt(id){if(F.on[id])return o('Online','ອອນລາຍ');var t=F.ls[id];if(!t)return o('Offline','ອອຟລາຍ');if(Date.now()-t<90000)return o('Last seen just now','ເຫັນຄັ້ງລ່າສຸດ ຫາກໍ່ນີ້');var d=new Date(t),n=new Date(),y=new Date(n.getTime()-864e5),hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
 if(d.toDateString()===n.toDateString())return o('Last seen today at '+hm,'ເຫັນຄັ້ງລ່າສຸດມື້ນີ້ ເວລາ '+hm);
 if(d.toDateString()===y.toDateString())return o('Last seen yesterday at '+hm,'ເຫັນຄັ້ງລ່າສຸດມື້ວານ ເວລາ '+hm);
 return o('Last seen ','ເຫັນຄັ້ງລ່າສຸດ ')+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()}
@@ -2157,13 +2157,13 @@ s.from('dm_read').select('user_id,read_at').in('user_id',ids).eq('peer_id',me())
 function loadLs(ids){var s=sb();if(!s||F.lsOff||!ids||!ids.length)return;
 s.from('user_presence').select('user_id,last_seen').in('user_id',ids).then(function(r){if(r.error){if(/user_presence|relation|schema|exist/i.test(r.error.message||''))F.lsOff=1;return}var ch=0;(r.data||[]).forEach(function(u){var t=Date.parse(u.last_seen)||0;if(t!==F.ls[u.user_id]){F.ls[u.user_id]=t;ch=1}});if(ch&&S.tab==='fr')render()}).catch(function(){})}
 function beat(){var s=sb(),id=me();if(!s||!id||F.lsOff)return;s.from('user_presence').upsert({user_id:id,last_seen:new Date().toISOString()},{onConflict:'user_id'}).then(function(r){if(r&&r.error&&/user_presence|relation|schema|exist/i.test(r.error.message||''))F.lsOff=1}).catch(function(){})}
-function presInit(){var s=sb(),id=me();if(!s||!id)return;
+function presInit(){var s=sb(),id=me();if(!s||!id)return;if(typeof SBUID!=='undefined'&&SBUID&&id!==SBUID)id=SBUID;
 try{var ch=s.channel('presence:app',{config:{presence:{key:id}}});
-ch.on('presence',{event:'sync'},function(){var st=ch.presenceState(),on={};Object.keys(st).forEach(function(k){on[k]=1});if(Object.keys(on).sort().join()!==Object.keys(F.on).sort().join()){F.on=on;if(S.tab==='fr')render()}});
+ch.on('presence',{event:'sync'},function(){var st=ch.presenceState(),on={},gone=[];Object.keys(st).forEach(function(k){on[k]=1});Object.keys(F.on).forEach(function(k){if(!on[k]&&k!==id){F.ls[k]=Date.now();gone.push(k)}});if(Object.keys(on).sort().join()!==Object.keys(F.on).sort().join()){F.on=on;if(gone.length)setTimeout(function(){loadLs(gone)},1500);if(S.tab==='fr')render()}});
 ch.subscribe(function(status){if(status==='SUBSCRIBED'&&!document.hidden){try{ch.track({t:Date.now()})}catch(e){}}});F.pc=ch}catch(e){}
 try{s.channel('rd-'+id).on('postgres_changes',{event:'*',schema:'public',table:'dm_read',filter:'peer_id=eq.'+id},function(p){var r=p.new;if(r&&r.user_id)setRd(r.user_id,r.read_at)}).subscribe()}catch(e){}
-beat();setInterval(function(){if(!document.hidden)beat()},45000);
-setInterval(function(){if(document.hidden||S.tab!=='fr'||!F.peer)return;F.pt=(F.pt||0)+1;loadRd([F.peer]);if(F.pt%5===0)loadLs([F.peer])},6000);
+beat();setInterval(function(){if(!document.hidden){beat();try{F.pc&&F.pc.track({t:Date.now()})}catch(e){}}},30000);window.addEventListener('online',function(){setTimeout(function(){try{F.pc&&F.pc.track({t:Date.now()})}catch(e){}beat()},800)});
+setInterval(function(){if(document.hidden||S.tab!=='fr'||!F.peer)return;F.pt=(F.pt||0)+1;loadRd([F.peer]);if(F.pt%2===0)loadLs([F.peer])},6000);
 document.addEventListener('visibilitychange',function(){beat();if(document.hidden){try{F.pc&&F.pc.untrack()}catch(e){}}else{try{F.pc&&F.pc.track({t:Date.now()})}catch(e){}if(S.tab==='fr'&&F.peer){var lm=F.msgs.filter(function(x){return x.a===F.peer}).pop();if(lm)markRead(F.peer,lm.created_at)}}});
 window.addEventListener('pagehide',function(){beat();try{F.pc&&F.pc.untrack()}catch(e){}})}
 var rs=document.createElement('style');rs.textContent='.fx-avw{position:relative;display:inline-flex;flex:none}.fx-dot{position:absolute;right:1px;bottom:1px;border-radius:50%;background:#22c55e;border:2px solid #fff;box-sizing:border-box}'
