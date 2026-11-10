@@ -1451,34 +1451,32 @@ background:linear-gradient(180deg,var(--cgl1),var(--cgl2) 58%,var(--cgl3));color
 .cgl-gr{position:absolute;left:-6%;right:-6%;bottom:0;height:25%;border-radius:50% 50% 0 0/28px 28px 0 0;background:linear-gradient(180deg,var(--cgl-g1),var(--cgl-g2));box-shadow:inset 0 5px 0 rgba(255,255,255,.35)}
 .cgl-gr::before{content:"";position:absolute;left:0;right:0;top:36%;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 18px,transparent 18px 38px)}
 .cgl-pe{position:absolute;top:-24px;width:10px;height:14px;border-radius:70% 0 70% 0;background:var(--cgl-pe);opacity:.8;animation:cglpe 2.8s linear infinite}
-.cgl-girl{position:absolute;left:0;bottom:calc(25% - 18px);width:min(36vw,150px,24vh);animation:cglgo 2.45s linear .25s both}
+.cgl-girl{position:absolute;left:50%;bottom:calc(25% - 18px);width:min(36vw,150px,24vh);transform:translateX(-50%);transform-origin:50% 100%;animation:cglspin 2.3s cubic-bezier(.45,.05,.4,1) .3s both}
 .cgl-svg{display:block;width:100%;height:auto;overflow:visible}
 .cgl-skip{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;font-weight:600;opacity:0;animation:cglsk .4s 1.2s forwards}
-.cgl-bob{animation:cglBob .5s ease-in-out infinite}
-.cgl-lgw,.cgl-lg{animation-duration:.5s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
-.cgl-lgw{animation-name:cglLift}
-.cgl-lg{animation-name:cglLeg}
+.cgl-bob{animation:cglBob .8s ease-in-out infinite}
+.cgl-lgw,.cgl-lg{animation:none}
 .cgl-lgw.r,.cgl-lg.r,.cgl-ar.r{animation-delay:-.25s}
 .cgl-lg.l{transform-origin:51px 146px}
 .cgl-lg.r{transform-origin:69px 146px}
-.cgl-ar{animation:cglArm .5s ease-in-out infinite}
+.cgl-ar{animation:cglArmL 1.1s ease-in-out infinite}
 .cgl-ar.l{transform-origin:41px 100px}
-.cgl-ar.r{transform-origin:79px 100px}
+.cgl-ar.r{transform-origin:79px 100px;animation-name:cglArmR;animation-delay:0s}
 .cgl-dr{transform-origin:60px 98px;animation:cglSway .5s ease-in-out infinite}
 .cgl-hd{transform-origin:60px 80px;animation:cglHead 1s ease-in-out infinite}
 .cgl-pt{animation:cglPt .5s ease-in-out infinite;animation-delay:-.12s}
 .cgl-pt.l{transform-origin:31px 57px}
 .cgl-pt.r{transform-origin:89px 57px;animation-delay:-.2s}
 .cgl-ey{transform-origin:61px 54px;animation:cglBl 1.5s infinite}
-.cgl-sh{transform-origin:60px 190px;animation:cglSh .5s ease-in-out infinite}
+.cgl-sh{transform-origin:60px 190px;animation:cglSh .8s ease-in-out infinite}
 @keyframes cglin{to{opacity:1}}
-@keyframes cglgo{from{transform:translateX(-120%)}to{transform:translateX(calc(100vw + 20%))}}
+@keyframes cglspin{from{transform:translateX(-50%) perspective(700px) rotateY(0deg)}to{transform:translateX(-50%) perspective(700px) rotateY(720deg)}}
 @keyframes cglpop{from{opacity:0;transform:translateY(12px) scale(.92)}to{opacity:1;transform:none}}
 @keyframes cglsk{to{opacity:.55}}
 @keyframes cglpe{from{transform:translate3d(0,-24px,0) rotate(0)}to{transform:translate3d(46px,105vh,0) rotate(340deg)}}
 @keyframes cglLeg{0%,100%{transform:rotate(-30deg)}50%{transform:rotate(30deg)}}
 @keyframes cglLift{0%,50%,100%{transform:translateY(0)}75%{transform:translateY(-5px)}}
-@keyframes cglArm{0%,100%{transform:rotate(32deg)}50%{transform:rotate(-32deg)}}
+@keyframes cglArmL{0%,100%{transform:rotate(34deg)}50%{transform:rotate(46deg)}}@keyframes cglArmR{0%,100%{transform:rotate(-34deg)}50%{transform:rotate(-46deg)}}
 @keyframes cglBob{0%,50%,100%{transform:translateY(4.5px)}25%,75%{transform:translateY(0)}}
 @keyframes cglSway{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-2deg)}}
 @keyframes cglHead{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
