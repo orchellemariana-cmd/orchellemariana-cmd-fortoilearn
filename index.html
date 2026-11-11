@@ -2738,6 +2738,120 @@ var r=w.getBoundingClientRect(),x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.wid
 var go=function(){var d=vpDur();if(d&&VP.a)try{VP.a.currentTime=x*d}catch(er){}vpUI()};
 if(VP.id==id&&VP.a){go();return}A.fvp({i:id});if(VP.a){var a=VP.a;if(a.readyState>0)go();else a.addEventListener('loadedmetadata',go,{once:true})}});
 document.addEventListener('visibilitychange',function(){if(document.hidden&&VP.a&&!VP.a.paused){VP.a.pause();vpUI()}});
+/* ===== v6: message actions (reply / forward / share / pin / edit / unsend / delete) + unread badge ===== */
+function pairQ(a,b){return 'and(a.eq.'+a+',b.eq.'+b+'),and(a.eq.'+b+',b.eq.'+a+')'}
+function mById(id){for(var i=F.msgs.length-1;i>=0;i--)if(String(F.msgs[i].id)===String(id))return F.msgs[i];return null}
+function isDel(m){return !!(m&&(m.deleted_at||m.body==='[[unsent]]'))}
+function plain(m){return !!(m&&m.kind==='text'&&!isDel(m)&&!fxParse(m.body))}
+function nm(id){return id===me()?o('You','ເຈົ້າ'):(F.names[id]||'?')}
+function snip(m){if(!m)return '';if(isDel(m))return '🚫 '+o('Message unsent','ຖອນຂໍ້ຄວາມແລ້ວ');if(m.kind==='voice')return '🎤 '+o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(m.dur||0);var b=m.body!=null?m.body:(m.preview||'');return String(lbl(b)).slice(0,90)}
+function xcol(er){return /\b(reply_to|fwd|edited_at|deleted_at|pinned_at|pinned_by|updated_at)\b/i.test((er&&er.message)||'')}
+function setupTx(){return o('Run chat_features.sql in Supabase to use this.','ແລ່ນ chat_features.sql ໃນ Supabase ເພື່ອໃຊ້ຟີເຈີນີ້.')}
+function failTx(){return o('Could not update. Try again.','ອັບເດດບໍ່ໄດ້. ລອງໃໝ່.')}
+function tm2(ts){var d=new Date(ts);return isNaN(d)?'':('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+function cvFix(){var pr=F.peer,lm=F.msgs[F.msgs.length-1];if(!pr||!lm)return;F.cv[pr]={ts:lm.created_at,k:lm.kind,d:lm.dur,p:lm.kind==='text'?String(lm.body).slice(0,80):'',mine:lm.a===me()}}
+F.rq=F.rq||{};F.rqq=F.rqq||{};F.pins=F.pins||[];F.pi=0;F.ma='';F.cf='';F.fw='';F.rp=null;F.ed='';
+/* reply quote info (loads the original lazily if it is older than the loaded window) */
+function rqInfo(id){var m=mById(id),c=F.rq[id];if(m)return{who:nm(m.a),t:snip(m)};if(c)return{who:c.a?nm(c.a):'',t:c.t};
+ if(!F.rqq[id]&&sb()){F.rqq[id]=1;sb().from('dm').select('id,a,kind,dur,preview,created_at').eq('id',id).limit(1).then(function(r){var x=r&&r.data&&r.data[0];F.rq[id]=x?{a:x.a,created_at:x.created_at,t:x.preview==='[[unsent]]'?snip({body:'[[unsent]]'}):x.kind==='voice'?'🎤 '+o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(x.dur||0):String(lbl(x.preview||'')).slice(0,90)}:{a:'',t:o('Original message unavailable','ບໍ່ພົບຂໍ້ຄວາມຕົ້ນສະບັບ')};if(S.tab==='fr')render()}).catch(function(){})}
+ return{who:'',t:'…'}}
+/* one message bubble */
+function bubX(m,me_,vo0,fi){var del=isDel(m),vo=vo0&&!del,q='',fw='',body,meta;
+if(m.reply_to&&!del){var rq=rqInfo(m.reply_to);q='<div class="fx-rq" data-a="fjump" data-i="'+esc(m.reply_to)+'"><b>'+esc(rq.who)+'</b><em>'+esc(rq.t)+'</em></div>'}
+if(m.fwd&&!del)fw='<div class="fx-fwd">↪ '+o('Forwarded','ສົ່ງຕໍ່ແລ້ວ')+'</div>';
+body=del?'<span class="fx-del">🚫 '+(me_?o('You unsent this message','ເຈົ້າຖອນຂໍ້ຄວາມນີ້ແລ້ວ'):o('This message was unsent','ຂໍ້ຄວາມນີ້ຖືກຖອນແລ້ວ'))+'</span>':(vo?vmHTML(m,me_):(fxBody(m)||esc(m.body)));
+meta=(m.pinned_at&&!del?'<span class="fx-pn">📌</span> ':'')+(m.edited_at&&!del?'<span class="fx-ed">'+o('edited','ແກ້ໄຂແລ້ວ')+'</span> · ':'')+tm2(m.created_at)+(me_&&!del?tkT(F.peer,m.created_at):'');
+return '<div class="fx-crow'+(me_?' me':'')+(fi>=0?' fresh':'')+'" data-mid="'+esc(m.id)+'"'+(fi>=0?' style="--d:'+fi+'"':'')+'>'+avImg(me_?me():F.peer,46)+'<div class="fx-cw">'+fw+q+'<div class="fx-cb'+(vo?' vo':'')+(del?' del':fxCls(m))+'">'+body+'</div><div class="fx-ct">'+meta+'</div></div></div>'}
+/* pinned bar */
+function pinsList(){var map={};F.pins.forEach(function(p){map[p.id]=p});F.msgs.forEach(function(m){if(m.pinned_at&&!isDel(m))map[m.id]=m;else delete map[m.id]});return Object.keys(map).map(function(k){return map[k]}).sort(function(a,b){return (Date.parse(b.pinned_at)||0)-(Date.parse(a.pinned_at)||0)})}
+function pinBar(){if(!F.peer)return '';var ps=pinsList();if(!ps.length)return '';var i=F.pi%ps.length,p=ps[i];return '<div class="fx-pinb"><button class="fx-pinj" data-a="fpinj"><span class="fx-pinn"><b>📌 '+o('Pinned message','ຂໍ້ຄວາມທີ່ປັກໝຸດ')+(ps.length>1?' · '+(i+1)+'/'+ps.length:'')+'</b><em>'+esc(snip(p))+'</em></span></button><button class="fx-pinx" data-a="fpinm" data-i="'+esc(p.id)+'" aria-label="'+o('Unpin','ຖອນໝຸດ')+'">'+ic('x',16)+'</button></div>'}
+/* reply / edit bar above the composer */
+function compBar(){if(F.ed)return '<div class="fx-bar"><span class="fx-barb"><b>✏️ '+o('Editing message','ກຳລັງແກ້ໄຂຂໍ້ຄວາມ')+'</b></span><button class="fx-barx" data-a="fbarx" aria-label="Cancel">'+ic('x',16)+'</button></div>';
+ if(F.rp)return '<div class="fx-bar"><span class="fx-barb"><b>↩ '+o('Replying to','ກຳລັງຕອບກັບ')+' '+esc(nm(F.rp.a))+'</b><em>'+esc(F.rp.t)+'</em></span><button class="fx-barx" data-a="fbarx" aria-label="Cancel">'+ic('x',16)+'</button></div>';return ''}
+/* action sheet + forward picker */
+var ICO={reply:'M9 14L4 9l5-5M4 9h10a6 6 0 016 6v3',fwd:'M15 14l5-5-5-5M20 9H10a6 6 0 00-6 6v3',share:'M12 3v12M8 7l4-4 4 4M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6',copy:'M9 9h10v12H9zM5 15V3h10',pin:'M12 17v5M8 3h8l-1 6 3 4H6l3-4z',edit:'M4 20h4L19 9l-4-4L4 16zM13 7l4 4',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'};
+function aico(k){return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+ICO[k]+'"/></svg>'}
+function msgPop(){
+if(F.fw){var fm=mById(F.fw);if(!fm)return '';var rows=(F.list||[]).filter(function(c){return c.user_id&&c.user_id!==me()}).map(function(c){return '<button class="fx-fwr" data-a="ffwto" data-p="'+esc(c.user_id)+'">'+avImg(c.user_id,40)+'<b>'+esc(F.names[c.user_id]||'?')+'</b><i>'+o('Send','ສົ່ງ')+'</i></button>'}).join('');
+ return '<div class="fx-ov dim" data-a="fmclose"></div><div class="fx-sheet fx-act"><div class="fx-actp">↪ '+o('Forward to…','ສົ່ງຕໍ່ຫາ…')+' <b>'+esc(snip(fm))+'</b></div><div class="fx-fwl">'+(rows||'<div class="fx-actp">'+o('No friends yet','ຍັງບໍ່ມີໝູ່')+'</div>')+'</div></div>'}
+if(!F.ma)return '';var m=mById(F.ma);if(!m)return '';
+var mine=m.a===me(),del=isDel(m),vo=m.kind==='voice',pl=plain(m),id=esc(m.id);
+var it=function(a,k,t,c){return '<button class="fx-ai'+(c?' '+c:'')+'" data-a="'+a+'" data-i="'+id+'"><span class="fx-aic">'+aico(k)+'</span>'+t+'</button>'};
+if(F.cf)return '<div class="fx-ov dim" data-a="fmclose"></div><div class="fx-sheet fx-act"><div class="fx-actp"><b>'+(F.cf==='uns'?o('Unsend this message for everyone?','ຖອນຂໍ້ຄວາມນີ້ສຳລັບທຸກຄົນບໍ?'):o('Delete this message for you?','ລຶບຂໍ້ຄວາມນີ້ສຳລັບເຈົ້າບໍ?'))+'</b><br>'+(F.cf==='uns'?o('It will disappear from both chats.','ຈະຫາຍໄປຈາກທັງສອງຝ່າຍ.'):o('The other person will still see it.','ອີກຝ່າຍຍັງຈະເຫັນຢູ່.'))+'</div>'+it(F.cf==='uns'?'funsok':'fdelok','trash',F.cf==='uns'?o('Unsend','ຖອນຂໍ້ຄວາມ'):o('Delete','ລຶບ'),'bad')+'<button class="fx-ai" data-a="fmclose"><span class="fx-aic">'+ic('x',20)+'</span>'+o('Cancel','ຍົກເລີກ')+'</button></div>';
+var l='';
+if(!del){l+=it('frp','reply',o('Reply','ຕອບກັບ'))+it('ffw','fwd',o('Forward','ສົ່ງຕໍ່'));if(vo)l+=it('fshare','share',o('Share audio','ແບ່ງປັນສຽງ'));if(pl)l+=it('fcopy','copy',o('Copy','ສຳເນົາ'));l+=it('fpin','pin',m.pinned_at?o('Unpin','ຖອນໝຸດ'):o('Pin','ປັກໝຸດ'));if(mine&&pl)l+=it('fedit','edit',o('Edit','ແກ້ໄຂ'));if(mine)l+=it('funs','trash',o('Unsend for everyone','ຖອນຂໍ້ຄວາມສຳລັບທຸກຄົນ'),'bad')}
+l+=it('fdel','trash',o('Delete for me','ລຶບສຳລັບຂ້ອຍ'),'bad');
+return '<div class="fx-ov dim" data-a="fmclose"></div><div class="fx-sheet fx-act"><div class="fx-actp">'+esc(snip(m))+'</div>'+l+'</div>'}
+/* server update helper (optimistic, rolls back on failure) */
+function upd(id,f,ok,rb){var s=sb();if(!s){if(rb)rb();return}s.from('dm').update(f).eq('id',id).select('id').then(function(r){var bad=r.error||!r.data||!r.data.length;if(bad){if(rb)rb();fxToast((!r.error||xcol(r.error))?setupTx():failTx())}else if(ok)ok();if(S.tab==='fr')render()}).catch(function(){if(rb)rb();fxToast(failTx());if(S.tab==='fr')render()})}
+/* actions */
+A.fmclose=function(){F.ma='';F.cf='';F.fw=''};
+A.frp=function(d){var m=mById(d.i);if(!m||isDel(m))return;F.ed='';F.rp={id:m.id,a:m.a,t:snip(m)};F.ma='';setTimeout(function(){var i=$('#fi');if(i)i.focus()},40)};
+A.fbarx=function(){if(F.ed){var i=$('#fi');if(i)i.value=''}F.rp=null;F.ed=''};
+A.fedit=function(d){var m=mById(d.i);if(!m||!plain(m)||m.a!==me())return;F.rp=null;F.ed=m.id;F.ma='';setTimeout(function(){var i=$('#fi');if(i){i.value=m.body;i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}},40)};
+A.fpin=function(d){var m=mById(d.i);if(!m||isDel(m))return;var on=!m.pinned_at,op=m.pinned_at,ob=m.pinned_by;m.pinned_at=on?new Date().toISOString():null;m.pinned_by=on?me():null;F.ma='';upd(m.id,{pinned_at:m.pinned_at,pinned_by:m.pinned_by},function(){loadPins()},function(){m.pinned_at=op;m.pinned_by=ob})};
+A.fpinm=function(d){var m=mById(d.i);if(m){A.fpin({i:d.i});return}var old=F.pins;F.pins=F.pins.filter(function(p){return String(p.id)!==String(d.i)});upd(d.i,{pinned_at:null,pinned_by:null},null,function(){F.pins=old})};
+A.fpinj=function(){var ps=pinsList();if(!ps.length)return;var p=ps[F.pi%ps.length];F.pi=(F.pi+1)%ps.length;jump(p.id)};
+A.fjump=function(d){jump(d.i)};
+A.funs=function(){F.cf='uns'};
+A.funsok=function(d){var m=mById(d.i||F.ma);F.ma='';F.cf='';if(!m||m.a!==me()||isDel(m))return;var o0={b:m.body,k:m.kind,d:m.dur,p:m.pinned_at,pb:m.pinned_by,da:m.deleted_at},iso=new Date().toISOString();if(VP.id==m.id)vpStop();m.deleted_at=iso;m.body='[[unsent]]';m.kind='text';m.dur=null;m.pinned_at=null;m.pinned_by=null;cvFix();upd(m.id,{deleted_at:iso},null,function(){m.body=o0.b;m.kind=o0.k;m.dur=o0.d;m.pinned_at=o0.p;m.pinned_by=o0.pb;m.deleted_at=o0.da;cvFix()})};
+A.fdel=function(){F.cf='del'};
+A.fdelok=function(d){var id=d.i||F.ma;F.hid=F.hid||ld('frhid',{});F.hid[id]=1;var k=Object.keys(F.hid);if(k.length>600)k.slice(0,k.length-600).forEach(function(x){delete F.hid[x]});sv('frhid',F.hid);if(VP.id==id)vpStop();F.ma='';F.cf=''};
+A.fcopy=function(d){var m=mById(d.i);F.ma='';if(!m)return;var t=String(m.body||''),done=function(){fxToast(o('Copied','ສຳເນົາແລ້ວ'))},fb=function(){try{var x=document.createElement('textarea');x.value=t;x.style.cssText='position:fixed;opacity:0';document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()}catch(e){}};try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}};
+A.ffw=function(d){F.fw=d.i;F.ma='';F.cf=''};
+A.ffwto=function(d){var m=mById(F.fw);F.fw='';if(!m||!d.p||isDel(m))return;send(m.kind,m.body,m.dur,{to:d.p,fwd:true});fxToast(o('Forwarded to ','ສົ່ງຕໍ່ໃຫ້ ')+(F.names[d.p]||''))};
+A.fshare=function(d){var m=mById(d.i);F.ma='';if(!m||m.kind!=='voice'||!m.body)return;try{var p=String(m.body).split(','),mt=(/data:([^;,]+)/.exec(p[0])||[])[1]||'audio/webm',bin=atob(p[1]),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);var ex=/mp4|m4a|aac/.test(mt)?'m4a':/ogg/.test(mt)?'ogg':/mpeg|mp3/.test(mt)?'mp3':'webm',fl=new File([u],'voice-message.'+ex,{type:mt});
+ if(navigator.canShare&&navigator.canShare({files:[fl]}))navigator.share({files:[fl],title:o('Voice message','ຂໍ້ຄວາມສຽງ')}).catch(function(){});
+ else{var url=URL.createObjectURL(fl),a=document.createElement('a');a.href=url;a.download=fl.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},4000);fxToast(o('Audio saved','ບັນທຶກສຽງແລ້ວ'))}}catch(e){fxToast(failTx())}};
+function flash(el){try{el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}el.classList.add('hl');setTimeout(function(){el.classList.remove('hl')},1700)}
+function jump(id){var el=document.querySelector('.fx-crow[data-mid="'+String(id).replace(/"/g,'')+'"]');if(el){flash(el);return}
+ var c=F.rq[id]||F.pins.filter(function(x){return String(x.id)===String(id)})[0],ts=c&&c.created_at,s=sb(),a=me(),b=F.peer;if(!ts||!s)return fxToast(o('Message not available','ບໍ່ພົບຂໍ້ຄວາມ'));
+ s.from('dm').select('*').or(pairQ(a,b)).gte('created_at',ts).order('created_at',{ascending:true}).limit(200).then(function(r){if(F.peer!==b||r.error||!r.data||!r.data.length)return;F.msgs=r.data;F.sc=0;render();setTimeout(function(){var e2=document.querySelector('.fx-crow[data-mid="'+String(id).replace(/"/g,'')+'"]');if(e2)flash(e2)},80)})}
+/* long-press (touch) / right-click (desktop) opens the sheet */
+var LP={t:0,x:0,y:0,fired:0};
+function lpOpen(id){if(!id||S.tab!=='fr'||!F.peer||!mById(id))return;try{navigator.vibrate&&navigator.vibrate(14)}catch(e){}var ht=document.getElementById('fsoon');if(ht)ht.remove();F.ma=id;F.cf='';F.fw='';render()}
+document.addEventListener('pointerdown',function(e){LP.fired=0;clearTimeout(LP.t);LP.t=0;if(S.tab!=='fr'||!F.peer||e.button>0)return;var r=e.target.closest&&e.target.closest('.fx-crow[data-mid]');if(!r||e.target.closest('.fx-rq'))return;LP.x=e.clientX;LP.y=e.clientY;var id=r.getAttribute('data-mid');LP.t=setTimeout(function(){LP.t=0;LP.fired=1;lpOpen(id)},430)},{passive:true});
+document.addEventListener('pointermove',function(e){if(LP.t&&(Math.abs(e.clientX-LP.x)>10||Math.abs(e.clientY-LP.y)>10)){clearTimeout(LP.t);LP.t=0}},{passive:true});
+['pointerup','pointercancel','scroll'].forEach(function(n){document.addEventListener(n,function(){clearTimeout(LP.t);LP.t=0},true)});
+document.addEventListener('click',function(e){if(LP.fired){LP.fired=0;e.preventDefault();e.stopPropagation()}},true);
+document.addEventListener('contextmenu',function(e){var r=e.target.closest&&e.target.closest('.fx-crow[data-mid]');if(!r||S.tab!=='fr'||!F.peer)return;e.preventDefault();if(LP.fired||F.ma)return;clearTimeout(LP.t);lpOpen(r.getAttribute('data-mid'))});
+function hint(){if(S.tab!=='fr'||!F.peer||!F.msgs.length||ld('frhint',0))return;sv('frhint',1);fxToast(o('Hold a message for options','ກົດຄ້າງຂໍ້ຄວາມເພື່ອເບິ່ງຕົວເລືອກ'))}
+/* syncing edits / unsends / pins made by the other person */
+function applyUpd(u){var m=mById(u.id);if(!m)return false;var ch=false;['edited_at','deleted_at','pinned_at','pinned_by','updated_at'].forEach(function(k){if(u[k]!==undefined&&u[k]!==m[k]){m[k]=u[k];ch=true}});
+ if(u.deleted_at){if(m.body!=='[[unsent]]'){m.body='[[unsent]]';m.kind='text';m.dur=null;ch=true}}else if(typeof u.body==='string'&&m.kind==='text'&&u.body!==m.body){m.body=u.body;ch=true}return ch}
+function frUpd(p){var u=p&&p.new;if(!u||!u.id)return;var ch=applyUpd(u),pr=u.a===me()?u.b:u.a,c=F.cv[pr];
+ if(u.deleted_at){if(c&&c.ts===u.created_at){c.p='[[unsent]]';c.k='text'}if(u.b===me()){var rd=ld('frread',{})[u.a];if(!rd||u.created_at>rd)F.un[u.a]=Math.max(0,(F.un[u.a]||0)-1);navBadge()}}
+ else if(c&&c.ts===u.created_at&&u.kind==='text'&&typeof u.body==='string')c.p=u.body.slice(0,80);
+ if(F.peer&&pr===F.peer)loadPins();if(S.tab==='fr'&&(ch||!F.peer))render()}
+function upInit(){var t='';F.msgs.forEach(function(m){var x=m.updated_at||m.created_at||'';if(x>t)t=x});F.upTs=t}
+function loadPins(){var s=sb(),a=me(),b=F.peer;if(!s||!a||!b||F.xOff)return;s.from('dm').select('id,a,b,kind,dur,created_at,pinned_at,pinned_by,preview').or(pairQ(a,b)).not('pinned_at','is',null).order('pinned_at',{ascending:false}).limit(20).then(function(r){if(r.error){if(xcol(r.error))F.xOff=1;return}if(F.peer!==b)return;F.pins=(r.data||[]).filter(function(p){return p.preview!=='[[unsent]]'});if(S.tab==='fr')render()}).catch(function(){})}
+function pollUpd(){var s=sb(),a=me(),b=F.peer;if(!s||!a||!b||!F.upTs||F.xOff)return;
+ s.from('dm').select('id,edited_at,deleted_at,pinned_at,pinned_by,updated_at').or(pairQ(a,b)).gt('updated_at',F.upTs).order('updated_at',{ascending:true}).limit(50).then(function(r){if(r.error){if(xcol(r.error))F.xOff=1;return}if(F.peer!==b||!r.data||!r.data.length)return;var ch=false,need=[];
+  r.data.forEach(function(u){if(u.updated_at>F.upTs)F.upTs=u.updated_at;var m=mById(u.id);if(!m)return;if(u.edited_at&&u.edited_at!==m.edited_at&&!u.deleted_at)need.push(u.id);if(applyUpd(u))ch=true});
+  need.forEach(function(id){s.from('dm').select('id,body').eq('id',id).limit(1).then(function(r2){var m=mById(id),x=r2&&r2.data&&r2.data[0];if(m&&x&&typeof x.body==='string'&&x.body!==m.body){m.body=x.body;cvFix();if(S.tab==='fr')render()}})});
+  loadPins();if(ch){cvFix();if(S.tab==='fr')render()}}).catch(function(){})}
+setInterval(function(){if(!document.hidden&&S.tab==='fr'&&F.peer)pollUpd()},5000);
+/* unread counter on the Chat tab of the navbar */
+function unTotal(){var n=0;Object.keys(F.un||{}).forEach(function(k){n+=F.un[k]||0});return n}
+function navBadge(){var n=unTotal(),b=document.querySelector('nav button[data-t="fr"]');if(b){var e=b.querySelector('.fx-nb');if(n){if(!e){e=document.createElement('span');e.className='fx-nb';b.appendChild(e)}var t=n>99?'99+':String(n);if(e.textContent!==t)e.textContent=t}else if(e)e.remove()}
+ try{var p=n?navigator.setAppBadge&&navigator.setAppBadge(n):navigator.clearAppBadge&&navigator.clearAppBadge();if(p&&p.catch)p.catch(function(){})}catch(x){}}
+var nv0=nav5;nav5=function(){var h=nv0(),n=unTotal();if(!n)return h;return h.replace(/(<button data-a="tab" data-t="fr"[^>]*>)/,'$1<span class="fx-nb">'+(n>99?'99+':n)+'</span>')};
+function unreadSync(){var s=sb(),id=me();if(!s||!id)return;
+ var rdq=s.from('dm_read').select('peer_id,read_at').eq('user_id',id).then(function(r){return r&&!r.error&&r.data?r.data:[]},function(){return[]});
+ var mq=s.from('dm').select('a,created_at').eq('b',id).neq('body','[[unsent]]').order('created_at',{ascending:false}).limit(300).then(function(r){return r&&!r.error&&r.data?r.data:null},function(){return null});
+ Promise.all([rdq,mq]).then(function(x){var ms=x[1];if(!ms)return;var rd=ld('frread',{}),rk={};Object.keys(rd).forEach(function(k){rk[k]=rd[k]});(x[0]||[]).forEach(function(r){var t=r.read_at;if(t&&(!rk[r.peer_id]||t>rk[r.peer_id]))rk[r.peer_id]=t});
+  var un={};ms.forEach(function(m){if(!rk[m.a]||m.created_at>rk[m.a])un[m.a]=(un[m.a]||0)+1});if(F.peer)un[F.peer]=0;F.un=un;navBadge();if(S.tab==='fr'&&!F.peer)render()})}
+setInterval(navBadge,2000);setInterval(function(){if(!document.hidden)unreadSync()},45000);document.addEventListener('visibilitychange',function(){if(!document.hidden)unreadSync()});
+(function(){var c=document.createElement('style');c.textContent='.fx-crow .fx-cb{-webkit-touch-callout:none}.fx-crow .fx-cb:not(.del){-webkit-user-select:none;user-select:none}'
++'.fx-rq{max-width:100%;box-sizing:border-box;padding:6px 10px;border-radius:12px;background:var(--csoft,#f6ecee);border-left:4px solid #C8102E;font-size:13px;line-height:1.25;cursor:pointer;overflow:hidden;text-align:left}.fx-rq b{display:block;color:#C8102E;font-size:12.5px}.fx-rq em{font-style:normal;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}'
++'.fx-fwd{font-size:12.5px;color:#8C7A72;font-style:italic;padding:0 6px}.fx-cb.del{background:none!important;box-shadow:none!important;border:1.5px dashed #cdb9b4;color:#8C7A72;font-style:italic;font-size:15px;padding:10px 16px}.fx-pn{font-size:12px}.fx-ed{font-style:italic}'
++'.fx-crow.hl .fx-cb{animation:fxhl 1.6s ease}@keyframes fxhl{0%,60%{box-shadow:0 0 0 4px rgba(228,64,92,.55)}100%{box-shadow:0 0 0 0 rgba(228,64,92,0)}}'
++'.fx-pinb{display:flex;align-items:center;gap:6px;margin:4px 12px 0;padding:4px 6px 4px 10px;border-radius:16px;background:rgba(255,255,255,.9);box-shadow:0 3px 10px rgba(200,60,80,.14);position:relative;z-index:3}.fx-pinj{flex:1;min-width:0;border:0;background:none;text-align:left;padding:4px 0 4px 10px;border-left:3px solid #C8102E;border-radius:0;color:inherit}.fx-pinn{display:flex;flex-direction:column;min-width:0}.fx-pinn b{font-size:12.5px;color:#C8102E}.fx-pinn em{font-style:normal;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fx-pinx{width:34px;height:34px;flex:none;border:0;border-radius:50%;background:none;display:flex;align-items:center;justify-content:center;padding:0;color:inherit}'
++'.fx-bar{display:flex;align-items:center;gap:8px;margin:6px 12px 0;padding:8px 8px 8px 14px;border-radius:18px;background:rgba(255,255,255,.92);border-left:4px solid #C8102E;box-shadow:0 3px 10px rgba(200,60,80,.14)}.fx-barb{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}.fx-barb b{font-size:13px;color:#C8102E}.fx-barb em{font-style:normal;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}.fx-barx{width:32px;height:32px;flex:none;border:0;border-radius:50%;background:rgba(0,0,0,.06);padding:0;display:flex;align-items:center;justify-content:center;color:inherit}'
++'.fx-act{padding-top:10px}.fx-actp{padding:8px 12px 12px;font-size:15px;opacity:.8;border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.fx-actp b{font-weight:700}.fx-ai{display:flex;align-items:center;gap:14px;width:100%;padding:10px;border:0;background:none;border-radius:16px;color:inherit;font-size:17px;font-weight:600;text-align:left}.fx-ai:active{background:rgba(0,0,0,.06)}.fx-ai.bad{color:#d92d3f}.fx-aic{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;flex:none}'
++'.fx-fwl{max-height:46vh;overflow-y:auto}.fx-fwr{display:flex;align-items:center;gap:12px;width:100%;padding:8px 6px;border:0;background:none;color:inherit;text-align:left;border-radius:16px}.fx-fwr b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px}.fx-fwr i{font-style:normal;padding:6px 14px;border-radius:16px;background:#C8102E;color:#fff;font-size:14px;font-weight:700}'
++'nav button{position:relative}.fx-nb{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;pointer-events:none;box-shadow:0 0 0 2px #fff;animation:fxnb .3s cubic-bezier(.2,.9,.3,1.4)}@keyframes fxnb{from{transform:scale(.3)}}';
+document.head.appendChild(c)})();
 /* ---- calls ---- */
 var DN={};
 function sig(to,p){var c=SG[to];if(c&&c.c.state!=='joined'&&c.c.state!=='joining'){try{sb().removeChannel(c.c)}catch(e){}c=SG[to]=null}if(!c){c=SG[to]={c:sb().channel('u:'+to)};c.p=new Promise(function(res,rej){c.c.subscribe(function(s){if(s==='SUBSCRIBED')res();else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){delete SG[to];rej(new Error(s))}})})}p.from=me();return c.p.then(function(){return c.c.send({type:'broadcast',event:'sig',payload:p})})}
