@@ -1608,6 +1608,29 @@ try{var nk='u:'+email+':name';if(name&&localStorage.getItem(nk)==null)localStora
 cglWalkIn(email,name,first)}
 var fail=function(m){cglHide();AU.err=m;AU.busy=0;render()};
 var G_SVG='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
+/* ===== v4: writing-girl mascot (auth screen) ===== */
+var AG={SX:124,SY:68,X0:56,ADV:11,MAXC:8,BASE:111,RX:100,RY:106};
+function agPose(hx,hy){var ax=hx+3,ay=hy-8,cx=(AG.SX+ax)/2+8,cy=Math.max(AG.SY,ay)+10;return{arm:'M'+AG.SX+' '+AG.SY+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+ax.toFixed(1)+' '+ay.toFixed(1),hx:ax,hy:ay,pen:'translate('+hx.toFixed(1)+' '+hy.toFixed(1)+')'}}
+function agHTML(){var p=agPose(AG.RX,AG.RY),B='#3a2a35',K='#ffd9b8',T='#ff8fb1';
+return '<div class="agirl" id="agirl" aria-hidden="true"><svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" focusable="false">'
++'<circle cx="74" cy="42" r="8.5" fill="'+B+'"/><circle cx="126" cy="42" r="8.5" fill="'+B+'"/><circle cx="100" cy="30" r="23" fill="'+B+'"/>'
++'<rect x="70" y="52" width="60" height="50" rx="18" fill="'+T+'"/><rect x="93" y="44" width="14" height="12" rx="5" fill="#f4c7a1"/>'
++'<circle cx="100" cy="33" r="20.5" fill="'+K+'"/>'
++'<path d="M79 31Q78 9 100 9Q122 9 121 31Q113 19 100 20Q87 19 79 31Z" fill="'+B+'"/>'
++'<circle cx="80" cy="27" r="3.4" fill="#ffd43b"/><circle cx="120" cy="27" r="3.4" fill="#ffd43b"/>'
++'<g class="agblink"><ellipse cx="92" cy="35" rx="4" ry="4.6" fill="#fff"/><circle id="agp1" cx="92" cy="35" r="2.5" fill="#2b2d42"/></g>'
++'<g class="agblink"><ellipse cx="108" cy="35" rx="4" ry="4.6" fill="#fff"/><circle id="agp2" cx="108" cy="35" r="2.5" fill="#2b2d42"/></g>'
++'<path d="M87 28.5Q92 26 96.5 28.5M103.5 28.5Q108 26 113 28.5" stroke="'+B+'" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
++'<circle cx="85" cy="41" r="3.2" fill="#ff9fb8" opacity=".55"/><circle cx="115" cy="41" r="3.2" fill="#ff9fb8" opacity=".55"/>'
++'<path d="M95.5 43Q100 46.5 104.5 43" stroke="#c4566f" stroke-width="1.6" fill="none" stroke-linecap="round"/>'
++'<rect x="8" y="88" width="184" height="10" rx="5" fill="#d9a066"/><rect x="18" y="97" width="164" height="23" fill="#b97d4a"/>'
++'<path d="M76 68Q64 84 80 92" stroke="'+T+'" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="82" cy="91" r="4.6" fill="'+K+'"/>'
++'<path d="M58 90H142L154 118H46Z" fill="#fffdf7" stroke="#e3dccb"/><path d="M49 114H151" stroke="#b9d7f2" stroke-width="1"/>'
++'<text id="agidle" class="agidle" x="100" y="108" text-anchor="middle">'+o('Hi!','ສະບາຍດີ')+'</text><g id="agtx"></g>'
++'<path id="agarm" d="'+p.arm+'" stroke="'+T+'" stroke-width="10" fill="none" stroke-linecap="round"/>'
++'<g id="agpen" transform="'+p.pen+'"><line x1="9" y1="-15" x2="0" y2="0" stroke="#ffc83d" stroke-width="3.4" stroke-linecap="round"/><line x1="1.6" y1="-2.8" x2="0" y2="0" stroke="#333" stroke-width="3.4" stroke-linecap="round"/><line x1="9" y1="-15" x2="10.4" y2="-17.4" stroke="#ff7b9c" stroke-width="3.4" stroke-linecap="round"/></g>'
++'<circle id="aghand" cx="'+p.hx.toFixed(1)+'" cy="'+p.hy.toFixed(1)+'" r="4.6" fill="'+K+'"/>'
++'</svg></div>'}
 function authV(){var up=AU.m==='up',first=!AU.seen,rec=!!AU.rec,ph=HSB&&AU.t==='ph'&&!rec,pm=AU.pm,ps=AU.ps;AU.seen=1;try{var yy=sessionStorage.getItem('authwhy');if(yy){sessionStorage.removeItem('authwhy');AU.err=o('Signed out: ','ອອກຈາກລະບົບ: ')+yy}}catch(e){}
 var P={u:'<path d="M20 21v-1a6 6 0 00-6-6h-4a6 6 0 00-6 6v1"/><circle cx="12" cy="7.5" r="4"/>',m:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',l:'<rect x="4" y="10.5" width="16" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>',e:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',x:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',p:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',s:'<path d="M12 3l8 3v6c0 5-3.4 8-8 9-4.6-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/>'};
 var ic=function(k,s){return '<svg class="aic" width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[k]+'</svg>'};
@@ -1643,9 +1666,10 @@ else{body=seg('am',AU.m)
 +fld('ap','l',o('Password','ລະຫັດຜ່ານ'),pt,AU.p,up?'new-password':'current-password',eye)
 +(up?hint6:(HSB?'<div class="aforg"><button class="alnk" data-a="aefp">'+o('Forgot password?','ລືມລະຫັດຜ່ານ?')+'</button></div>':''))
 +msg+sub('asubmit',up?o('Create account','ສ້າງບັນຊີ'):o('Sign in','ເຂົ້າສູ່ລະບົບ'))}
-var ttl=(rec||(ph&&pm==='fp'&&ps==='pw'))?o('Set a new password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):(ph&&pm==='fp')?o('Reset password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):(up||(ph&&pm==='up'))?o('Create account','ສ້າງບັນຊີ'):o('Welcome back','ຍິນດີຕ້ອນຮັບ');
+var ttl=(rec||(ph&&pm==='fp'&&ps==='pw'))?o('Set a new password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):(ph&&pm==='fp')?o('Reset password','ຕັ້ງລະຫັດຜ່ານໃໝ່'):(up||(ph&&pm==='up'))?o('Create account','ສ້າງບັນຊີ'):o('Sign in','ເຂົ້າສູ່ລະບົບ');
 return '<div class="au'+(first?' ain':'')+'">'
 +'<div class="row sp ahd"><div><div class="s">ESL Fortoilearn</div><h1>'+ttl+'</h1></div><div class="g seg alang" role="group" aria-label="Language"><button data-a="lang" data-l="lo" class="'+(lo()?'on':'')+'">ລາວ</button><button data-a="lang" data-l="en" class="'+(lo()?'':'on')+'">EN</button></div></div>'
++agHTML()
 +'<div class="acard">'
 +(guard?'<button class="agbtn" data-a="agoogle">'+G_SVG+'<span>'+o('Continue with Google','ສືບຕໍ່ດ້ວຍ Google')+'</span></button><div class="aor">'+(ph?o('or use your phone number','ຫຼື ໃຊ້ເບີໂທລະສັບ'):o('or use email','ຫຼື ໃຊ້ອີເມວ'))+'</div>':'')
 +body
@@ -1670,6 +1694,33 @@ var bad=function(){fail(o('Google sign-in did not finish. Please try again.','�
 google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid email profile',callback:function(r){if(!r||!r.access_token)return bad();fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}}).then(function(x){return x.json()}).then(function(u){if(!u.email)throw 0;var e=u.email.toLowerCase(),ac=ld('acc',{}),first=!Object.keys(ac).length;if(!ac[e]){ac[e]={n:u.name||e.split('@')[0],g:1};sv('acc',ac)}enter(e,ac[e].n,first)}).catch(bad)},error_callback:bad}).requestAccessToken()};
 A.pout=function(){try{localStorage.removeItem('sess');localStorage.removeItem('guest')}catch(e){}try{sessionStorage.removeItem('sess')}catch(e){}location.reload()};
 document.addEventListener('keydown',function(e){if(S.tab==='auth'&&e.key==='Enter'&&/^a[enp]$/.test(e.target.id||'')&&!(HSB&&(AU.t==='ph'||AU.rec))){A.asubmit();render()}});
+/* ===== v4: girl writes what you type ===== */
+(function(){
+var F={ae:1,an:1,ap:1,ap2:1,aph:1,aotp:1},RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,st={x:AG.RX,y:AG.RY,tx:AG.RX,ty:AG.RY,until:0,raf:0,len:{}};
+function G(id){return document.getElementById(id)}
+function go(){if(!st.raf)st.raf=requestAnimationFrame(tick)}
+function tick(ts){st.raf=0;var A=G('agarm'),H=G('aghand'),P=G('agpen');if(!A||!H||!P)return;
+if(!A.getAttribute('data-k')){A.setAttribute('data-k','1');st.x=AG.RX;st.y=AG.RY}
+var w=ts<st.until&&!RM,jx=w?Math.sin(ts/26)*3.2:0,jy=w?Math.cos(ts/19)*1.6-Math.abs(Math.sin(ts/40))*1.2:0;
+st.x+=(st.tx-st.x)*.3;st.y+=(st.ty-st.y)*.3;
+var p=agPose(st.x+jx,st.y+jy);
+A.setAttribute('d',p.arm);H.setAttribute('cx',p.hx);H.setAttribute('cy',p.hy);P.setAttribute('transform',p.pen);
+var dx=Math.max(-1.6,Math.min(1.6,(st.x-100)/28)).toFixed(2);
+['agp1','agp2'].forEach(function(id){var e=G(id);if(e)e.setAttribute('transform','translate('+dx+' 1.5)')});
+if(ts<st.until||Math.abs(st.tx-st.x)>.3||Math.abs(st.ty-st.y)>.3)go()}
+function paint(inp,anim,grew){var tx=G('agtx');if(!tx)return;
+var pw=inp.type==='password',ch=Array.from(inp.value||''),idle=G('agidle'),vis=ch.slice(-AG.MAXC),h='';
+if(idle)idle.style.display=ch.length?'none':'';
+vis.forEach(function(c,i){var last=anim&&grew&&i===vis.length-1;
+h+='<text class="agc'+(pw?' agpw':'')+(last?' agw':'')+'" x="'+(AG.X0+i*AG.ADV+5)+'" y="'+AG.BASE+'" text-anchor="middle">'+(pw?'\u2605':esc(c))+'</text>'});
+tx.innerHTML=h;
+if(vis.length){st.tx=AG.X0+(vis.length-1)*AG.ADV+5;st.ty=AG.BASE-3}else{st.tx=AG.RX;st.ty=AG.RY}
+if(anim){st.until=performance.now()+(grew?460:320)}
+go()}
+document.addEventListener('input',function(e){var t=e.target;if(!t||!F[t.id]||S.tab!=='auth')return;
+Promise.resolve().then(function(){var n=Array.from(t.value||'').length,grew=n>(st.len[t.id]||0);st.len[t.id]=n;paint(t,1,grew)})});
+document.addEventListener('focusin',function(e){var t=e.target;if(!t||!F[t.id]||S.tab!=='auth')return;st.len[t.id]=Array.from(t.value||'').length;paint(t,0,0)});
+})();
 var pf=profV;profV=function(){var h=pf();if(!UID)return h;var u=ld('acc',{})[UID]||{};return h+'<div class="g" style="padding:14px 18px"><div class="s">'+o('Signed in as','ເຂົ້າສູ່ລະບົບດ້ວຍ')+(u.g?' · Google':'')+'</div><b>'+esc(UID)+'</b></div>'};
 var rdA=render;render=function(){if(S.tab==='auth'){document.documentElement.lang=lo()?'lo':'en';document.documentElement.classList.remove('cloud');$('#app').innerHTML=authV();if(GCID)loadG().catch(function(){});return}rdA()};
 if(!UID&&!localStorage.getItem('guest')){S.tab='auth'}
@@ -3015,6 +3066,15 @@ render();
 .aforg{display:flex;justify-content:flex-end;margin-top:-6px}
 .aforg .alnk{min-height:36px;padding:0 8px;font-size:14px}
 @media(prefers-reduced-motion:reduce){.au,.au *{animation:none!important;transition:none!important}}
+.agirl{display:flex;justify-content:center;margin:-2px 0 -4px;pointer-events:none}
+.agirl svg{width:min(210px,62vw);height:auto;display:block;overflow:visible}
+.agc{fill:#2b2d42;stroke:#2b2d42;stroke-width:.5;font:600 17px "Segoe Script","Bradley Hand","Chalkboard SE","Comic Sans MS","Noto Sans Lao","Phetsarath OT",cursive,sans-serif}
+.agc.agpw{fill:#ff6b9d;stroke:#ff6b9d;font-size:14px}
+.agidle{fill:#9aa0b4;font:600 13px "Noto Sans Lao","Phetsarath OT",system-ui,sans-serif}
+.agw{animation:agw .42s ease-out both}
+@keyframes agw{from{stroke-dasharray:200;stroke-dashoffset:200;fill-opacity:0}60%{fill-opacity:0}to{stroke-dasharray:200;stroke-dashoffset:0;fill-opacity:1}}
+.agblink{transform-box:fill-box;transform-origin:center;animation:agblink 4.2s infinite}
+@keyframes agblink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
 </style>
 <style>
 .pb{transform-origin:bottom center}
