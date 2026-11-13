@@ -4328,7 +4328,7 @@ function mk(ix){var ws=D[ix].w,R=[];for(var r=0;r<5;r++){var w=ws[r%ws.length];i
 function mq(ix){var R=[],mx=Math.max(ix,2);for(var r=0;r<5;r++){var j=r<2?ix:Math.random()*(mx+1)|0,ws=D[j].w,w=ws[Math.random()*ws.length|0],o=[w];while(o.length<3){var x=rw(j);if(o.indexOf(x)<0&&x.n[0]!==w.n[0])o.push(x)}R.push({t:r%2?'wrd':'lis',w:w,o:sh(o)})}return R}
 function ask(){var g=K.g,r=g&&g.r[g.i];if(r&&(r.t==='let'||r.t==='lis'))setTimeout(function(){if(K.g===g&&!g.fin&&!OV)sp(r.w.n)},350)}
 function start(m){K.m=m;K.g=null;if(m==='play'||m==='quiz'){K.g={r:m==='play'?mk(K.i):mq(K.i),i:0,bad:0,no:{},lock:0,k:m};ask()}if(m==='trace')K.lc=0}
-function game(){var g=K.g,r=g.r[g.i],L=D[K.i].L,w=r.w;if(g.fin)return fin();
+function game(){var g=K.g;if(g.fin)return fin();var r=g.r[g.i],L=D[K.i].L,w=r.w;
 var bar='<div class="bar" role="img" aria-label="'+g.i+'/'+g.r.length+'"><i style="width:'+Math.round(g.i/g.r.length*100)+'%"></i></div>',q,big;
 var pl=function(){return '<button class="round" data-kx="'+(r.t==='pic'?'sl':'sr')+'" aria-label="Listen">'+ic('play',16)+'</button>'};
 if(r.t==='pic'){q=u('qpic',L);big='<div class="kxL">'+L+'</div>'+pl()}
