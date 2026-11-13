@@ -3218,7 +3218,7 @@ function zqSlide(sc,to,instant){cancelAnimationFrame(ZF.raf);var from=sc.scrollT
  (function step(n){var p=Math.min(1,(n-t0)/dur),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;sc.scrollTop=from+(to-from)*e;if(p<1)ZF.raf=requestAnimationFrame(step)})(t0)}
 /* keep the active sentence parked near the top so the lines slide up as the video plays */
 function zqFollow(sm,force){var sc=document.querySelector('.zqrows');if(!sc)return;if(!force&&Date.now()-ZF.u<2500)return;var on=sc.querySelector('.zqrow.on');if(!on)return;
- var d=on.getBoundingClientRect().top-sc.getBoundingClientRect().top;zqSlide(sc,sc.scrollTop+d-sc.clientHeight*.28,!sm)}
+ var d=on.getBoundingClientRect().top-sc.getBoundingClientRect().top;zqSlide(sc,sc.scrollTop+d-6,!sm)}
 var ypr0=ypRows;ypRows=function(k){ypr0(k);var r=document.querySelectorAll('.zqrow');for(var j=0;j<r.length;j++){r[j].classList.toggle('on',j===k);r[j].classList.toggle('past',j<k)}if(ZF.last!==k){ZF.last=k;var nr=r[k];if(nr&&!zqReduce()){nr.classList.remove('zqnew');void nr.offsetWidth;nr.classList.add('zqnew');setTimeout(function(){nr.classList.remove('zqnew')},800)}}zqFollow(true)};
 /* move the highlight to sentence k without seeking or touching the play mode */
 function zqMark(k){var c=YP.c;if(!c||!c.ts||k<0||k>=c.ts.length||k===YP.i)return;
@@ -4517,11 +4517,11 @@ render();
 
 <style id="zqscroll">
 /* transcript = lyric-style viewport: the active sentence slides up as the video plays */
-.zqrows{position:relative;max-height:clamp(230px,46vh,440px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 80%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 80%,transparent 100%)}
+.zqrows{position:relative;max-height:clamp(230px,46vh,440px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 3%,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 3%,#000 82%,transparent 100%)}
 .zqrows::-webkit-scrollbar{display:none}
 .zqrows::before{display:none}
-.zqin{position:relative;display:flex;flex-direction:column;gap:2px;padding:14px 0 170px}
-.zqin::before{content:"";position:absolute;left:19px;top:28px;bottom:184px;width:2px;background:#F2B6CB}
+.zqin{position:relative;display:flex;flex-direction:column;gap:2px;padding:14px 0 clamp(210px,44vh,420px)}
+.zqin::before{content:"";position:absolute;left:19px;top:28px;bottom:clamp(224px,44vh,434px);width:2px;background:#F2B6CB}
 .zqrow{transition:opacity .4s ease}
 .zqrow:not(.on){opacity:.55}
 .zqrow button[data-a=dline]{transition:background .35s ease,color .35s ease}
