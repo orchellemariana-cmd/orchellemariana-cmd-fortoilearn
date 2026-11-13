@@ -2953,17 +2953,19 @@ A.fcb=function(d){window.frOpen(d.i,d.n,true)};
 var RG={ac:null,mode:'',iv:0,nodes:[]};
 function rgCtx(){try{RG.ac=RG.ac||new (window.AudioContext||window.webkitAudioContext)();if(RG.ac.state==='suspended')RG.ac.resume()}catch(e){}return RG.ac}
 function rgTone(f,t0,dur,vol,type,f2){var a=rgCtx();if(!a)return;try{var os=a.createOscillator(),g=a.createGain(),t=a.currentTime+t0;os.type=type||'sine';os.frequency.setValueAtTime(f,t);if(f2)os.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.03);g.gain.setValueAtTime(vol,t+Math.max(.03,dur-.06));g.gain.linearRampToValueAtTime(0,t+dur);os.connect(g);g.connect(a.destination);os.start(t);os.stop(t+dur+.03);var n={o:os,g:g};RG.nodes.push(n);os.onended=function(){var i=RG.nodes.indexOf(n);if(i>=0)RG.nodes.splice(i,1)}}catch(e){}}
+function rgBell(f,t0,dur,vol){var a=rgCtx();if(!a)return;try{var t=a.currentTime+t0,o1=a.createOscillator(),o2=a.createOscillator(),g=a.createGain(),g2=a.createGain();o1.type='sine';o2.type='sine';o1.frequency.value=f;o2.frequency.value=f*2.01;g2.gain.value=.25;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0008,t+dur);o1.connect(g);o2.connect(g2);g2.connect(g);g.connect(a.destination);o1.start(t);o2.start(t);o1.stop(t+dur+.05);o2.stop(t+dur+.05);var n={o:o1,g:g};RG.nodes.push(n);o1.onended=function(){var i=RG.nodes.indexOf(n);if(i>=0)RG.nodes.splice(i,1)}}catch(e){}}
+function rgConn(){rgBell(740,0,.22,.22);rgBell(988,.14,.32,.22)}
 /* one cycle of each sound */
 function rgPlay(m){
-if(m==='on'){/* ONLINE: bright double ring (their app is open, it is ringing now) */[0,.65].forEach(function(d){rgTone(440,d,.45,.13);rgTone(480,d,.45,.13)})}
-else if(m==='off'){/* OFFLINE: low, soft, sinking single tone (they are not in the app) */rgTone(300,0,.8,.14,'sine',190)}
-else if(m==='in'){/* INCOMING: cheerful ringtone */[[880,0],[660,.16],[880,.32],[660,.48],[990,.8],[880,.96]].forEach(function(n){rgTone(n[0],n[1],.14,.16,'triangle')})}}
+if(m==='on'){/* ringing: soft double pulse, like the WhatsApp ringback */[0,.5].forEach(function(d){rgBell(466,d,.42,.22);rgBell(587,d,.42,.12)})}
+else if(m==='off'){/* calling, not reached yet: single soft blip */rgBell(523,0,.28,.2)}
+else if(m==='in'){/* incoming: marimba-style melody that repeats */[[659,0],[784,.15],[880,.3],[784,.45],[659,.6],[784,.9],[880,1.05],[988,1.2],[880,1.35],[784,1.5]].forEach(function(n){rgBell(n[0],n[1],.5,.24)})}}
 function rgStop(){clearInterval(RG.iv);RG.iv=0;var a=RG.ac;RG.nodes.slice().forEach(function(n){try{n.g.gain.cancelScheduledValues(0);n.g.gain.setValueAtTime(0,a.currentTime);n.o.stop()}catch(e){}});RG.nodes=[]}
-function rgEnd(){rgTone(480,0,.16,.12);rgTone(480,.26,.16,.12)}
+function rgEnd(){rgTone(425,0,.13,.15);rgTone(425,.24,.13,.15)}
 function outTxt(){return o('Calling…','ກຳລັງໂທ…')+' · '+(F.on[C.peer]?o('Online','ອອນລາຍ'):o('Offline','ອອຟລາຍ'))}
-function ringSync(){var m=C.st==='out'?(F.on[C.peer]?'on':'off'):C.st==='in'?'in':'';if(m===RG.mode)return;rgStop();RG.mode=m;
+function ringSync(){var m=C.st==='out'?(F.on[C.peer]?'on':'off'):C.st==='in'?'in':'';if(m===RG.mode)return;var pv=RG.mode;rgStop();RG.mode=m;if(pv&&!m&&(C.st==='conn'||C.st==='live'))rgConn();
 if(C.st==='out'){var e=document.getElementById('fct');if(e)e.textContent=outTxt()}
-if(!m)return;rgPlay(m);RG.iv=setInterval(function(){rgPlay(RG.mode)},m==='in'?2200:m==='on'?3200:3600)}
+if(!m)return;rgPlay(m);RG.iv=setInterval(function(){rgPlay(RG.mode)},m==='in'?3000:m==='on'?3000:2200)}
 setInterval(function(){if(C.st==='out')ringSync()},1000);
 document.addEventListener('pointerdown',function(){rgCtx()},{once:true,passive:true});
 function end(snd,why){var bp=!!(C.peer&&C.st&&(C.st!=='in'||why!=='to'));if(C.peer&&C.st)logCall(why);if(C.peer&&snd)sig(C.peer,{t:'bye'});clearInterval(C.iv);clearInterval(C.rs);clearTimeout(C.to);clearTimeout(C.ct);clearInterval(C.dv);if(C.pc)try{C.pc.close()}catch(e){}if(C.ls)C.ls.getTracks().forEach(function(t){t.stop()});if(C.au)C.au.remove();C={st:''};ui();if(bp)rgEnd()}
