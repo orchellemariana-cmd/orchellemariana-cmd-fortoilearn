@@ -3218,7 +3218,7 @@ function zqSlide(sc,to,instant){cancelAnimationFrame(ZF.raf);var from=sc.scrollT
  (function step(n){var p=Math.min(1,(n-t0)/dur),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;sc.scrollTop=from+(to-from)*e;if(p<1)ZF.raf=requestAnimationFrame(step)})(t0)}
 /* keep the active sentence parked near the top so the lines slide up as the video plays */
 function zqFollow(sm,force){var sc=document.querySelector('.zqrows');if(!sc)return;if(!force&&Date.now()-ZF.u<2500)return;var on=sc.querySelector('.zqrow.on');if(!on)return;
- var d=on.getBoundingClientRect().top-sc.getBoundingClientRect().top;zqSlide(sc,sc.scrollTop+d-6,!sm)}
+ var y=0,e=on;while(e&&e!==sc){y+=e.offsetTop;e=e.offsetParent}zqSlide(sc,y-6,!sm)}
 var ypr0=ypRows;ypRows=function(k){ypr0(k);var r=document.querySelectorAll('.zqrow');for(var j=0;j<r.length;j++){r[j].classList.toggle('on',j===k);r[j].classList.toggle('past',j<k)}if(ZF.last!==k){ZF.last=k;var nr=r[k];if(nr&&!zqReduce()){nr.classList.remove('zqnew');void nr.offsetWidth;nr.classList.add('zqnew');setTimeout(function(){nr.classList.remove('zqnew')},800)}}zqFollow(true)};
 /* move the highlight to sentence k without seeking or touching the play mode */
 function zqMark(k){var c=YP.c;if(!c||!c.ts||k<0||k>=c.ts.length||k===YP.i)return;
