@@ -3194,7 +3194,7 @@ detYT=function(){var c=CL[sh.c];if(!c||!c.ts||!c.ts.length)return det0();
   return'<div class="zqrow '+(on?'on':(i<act?'past':''))+'"><button data-a="dline" data-i="'+i+'"><span class="zqtm">'+mmss(ts[i])+'</span><span class="zqtx">'+tx+'</span><span class="zqwave" aria-hidden="true"><b></b><b></b><b></b><b></b></span></button></div>'}).join('');
  return'<div class="zql"><div class="zqh"><button class="round zqback" data-a="back" aria-label="'+t('back')+'">'+ic('back',20)+'</button><div class="zqhm"><h1>'+title+'</h1><span class="zqpill">'+pill+'</span></div><div class="zqmasc" aria-hidden="true"></div></div>'
  +ytCard(c,a,b,sh.ap,1)
- +'<div class="zqc"><div class="zqth"><span class="zqtt"><span aria-hidden="true">📄</span>'+t('vTr')+'</span><button class="zqhide" data-yp="trh">'+t(show?'vHide':'vShow')+' '+(show?'⌃':'⌄')+'</button></div>'+(show?'<div class="zqrows"><div class="zqin">'+rows+'</div></div>':'')+'</div>'
+ +'<div class="zqc">'+(show?'<div class="zqrows"><div class="zqin">'+rows+'</div></div>':'')+'</div>'
  +'<div class="zqxp"><span aria-hidden="true" style="font-size:26px">⭐</span><span>'+t('vEarn')+' <b>20 XP</b> '+t('vXP')+'</span><span aria-hidden="true" style="font-size:26px">🎁</span></div>'
  +'<div class="zqact"><button class="go" data-a="dstart">'+t('sshad')+'</button><button class="btn" style="flex:1.3" data-a="ddict">'+t('dict')+'</button><button class="round" style="width:52px;height:52px" data-a="dsave" aria-label="'+t('offl')+'">'+ic('dl',22)+'</button></div>'
  +(c.my?'<button data-a="ytdel" style="background:none;border:0;min-height:44px" class="s">'+t('ytdel')+'</button>':'')+'</div>'};
