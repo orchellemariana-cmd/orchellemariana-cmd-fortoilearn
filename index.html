@@ -3214,12 +3214,12 @@ function zqReduce(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-mo
 /* eased slide of the transcript viewport: same feel on every browser, restarts cleanly from wherever it is */
 function zqSlide(sc,to,instant){cancelAnimationFrame(ZF.raf);var from=sc.scrollTop,max=Math.max(0,sc.scrollHeight-sc.clientHeight);to=Math.max(0,Math.min(max,to));
  if(instant||zqReduce()||Math.abs(to-from)<2){sc.scrollTop=to;return}
- var t0=performance.now(),dur=Math.min(700,Math.max(420,Math.abs(to-from)*1.2));
- (function step(n){var p=Math.min(1,(n-t0)/dur),e=1-Math.pow(1-p,3);sc.scrollTop=from+(to-from)*e;if(p<1)ZF.raf=requestAnimationFrame(step)})(t0)}
+ var t0=performance.now(),dur=Math.min(850,Math.max(600,Math.abs(to-from)*1.4));
+ (function step(n){var p=Math.min(1,(n-t0)/dur),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;sc.scrollTop=from+(to-from)*e;if(p<1)ZF.raf=requestAnimationFrame(step)})(t0)}
 /* keep the active sentence parked near the top so the lines slide up as the video plays */
 function zqFollow(sm,force){var sc=document.querySelector('.zqrows');if(!sc)return;if(!force&&Date.now()-ZF.u<2500)return;var on=sc.querySelector('.zqrow.on');if(!on)return;
  var d=on.getBoundingClientRect().top-sc.getBoundingClientRect().top;zqSlide(sc,sc.scrollTop+d-sc.clientHeight*.28,!sm)}
-var ypr0=ypRows;ypRows=function(k){ypr0(k);var r=document.querySelectorAll('.zqrow');for(var j=0;j<r.length;j++){r[j].classList.toggle('on',j===k);r[j].classList.toggle('past',j<k)}zqFollow(true)};
+var ypr0=ypRows;ypRows=function(k){ypr0(k);var r=document.querySelectorAll('.zqrow');for(var j=0;j<r.length;j++){r[j].classList.toggle('on',j===k);r[j].classList.toggle('past',j<k)}if(ZF.last!==k){ZF.last=k;var nr=r[k];if(nr&&!zqReduce()){nr.classList.remove('zqnew');void nr.offsetWidth;nr.classList.add('zqnew');setTimeout(function(){nr.classList.remove('zqnew')},800)}}zqFollow(true)};
 /* move the highlight to sentence k without seeking or touching the play mode */
 function zqMark(k){var c=YP.c;if(!c||!c.ts||k<0||k>=c.ts.length||k===YP.i)return;
  YP.i=k;YP.a=c.ts[k];YP.end=segEnd(c,k);YP.key=c.id+'|'+YP.a;sh.seg=k;sh.i=k;ypRows(k)}
@@ -3236,7 +3236,8 @@ function zqModes(){var I={once:'<path d="M7 4l13 8-13 8z" fill="currentColor" st
  return'<div class="zqpm" role="group" aria-label="'+t('vPlay')+'">'+[['once','ypOnce'],['loop','ypLoop'],['auto','ypCont']].map(function(x){var k=x[0],on=cur===k;
   return'<button type="button" data-yp="mode" data-v="'+k+'" aria-pressed="'+(on?'true':'false')+'" class="'+(on?'on':'')+'">'+(k==='auto'?'':sv(I[k]))+'<span>'+t(x[1])+'</span>'+(k==='auto'?sv(I[k]):'')+'</button>'}).join('')+'</div>'}
 var ypui0=ypUI;ypUI=function(tm){ypui0(tm);var sk=document.getElementById('ypseek');if(sk)sk.style.setProperty('--p',(sk.value/10)+'%');document.body.classList.toggle('zqplay',!!YP.playing);zqTrack(tm)};
-var rdVL=render;render=function(){var s0=document.querySelector('.zqrows'),y0=s0?s0.scrollTop:0;rdVL();var c=S.view==='detail'&&CL[sh.c];document.body.classList.toggle('zqlp',!!(c&&c.yt&&c.ts&&c.ts.length));var s1=document.querySelector('.zqrows');if(s1){if(y0)s1.scrollTop=y0;zqFollow(true)}};
+var clZ=A.clip;A.clip=function(){ZF.top=1;ZF.last=-1;return clZ.apply(this,arguments)};
+var rdVL=render;render=function(){var s0=document.querySelector('.zqrows'),y0=s0?s0.scrollTop:0;rdVL();if(ZF.top){ZF.top=0;if(S.view==='detail'){ZF.last=-1;try{window.scrollTo({top:0,left:0,behavior:'instant'})}catch(e){window.scrollTo(0,0)}}}var c=S.view==='detail'&&CL[sh.c];document.body.classList.toggle('zqlp',!!(c&&c.yt&&c.ts&&c.ts.length));var s1=document.querySelector('.zqrows');if(s1){if(y0)s1.scrollTop=y0;zqFollow(true)}};
 
 /* ---- Liquid Glass settings popup ---- */
 var ZQ={open:0,btn:null};
@@ -4545,5 +4546,9 @@ html[lang="lo"] #zqpop .zqpm button{font-size:13px;padding:0 7px;gap:4px}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #zqpop .zqpm{border-bottom-color:rgba(255,160,190,.2)}:root:not([data-theme="light"]) #zqpop .zqpm button:not(.on){background:rgba(255,255,255,.08);border-color:rgba(255,160,190,.35);color:#FFC2D8;box-shadow:none}}
 @media(prefers-reduced-motion:reduce){#zqpop .zqpm button{transition:none}}
 /* transcript: lines that already played fade as they slide up */
-.zqrow.past:not(.on){opacity:.38}
+.zqrow.past:not(.on){opacity:.14;transform:translateY(-8px)}
+.zqrow{transition:opacity .6s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+.zqrow.zqnew{animation:zqUp .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes zqUp{from{opacity:.25;transform:translateY(28px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.zqrow.zqnew{animation:none}.zqrow.past:not(.on){transform:none}}
 </style>
