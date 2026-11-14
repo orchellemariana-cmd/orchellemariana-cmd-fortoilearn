@@ -2454,7 +2454,7 @@ var mmss=function(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+('0
 var box=function(x){return '<div class="g s" style="padding:16px 18px">'+x+'</div>'};
 function note(id,txt){var e=document.getElementById('fnote');if(e)e.remove();e=document.createElement('button');e.id='fnote';e.className='g';e.setAttribute('data-a','fopenx');e.setAttribute('data-i',id);e.style.cssText='position:fixed;z-index:9995;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);padding:10px 16px 10px 12px;text-align:left;border-radius:18px;display:flex;align-items:center;gap:12px';e.innerHTML=avImg(id,40)+'<span style="min-width:0"><b>'+esc(pn(id))+'</b><div class="s" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(txt)+'</div></span>';document.body.appendChild(e);setTimeout(function(){e.remove()},4500)}
 function init(){if(F.init||!sb()||!me())return;F.init=1;var id=me();
-sb().channel('dm-'+id).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm',filter:'b=eq.'+id},function(p){var m=p.new;bump(m);if(S.tab==='fr'&&F.peer===m.a){F.msgs.push(m);markRead(m.a,m.created_at);F.sc=1;render()}else{if(!(S.tab==='fr'&&!F.peer))note(m.a,m.kind==='voice'?o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(m.dur||0):lbl(m.body));if(S.tab==='fr')render()}}).subscribe();
+sb().channel('dm-'+id).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm',filter:'b=eq.'+id},function(p){var m=p.new;bump(m);try{resIn(m)}catch(e){}if(S.tab==='fr'&&F.peer===m.a){F.msgs.push(m);markRead(m.a,m.created_at);F.sc=1;render()}else{if(!(S.tab==='fr'&&!F.peer))note(m.a,m.kind==='voice'?o('Voice message','ຂໍ້ຄວາມສຽງ')+' · '+mmss(m.dur||0):lbl(m.body));if(S.tab==='fr')render()}}).subscribe();
 try{sb().channel('dmu-'+id).on('postgres_changes',{event:'UPDATE',schema:'public',table:'dm',filter:'b=eq.'+id},frUpd).on('postgres_changes',{event:'UPDATE',schema:'public',table:'dm',filter:'a=eq.'+id},frUpd).subscribe()}catch(e){}
 unreadSync();presInit();sigSub()}
 setInterval(init,1500);
@@ -3056,23 +3056,37 @@ var ls=[],i,p;for(i=0;i<o_.l.length;i++){p=o_.l[i];if(!Array.isArray(p)||typeof 
 ls.sort(function(a,b){return a.s-b.s});
 r.yt=o_.yt;r.v=o_.v?1:0;r.lo=typeof o_.lo==='string'?o_.lo.slice(0,120):'';r.tp=typeof o_.tp==='string'?o_.tp.slice(0,30):'';r.b=/^[\d.]{1,3}$/.test(String(o_.b))?String(o_.b):'6';r.d=Math.max(0,Math.min(21600,Math.round(+o_.d||0)));r.l=ls;if(r.i!=null){r.i=Math.min(r.i,ls.length-1);if(!r.q)r.q=ls[r.i].e}}
 return r}
+var CLR={},RA=null,RK='',RL=0;
+function audOk(a){return typeof a==='string'&&a.length<1200000&&/^data:audio\/[\w.+-]+(;codecs=[\w.,-]+)?;base64,[A-Za-z0-9+\/=]+$/.test(a)}
 function resParse(v){var o_;try{o_=JSON.parse(v)}catch(e){return null}
-if(!o_||typeof o_!=='object'||typeof o_.id!=='string'||!isFinite(+o_.i)||!isFinite(+o_.p))return null;
-return {t:String(o_.t||'').slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),i:Math.max(0,Math.min(199,Math.round(+o_.i))),q:String(o_.q||'').slice(0,300),p:Math.max(0,Math.min(100,Math.round(+o_.p)))}}
-function resLbl(v){var p=resParse(v);return '📊 '+o('Shadow result','ຜົນຮຽນແບບສຽງ')+(p?' · '+p.p+'%':'')}
-/* best score of each person for one sentence, read from this conversation */
-function clipScores(id,i){var r={me:null,them:null},k,m,x,p,who,sc;
-(F.msgs||[]).forEach(function(m){if(!m||typeof m.body!=='string'||isDel(m))return;x=fxParse(m.body);if(!x)return;sc=null;
+if(!o_||typeof o_!=='object'||typeof o_.id!=='string'||!isFinite(+o_.i))return null;
+return {t:String(o_.t||'').slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),i:Math.max(0,Math.min(199,Math.round(+o_.i))),q:String(o_.q||'').slice(0,300),p:(o_.p!=null&&isFinite(+o_.p))?Math.max(0,Math.min(100,Math.round(+o_.p))):null,d:Math.max(0,Math.min(600,Math.round(+o_.d||0))),a:audOk(o_.a)?o_.a:''}}
+function resLbl(v){var m=/"p":(\d+)/.exec(String(v));return '📊 '+o('Shadow result','ຜົນຮຽນແບບສຽງ')+(m?' · '+m[1]+'%':' · 🎙')}
+/* latest score of each person for one sentence, read from this conversation */
+function clipScores(id,i){var r={me:null,them:null};
+(F.msgs||[]).forEach(function(m){if(!m||typeof m.body!=='string'||isDel(m))return;var x=fxParse(m.body),p,sc=null;if(!x)return;
 if(x.t==='clip'){p=clipParse(x.v);if(p&&p.id===id&&p.i===i&&p.s!=null)sc=p.s}
-else if(x.t==='clipres'){p=resParse(x.v);if(p&&p.id===id&&p.i===i)sc=p.p}
-if(sc==null)return;who=m.a===me()?'me':'them';if(r[who]==null||sc>r[who])r[who]=sc});
+else if(x.t==='clipres'){p=resParse(x.v);if(p&&p.id===id&&p.i===i&&p.p!=null)sc=p.p}
+if(sc!=null)r[m.a===me()?'me':'them']=sc});
 return r}
 function scoreLine(id,i){var sc=clipScores(id,i);if(sc.me==null&&sc.them==null)return '';var nm=(F.names&&F.names[F.peer])||o('Friend','ໝູ່');
 return '<div class="fx-clsc"><span>'+o('You','ເຈົ້າ')+' <b>'+(sc.me==null?'–':sc.me+'%')+'</b></span><span>'+esc(nm)+' <b>'+(sc.them==null?'–':sc.them+'%')+'</b></span></div>'}
 function resCard(m,v){var p=resParse(v);if(!p)return '📊 '+o('Shadow result','ຜົນຮຽນແບບສຽງ');var nm=(F.names&&F.names[F.peer])||o('Friend','ໝູ່');
-return '<div class="fx-clip"><div class="fx-cl1">📊 '+(m.a===me()?o('You shadowed this','ເຈົ້າຮຽນແບບສຽງ'):esc(nm)+' '+o('shadowed this','ຮຽນແບບສຽງ'))+'</div><b>“'+esc(p.q)+'”</b><small>'+esc(p.t)+' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1)+'</small>'+scoreLine(p.id,p.i)+'</div>'}
+return '<div class="fx-clip"><div class="fx-cl1">📊 '+(m.a===me()?o('You shadowed this','ເຈົ້າຮຽນແບບສຽງ'):esc(nm)+' '+o('shadowed this','ຮຽນແບບສຽງ'))+'</div><b>“'+esc(p.q)+'”</b><small>'+esc(p.t)+' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1)+'</small>'+scoreLine(p.id,p.i)
++(p.a?'<button class="fx-clgo" data-a="fres" data-i="'+esc(m.id)+'">'+(RK==='m'+m.id?'■ ':'▶ ')+o('Listen','ຟັງ')+(p.d?' · '+mmss(p.d):'')+'</button>':'')+'</div>'}
 /* remember who a sentence was shared with, so results can be sent back */
 function regShare(id,i,peer){st.shr=st.shr||{};var k=id+':'+i,a=st.shr[k]=st.shr[k]||[];if(a.indexOf(peer)<0&&a.length<20){a.push(peer);sv('st',st)}}
+/* live results: kept in memory per sentence and per person */
+function storeRes(m){if(!m||typeof m.body!=='string'||m.body.indexOf('[[clipres]]')!==0)return false;var p=resParse(m.body.slice(11));if(!p)return false;
+var k=p.id+':'+p.i,c=CLR[k]=CLR[k]||{},ts=String(m.created_at||new Date().toISOString());
+if(!c[m.a]||String(c[m.a].ts)<ts)c[m.a]={p:p.p,d:p.d,a:p.a,ts:ts};return true}
+function resIn(m){if(storeRes(m)&&S.tab==='practice'&&S.view==='shadow')render()}
+function loadRes(cb){if(RL)return;var s=sb();if(!s||!me())return;RL=1;
+s.from('dm').select('id,a,b,body,created_at').eq('kind','text').like('body','[[clipres]]%').order('created_at',{ascending:false}).limit(40).then(function(r){if(r.error||!r.data){RL=0;return}r.data.forEach(storeRes);if(cb)cb()},function(){RL=0}).catch(function(){RL=0})}
+function playAud(src,k){if(RA){try{RA.pause()}catch(e){}RA=null;if(RK===k){RK='';return}}RK=k;if(!audOk(src)){RK='';return}
+RA=new Audio(src);RA.onended=function(){RK='';RA=null;render()};var pr=RA.play();if(pr&&pr.catch)pr.catch(function(){RK='';RA=null;render()})}
+A.fres=function(d){var m=mById(d.i);if(!m||isDel(m))return;var x=fxParse(m.body),p=x&&x.t==='clipres'?resParse(x.v):null;if(!p||!p.a)return;vpStop();playAud(p.a,'m'+m.id)};
+A.tplay=function(d){var r=(CLR[d.k]||{})[d.w];if(!r||!r.a)return;vpStop();playAud(r.a,'t'+d.k+d.w)};
 function clipLbl(v){var m=/"t":"((?:[^"\\]|\\.)*)"/.exec(String(v)),n='';if(m){try{n=JSON.parse('"'+m[1]+'"')}catch(e){}}return '🎬 '+o('Shadow clip','ຄລິບຮຽນແບບສຽງ')+(n?' · '+n.slice(0,40):'')}
 function clipCard(m,v){var p=clipParse(v);if(!p)return '🎬 '+o('Shadow clip','ຄລິບຮຽນແບບສຽງ');
 var sen=p.i!=null&&p.q;
@@ -3088,7 +3102,7 @@ var k=clipIdx(p);if(k<0){fxToast(o('This clip isn’t in your app yet','ຄລ�
 vpStop();F.menu=0;F.sheet='';F.ma='';S.tab='practice';A.clip({c:k});
 if(p.i!=null&&CL[k]){regShare(CL[k].id,Math.min(p.i,CL[k].s.length-1),m.a===me()?m.b:m.a);var si=Math.min(p.i,CL[k].s.length-1);sh.i=si;sh.seg=si;sh.step=1;sh.res=null;sh.tx='';sh.ap=0;S.view='shadow'}
 try{window.scrollTo(0,0)}catch(e){}};
-window.FXS={reg:regShare,ok:function(){return !!(sb()&&me())},
+window.FXS={reg:regShare,res:CLR,loadRes:loadRes,me:function(){return me()},name:function(id){return (F.names&&F.names[id])||o('Friend','ໝູ່')},playing:function(k){return RK===k},ok:function(){return !!(sb()&&me())},
 friends:function(){var seen={};return (F.list||[]).filter(function(u){if(!u.user_id||u.user_id===me()||seen[u.user_id])return false;seen[u.user_id]=1;return true}).map(function(u){return {id:u.user_id,name:F.names[u.user_id]||u.name||o('Friend','ໝູ່'),ts:(F.cv[u.user_id]||{}).ts||''}}).sort(function(a,b){return a.ts<b.ts?1:a.ts>b.ts?-1:String(a.name).localeCompare(String(b.name))})},
 av:function(id,z){return avImg(id,z)},
 load:function(cb){loadList();if((F.list||[]).length||!F.ld){cb();return}var n=0,iv=setInterval(function(){if(!F.ld||++n>25){clearInterval(iv);cb()}},300)},
@@ -4647,11 +4661,21 @@ function isZ(c){return !!(c&&c.yt&&c.ts&&c.ts.length)}
 /* ---- 10 XP for every sentence shadowed (once per sentence) ---- */
 function award(){var c=CL[sh.c],r=sh.res;if(!c||!r||S.view!=='shadow')return;if(r.na&&!(sh.dur>=1.5))return;
 st.sx=st.sx||{};var a=st.sx[c.id]=st.sx[c.id]||[];if(a.indexOf(sh.i)>=0)return;a.push(sh.i);sh.xpi=sh.i;bump('shs')}
-function sendRes(){var c=CL[sh.c],r=sh.res;if(!c||!r||r.na||S.view!=='shadow'||!window.FXS)return;var key=c.id+':'+sh.i,fr=(st.shr||{})[key];if(!fr||!fr.length)return;
-st.shb=st.shb||{};var pct=Math.round(+r.pct);if(!(pct>(st.shb[key]==null?-1:st.shb[key])))return;st.shb[key]=pct;sv('st',st);
-var body='[[clipres]]'+JSON.stringify({t:String(c.t).slice(0,120),id:String(c.id),i:sh.i,q:String(c.s[sh.i]).slice(0,300),p:pct});fr.forEach(function(f){FXS.send(f,body,function(){})})}
-var ss0=shScore;shScore=function(){ss0.apply(this,arguments);try{award()}catch(e){}try{sendRes()}catch(e){}};
+function audDur(src,cb){try{var C=window.AudioContext||window.webkitAudioContext;if(!C){cb(0);return}fetch(src).then(function(r){return r.arrayBuffer()}).then(function(b){var c=new C();return c.decodeAudioData(b).then(function(x){try{c.close()}catch(e){}return x})}).then(function(x){cb(x.duration)}).catch(function(){cb(0)})}catch(e){cb(0)}}
+/* when a shared sentence has been recorded, send the score and the voice to the friend(s); only better attempts after the first */
+function maybeSend(){var c=CL[sh.c];if(S.view!=='shadow'||S.tab!=='practice'||!c||S.recording||!sh.res||typeof S.audio!=='string'||S.audio===sh.sa)return;
+var key=c.id+':'+sh.i,fr=(st.shr||{})[key];if(!fr||!fr.length||!window.FXS)return;
+var r=sh.res,pct=r.na?null:Math.round(+r.pct),best=(st.shb||{})[key];sh.sa=S.audio;
+if(best!=null&&(pct==null||pct<=best))return;
+st.shb=st.shb||{};st.shb[key]=pct==null?-1:pct;sv('st',st);
+var au=S.audio,idx=sh.i,X=window.FXS;
+audDur(au,function(d){d=Math.round(d||0);var obj={id:String(c.id),i:idx,p:pct,d:d,t:String(c.t).slice(0,120),q:String(c.s[idx]).slice(0,300),a:au.length<=900000?au:''},body='[[clipres]]'+JSON.stringify(obj);
+fr.forEach(function(f){X.send(f,body,function(){})});(X.res[key]=X.res[key]||{})[X.me()]={p:pct,d:d,a:obj.a,ts:new Date().toISOString()};render()})}
+var ss0=shScore;shScore=function(){ss0.apply(this,arguments);try{award()}catch(e){}};
 /* ---- the shadowing page, same look as the video page ---- */
+function togetherCard(c){var key=c.id+':'+sh.i,fr=(st.shr||{})[key],X=window.FXS;if(!fr||!fr.length||!X)return '';X.loadRes(function(){render()});var R=X.res[key]||{};
+function row(u,nm,w){var r=R[u],sc=r?(r.p!=null?r.p+'%':'🎙'):'–';return '<div class="zqtr"><span class="zqtn">'+esc(nm)+'</span>'+(r?'':(w?'<i class="zqwt">'+o('Waiting…','ລໍຖ້າ…')+'</i>':''))+'<b>'+sc+'</b>'+(r&&r.a?'<button class="round" style="width:40px;height:40px" data-a="tplay" data-k="'+esc(key)+'" data-w="'+esc(u)+'" aria-label="'+o('Listen','ຟັງ')+'">'+(X.playing('t'+key+u)?'■':'▶')+'</button>':'')+'</div>'}
+return '<div class="zqc"><div class="zqsn"><span>👥 '+o('Together','ນຳກັນ')+'</span></div>'+row(X.me(),o('You','ເຈົ້າ'),0)+fr.map(function(u){return row(u,X.name(u),1)}).join('')+'</div>'}
 function shZ(c){var s=c.s[sh.i],tg=s.split(/\s+/),r=sh.res,weak=r&&r.weak?r.weak:[],sp=sh.sp||.75,l=c.sl&&c.sl[sh.i]?c.sl[sh.i]:'',a=c.ts[sh.i],b=c.ts[sh.i+1]||a+6,step=sh.step||1,got=r&&sh.xpi===sh.i,m=YP.pref.sub,
 chip=function(n,lab,on){return '<span class="chip'+(on?' on':'')+'">'+n+' '+lab+'</span>'},
 v=ytCard(c,a,b,sh.ap),k=v.indexOf('</div>',v.indexOf('id="ytslot"')),slot=k>0?v.slice(0,k+6):v,
@@ -4665,16 +4689,16 @@ return '<div class="zql zqsh"><div class="zqh"><button class="round zqback" data
 +(S.msg?'<div class="no" role="status">'+S.msg+'</div>':'')
 +(r?'<div class="zqc"><div class="row sp"><b style="font-size:20px">'+(r.na?t('noscore'):t('match')+' '+r.pct+'%')+'</b>'+(got?'<span class="zqgot">⭐ +10 XP</span>':'')+'</div>'+(r.na?'<div class="s" style="margin-top:8px">'+t('cmp')+'</div>':'<div class="s" style="margin-top:4px">'+t('weakul')+'</div>')+'</div>':'')
 
-+'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div>'
++togetherCard(c)+'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div>'
 +(YP.pref.atr?'<div class="zqc"><div class="zqrows"><div class="zqin">'+rows+'</div></div></div>':'')+'</div>'}
 var dl9=A.dline;A.dline=function(d){var c=CL[sh.c];if(S.view==='shadow'&&isZ(c)){sh.i=+d.i;sh.seg=+d.i;sh.step=1;sh.res=null;sh.sc=null;sh.tx='';S.audio=null;sh.ap=1;return}return dl9.apply(this,arguments)};
 var sv9=shV;shV=function(){var c=CL[sh.c];if(isZ(c))return shZ(c);var h=sv9.apply(this,arguments),m='<div style="display:flex;gap:8px">',i=h.indexOf(m);
 return i<0?h:h.slice(0,i)+'<div class="row" style="justify-content:flex-end">'+shareBtn('clsh')+'</div>'+h.slice(i)};
-var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp')};
+var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp');try{maybeSend()}catch(e){}};
 /* ---- share the sentence you are on ---- */
 function payload(c,i,note){var p={t:String(c.t).slice(0,120),id:String(c.id),i:i,q:String(c.s[i]||'').slice(0,300)};
 if(c.yt&&c.ts){p.yt=c.yt;if(c.v)p.v=1;if(c.lo)p.lo=c.lo;p.tp=c.tid;p.b=c.b;p.d=c.d;p.l=c.ts.map(function(s,k){return [s,c.s[k]]})}
-var b=(st.shb||{})[c.id+':'+i];if(b!=null)p.s=b;
+var b=(st.shb||{})[c.id+':'+i];if(b!=null&&b>=0)p.s=b;
 if(note)p.n=note;return p}
 function root(){return document.getElementById('clsheet')}
 function close(){var e=root();if(e)e.remove();SH.open=0}
@@ -4705,7 +4729,7 @@ var st9=document.createElement('style');st9.textContent=
 +':root[data-theme="dark"] body.zqlp .clsh-zq{color:#FFC2D8}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .clsh-zq{color:#FFC2D8}}'
 +'.clsh-in{margin:0;padding:5px 12px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--vr,#C8102E);font-weight:700;letter-spacing:0;text-transform:none}:root[data-theme="dark"] body.zqlp .clsh-in{color:#FFC2D8}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .clsh-in{color:#FFC2D8}}'
 +'.zqsn{align-items:center;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--vmut,#9A5870);margin-bottom:6px}.zqss{font-size:20px;font-weight:700;line-height:1.4;color:var(--vtx,#4A1230)}.zqsl{margin-top:6px;font-size:14px;color:var(--vmut,#9A5870)}.zqwk{color:var(--vr,#B3123F);text-decoration:underline wavy}'
-+'.zqgot{padding:4px 12px;border-radius:999px;background:#FFE9A8;color:#6B4A00;font-size:13px;font-weight:700}'
++'.zqtr{display:flex;align-items:center;gap:12px;padding:6px 0}.zqtn{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zqtr b{font-size:18px}.zqwt{font-style:normal;font-size:13px;color:var(--vmut,#9A5870)}.zqgot{padding:4px 12px;border-radius:999px;background:#FFE9A8;color:#6B4A00;font-size:13px;font-weight:700}'
 +':root[data-theme="dark"] body.zqlp .zqss{color:#FFE3EE}:root[data-theme="dark"] body.zqlp .zqsn,:root[data-theme="dark"] body.zqlp .zqsl{color:#FFC2D8}:root[data-theme="dark"] body.zqlp .zqwk{color:#FF7A9E}'
 +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .zqss{color:#FFE3EE}:root:not([data-theme="light"]) body.zqlp .zqsn,:root:not([data-theme="light"]) body.zqlp .zqsl{color:#FFC2D8}:root:not([data-theme="light"]) body.zqlp .zqwk{color:#FF7A9E}}'
 +'#clsheet{position:fixed;inset:0;z-index:9990}.cls-ov{position:absolute;inset:0;background:rgba(0,0,0,.42);animation:clsf .2s both}'
