@@ -3048,14 +3048,16 @@ function clipParse(v){var o_;try{o_=JSON.parse(v)}catch(e){return null}
 if(!o_||typeof o_!=='object'||typeof o_.t!=='string'||typeof o_.id!=='string')return null;
 var r={t:o_.t.slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),n:typeof o_.n==='string'?o_.n.slice(0,120):''};
 if(!r.id)return null;
+if(typeof o_.i==='number'&&isFinite(o_.i)){r.i=Math.max(0,Math.min(199,Math.round(o_.i)));r.q=typeof o_.q==='string'?o_.q.slice(0,300):''}
 if(o_.yt!=null){if(typeof o_.yt!=='string'||!/^[\w-]{11}$/.test(o_.yt)||!Array.isArray(o_.l)||!o_.l.length||o_.l.length>80)return null;
 var ls=[],i,p;for(i=0;i<o_.l.length;i++){p=o_.l[i];if(!Array.isArray(p)||typeof p[1]!=='string'||!isFinite(+p[0]))return null;ls.push({s:Math.max(0,Math.min(86400,Math.round(+p[0]))),e:p[1].slice(0,300)})}
 ls.sort(function(a,b){return a.s-b.s});
-r.yt=o_.yt;r.v=o_.v?1:0;r.lo=typeof o_.lo==='string'?o_.lo.slice(0,120):'';r.tp=typeof o_.tp==='string'?o_.tp.slice(0,30):'';r.b=/^[\d.]{1,3}$/.test(String(o_.b))?String(o_.b):'6';r.d=Math.max(0,Math.min(21600,Math.round(+o_.d||0)));r.l=ls}
+r.yt=o_.yt;r.v=o_.v?1:0;r.lo=typeof o_.lo==='string'?o_.lo.slice(0,120):'';r.tp=typeof o_.tp==='string'?o_.tp.slice(0,30):'';r.b=/^[\d.]{1,3}$/.test(String(o_.b))?String(o_.b):'6';r.d=Math.max(0,Math.min(21600,Math.round(+o_.d||0)));r.l=ls;if(r.i!=null){r.i=Math.min(r.i,ls.length-1);if(!r.q)r.q=ls[r.i].e}}
 return r}
 function clipLbl(v){var m=/"t":"((?:[^"\\]|\\.)*)"/.exec(String(v)),n='';if(m){try{n=JSON.parse('"'+m[1]+'"')}catch(e){}}return '🎬 '+o('Shadow clip','ຄລິບຮຽນແບບສຽງ')+(n?' · '+n.slice(0,40):'')}
 function clipCard(m,v){var p=clipParse(v);if(!p)return '🎬 '+o('Shadow clip','ຄລິບຮຽນແບບສຽງ');
-return '<div class="fx-clip"><div class="fx-cl1">🎬 '+o('Shadow this together','ມາຮຽນແບບສຽງນຳກັນ')+'</div><b>'+esc(p.t)+'</b>'+(p.n?'<em>“'+esc(p.n)+'”</em>':'')+'<button class="fx-clgo" data-a="fclip" data-i="'+esc(m.id)+'">'+o('Open clip','ເປີດຄລິບ')+'</button></div>'}
+var sen=p.i!=null&&p.q;
+return '<div class="fx-clip"><div class="fx-cl1">🎬 '+o('Shadow this together','ມາຮຽນແບບສຽງນຳກັນ')+'</div>'+(sen?'<b>“'+esc(p.q)+'”</b><small>'+esc(p.t)+' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1)+'</small>':'<b>'+esc(p.t)+'</b>')+(p.n?'<em>“'+esc(p.n)+'”</em>':'')+'<button class="fx-clgo" data-a="fclip" data-i="'+esc(m.id)+'">'+(sen?o('Shadow it','ຮຽນແບບສຽງ'):o('Open clip','ເປີດຄລິບ'))+'</button></div>'}
 /* find the clip in this learner's app; a YouTube clip they don't have yet is added to their own clips */
 function clipIdx(p){var i,c,id='sh-'+p.id;for(i=0;i<CL.length;i++){c=CL[i];if((c.id===p.id||c.id===id)&&(!p.yt||c.yt===p.yt))return i}
 if(!p.yt)return -1;
@@ -3064,14 +3066,16 @@ for(i=0;i<CL.length;i++)if(CL[i].id===id)return i;return -1}
 A.fclip=function(d){var m=mById(d.i);if(!m||isDel(m))return;var x=fxParse(m.body),p=x&&x.t==='clip'?clipParse(x.v):null;
 if(!p){fxToast(o('This clip can’t be opened','ເປີດຄລິບນີ້ບໍ່ໄດ້'));return}
 var k=clipIdx(p);if(k<0){fxToast(o('This clip isn’t in your app yet','ຄລິບນີ້ຍັງບໍ່ມີໃນແອັບຂອງເຈົ້າ'));return}
-vpStop();F.menu=0;F.sheet='';F.ma='';S.tab='practice';A.clip({c:k});try{window.scrollTo(0,0)}catch(e){}};
+vpStop();F.menu=0;F.sheet='';F.ma='';S.tab='practice';A.clip({c:k});
+if(p.i!=null&&CL[k]){var si=Math.min(p.i,CL[k].s.length-1);sh.i=si;sh.seg=si;sh.step=1;sh.res=null;sh.tx='';sh.ap=0;S.view='shadow'}
+try{window.scrollTo(0,0)}catch(e){}};
 window.FXS={ok:function(){return !!(sb()&&me())},
 friends:function(){var seen={};return (F.list||[]).filter(function(u){if(!u.user_id||u.user_id===me()||seen[u.user_id])return false;seen[u.user_id]=1;return true}).map(function(u){return {id:u.user_id,name:F.names[u.user_id]||u.name||o('Friend','ໝູ່'),ts:(F.cv[u.user_id]||{}).ts||''}}).sort(function(a,b){return a.ts<b.ts?1:a.ts>b.ts?-1:String(a.name).localeCompare(String(b.name))})},
 av:function(id,z){return avImg(id,z)},
 load:function(cb){loadList();if((F.list||[]).length||!F.ld){cb();return}var n=0,iv=setInterval(function(){if(!F.ld||++n>25){clearInterval(iv);cb()}},300)},
 send:function(to,body,cb){var s=sb();if(!s||!me()){cb(false);return}
 s.from('dm').insert({a:me(),b:to,kind:'text',body:body}).select().single().then(function(r){if(r.error){cb(false);return}if(to===F.peer)F.msgs.push(r.data);bump(r.data);cb(true)}).catch(function(){cb(false)})}};
-var cs9=document.createElement('style');cs9.textContent='.fx-clip{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:200px;max-width:100%}.fx-cl1{font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.7}.fx-clip b{font-size:16px;line-height:1.25}.fx-clip em{font-style:normal;font-size:14px;opacity:.85}.fx-clgo{margin-top:6px;border:0;border-radius:16px;padding:8px 16px;font-size:14px;font-weight:700;background:#C8102E;color:#fff;min-height:36px}';document.head.appendChild(cs9);
+var cs9=document.createElement('style');cs9.textContent='.fx-clip{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:200px;max-width:100%}.fx-cl1{font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.7}.fx-clip b{font-size:16px;line-height:1.25}.fx-clip small{font-size:12px;opacity:.7}.fx-clip em{font-style:normal;font-size:14px;opacity:.85}.fx-clgo{margin-top:6px;border:0;border-radius:16px;padding:8px 16px;font-size:14px;font-weight:700;background:#C8102E;color:#fff;min-height:36px}';document.head.appendChild(cs9);
 })();
 </script>
 <script>
@@ -4614,44 +4618,55 @@ html[lang="lo"] #zqpop .zqpm button{font-size:13px;padding:0 7px;gap:4px}
 </style>
 
 <script>
-/* ===== Share a clip with a friend ("Shadow this together") from the Practice tab ===== */
+/* ===== Shadowing page: video-style layout, share one sentence with a friend, 10 XP per sentence ===== */
 (function(){
 var lo=function(){return S.lang==='lo'},o=function(a,b){return lo()?b:a};
-var SH={open:0,c:null,note:'',loaded:0,busy:'',sent:{},err:''};
+var SH={open:0,c:null,i:0,note:'',loaded:0,busy:'',sent:{},err:''};
 var ICON='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></svg>';
-function btn(cls){return '<button class="'+cls+'" data-a="clshare">'+ICON+'<span>'+o('Share','ແບ່ງປັນ')+'</span></button>'}
-/* put the Share button next to the topic pill, on every version of the clip page */
-function addBtn(h){if(typeof h!=='string'||h.indexOf('data-a="clshare"')>=0)return h;
-var k=h.indexOf('<span class="zqpill">');
-if(k>=0){var e=h.indexOf('</span>',k);if(e>0)return h.slice(0,e+7)+btn('clsh clsh-zq')+h.slice(e+7)}
-var m='<div class="row" style="flex-wrap:wrap">',i=h.indexOf(m);
-if(i>=0){var j=h.indexOf('</div>',i+m.length);if(j>0)return h.slice(0,j)+btn('clsh')+h.slice(j)}
-return h}
-var dY=detYT;detYT=function(){return addBtn(dY.apply(this,arguments))};
-var dV=detV;detV=function(){return addBtn(dV.apply(this,arguments))};
-function payload(c,note){var p={t:String(c.t).slice(0,120),id:String(c.id)};
-if(c.yt&&c.ts){p.yt=c.yt;if(c.v)p.v=1;if(c.lo)p.lo=c.lo;p.tp=c.tid;p.b=c.b;p.d=c.d;p.l=c.ts.map(function(s,i){return [s,c.s[i]]})}
+function shareBtn(cls){return '<button class="'+cls+'" data-a="clshare">'+ICON+'<span>'+o('Share sentence','ແບ່ງປັນປະໂຫຍກ')+'</span></button>'}
+function isZ(c){return !!(c&&c.yt&&c.ts&&c.ts.length)}
+/* ---- 10 XP for every sentence shadowed (once per sentence) ---- */
+function award(){var c=CL[sh.c],r=sh.res;if(!c||!r||S.view!=='shadow')return;if(r.na&&!(sh.dur>=1.5))return;
+st.sx=st.sx||{};var a=st.sx[c.id]=st.sx[c.id]||[];if(a.indexOf(sh.i)>=0)return;a.push(sh.i);sh.xpi=sh.i;bump('shs')}
+var ss0=shScore;shScore=function(){ss0.apply(this,arguments);try{award()}catch(e){}};
+/* ---- the shadowing page, same look as the video page ---- */
+function shZ(c){var s=c.s[sh.i],tg=s.split(/\s+/),r=sh.res,weak=r&&r.weak?r.weak:[],sp=sh.sp||.75,l=c.sl&&c.sl[sh.i]?c.sl[sh.i]:'',a=c.ts[sh.i],b=c.ts[sh.i+1]||a+6,step=sh.step||1,got=r&&sh.xpi===sh.i,
+chip=function(n,lab,on){return '<span class="chip'+(on?' on':'')+'">'+n+' '+lab+'</span>'};
+return '<div class="zql zqsh"><div class="zqh"><button class="round zqback" data-a="back" aria-label="'+t('back')+'">'+ic('back',20)+'</button><div class="zqhm"><h1>'+esc(c.t)+'</h1><span class="zqpill">'+((c.tp&&c.tp.en)?esc(c.tp.en):'')+'</span>'+shareBtn('clsh clsh-zq')+'</div><div class="zqmasc" aria-hidden="true"></div></div>'
++ytCard(c,a,b,sh.ap)
++'<div class="zqc"><div class="zqsn">'+t('rep')+' · '+(sh.i+1)+'/'+c.s.length+'</div><div class="zqss">'+tg.map(function(w,i){return weak.indexOf(i)>=0?'<b class="zqwk">'+esc(w)+'</b>':esc(w)}).join(' ')+'</div>'+(l?'<div class="zqsl">'+esc(l)+'</div>':'')+'</div>'
++'<div class="zqmodes" style="display:flex;gap:8px">'+chip(1,t('listen'),step===1)+chip(2,t('st2'),step===2)+chip(3,t('st3'),step===3)+'</div>'
++'<div class="row" style="justify-content:space-evenly"><button class="round" style="width:52px;height:52px" data-a="shsay" data-r="'+sp+'" aria-label="'+t('play')+'">'+ic('play',20)+'</button><button class="mic" style="width:72px;height:72px" data-a="shrec" aria-label="'+t(S.recording?'tapstop':'taprec')+'">'+ic('mic',30)+'</button><button class="round" style="width:52px;height:52px;font-size:12px;font-weight:700" data-a="shspd" aria-label="Speed">'+sp+'×</button></div>'
++(S.msg?'<div class="no" role="status">'+S.msg+'</div>':'')
++(r?'<div class="zqc"><div class="row sp"><b style="font-size:20px">'+(r.na?t('noscore'):t('match')+' '+r.pct+'%')+'</b>'+(got?'<span class="zqgot">⭐ +10 XP</span>':'')+'</div>'+(r.na?'<div class="s" style="margin-top:8px">'+t('cmp')+'</div>':'<div class="s" style="margin-top:4px">'+t('weakul')+'</div>')+'</div>':'')
++'<div class="zqxp"><span aria-hidden="true" style="font-size:26px">⭐</span><span>'+o('Earn <b>10 XP</b> for each sentence you shadow','ຮັບ <b>10 XP</b> ທຸກປະໂຫຍກທີ່ຮຽນແບບສຽງ')+'</span><span aria-hidden="true" style="font-size:26px">🎁</span></div>'
++'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div></div>'}
+var sv9=shV;shV=function(){var c=CL[sh.c];if(isZ(c))return shZ(c);var h=sv9.apply(this,arguments),m='<div style="display:flex;gap:8px">',i=h.indexOf(m);
+return i<0?h:h.slice(0,i)+'<div class="row" style="justify-content:flex-end">'+shareBtn('clsh')+'</div>'+h.slice(i)};
+var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp')};
+/* ---- share the sentence you are on ---- */
+function payload(c,i,note){var p={t:String(c.t).slice(0,120),id:String(c.id),i:i,q:String(c.s[i]||'').slice(0,300)};
+if(c.yt&&c.ts){p.yt=c.yt;if(c.v)p.v=1;if(c.lo)p.lo=c.lo;p.tp=c.tid;p.b=c.b;p.d=c.d;p.l=c.ts.map(function(s,k){return [s,c.s[k]]})}
 if(note)p.n=note;return p}
 function root(){return document.getElementById('clsheet')}
 function close(){var e=root();if(e)e.remove();SH.open=0}
 function draw(){if(!SH.open)return;var c=SH.c,e=root(),inp=document.getElementById('clnote');if(inp)SH.note=inp.value;
 if(!e){e=document.createElement('div');e.id='clsheet';document.body.appendChild(e)}
 var X=window.FXS,body;
-if(!X||!X.ok())body='<div class="cls-msg">'+o('Sign in with an account to share clips with friends.','ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ ເພື່ອແບ່ງປັນຄລິບໃຫ້ໝູ່.')+'</div>';
+if(!X||!X.ok())body='<div class="cls-msg">'+o('Sign in with an account to share with friends.','ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ ເພື່ອແບ່ງປັນໃຫ້ໝູ່.')+'</div>';
 else if(!SH.loaded)body='<div class="cls-msg">'+o('Loading…','ກຳລັງໂຫຼດ…')+'</div>';
 else{var fr=X.friends();
 body='<input id="clnote" class="cls-in" maxlength="120" value="'+esc(SH.note)+'" placeholder="'+o('Add a note (optional)','ເພີ່ມຂໍ້ຄວາມ (ບໍ່ບັງຄັບ)')+'" aria-label="'+o('Note','ຂໍ້ຄວາມ')+'">'
 +(SH.err?'<div class="cls-err" role="alert">'+SH.err+'</div>':'')
 +(fr.length?'<div class="cls-list">'+fr.map(function(u){var s=SH.sent[u.id],b=SH.busy===u.id;return '<button class="cls-row" data-cs="send" data-id="'+esc(u.id)+'"'+(b?' disabled':'')+'>'+X.av(u.id,40)+'<b>'+esc(u.name)+'</b><i class="'+(s?'ok':'')+'">'+(b?'…':s?'✓ '+o('Sent','ສົ່ງແລ້ວ'):o('Send','ສົ່ງ'))+'</i></button>'}).join('')+'</div>'
 :'<div class="cls-msg">'+o('No friends yet. Learners who join the leaderboard appear here.','ຍັງບໍ່ມີໝູ່. ຜູ້ຮຽນທີ່ເຂົ້າຮ່ວມອັນດັບຈະສະແດງຢູ່ນີ້.')+'</div>')}
-e.innerHTML='<div class="cls-ov" data-cs="x"></div><div class="cls-sh" role="dialog" aria-modal="true" aria-label="'+o('Share clip','ແບ່ງປັນຄລິບ')+'"><div class="cls-hd"><div class="cls-t"><b>'+o('Share clip','ແບ່ງປັນຄລິບ')+'</b><span>'+esc(c.t)+'</span></div><button class="cls-x" data-cs="x" aria-label="'+o('Close','ປິດ')+'">✕</button></div><div class="cls-sub">🎬 '+o('Shadow this together','ມາຮຽນແບບສຽງນຳກັນ')+'</div>'+body+'</div>';
-}
-A.clshare=function(){var c=CL[sh.c];if(!c)return;SH={open:1,c:c,note:'',loaded:0,busy:'',sent:{},err:''};
+e.innerHTML='<div class="cls-ov" data-cs="x"></div><div class="cls-sh" role="dialog" aria-modal="true" aria-label="'+o('Share sentence','ແບ່ງປັນປະໂຫຍກ')+'"><div class="cls-hd"><div class="cls-t"><b>'+o('Share sentence','ແບ່ງປັນປະໂຫຍກ')+'</b><span>“'+esc(c.s[SH.i])+'”</span></div><button class="cls-x" data-cs="x" aria-label="'+o('Close','ປິດ')+'">✕</button></div><div class="cls-sub">🎬 '+o('Shadow this together','ມາຮຽນແບບສຽງນຳກັນ')+' · +10 XP</div>'+body+'</div>'}
+A.clshare=function(){var c=CL[sh.c];if(!c)return;SH={open:1,c:c,i:sh.i,note:'',loaded:0,busy:'',sent:{},err:''};
 var X=window.FXS;if(!X||!X.ok()){SH.loaded=1;draw();return}
 draw();X.load(function(){SH.loaded=1;draw();setTimeout(draw,1500)})};
 function doSend(id){var X=window.FXS,inp=document.getElementById('clnote'),note=inp?inp.value.trim().slice(0,120):SH.note;SH.note=note;
 if(!X||SH.busy||SH.sent[id])return;SH.busy=id;SH.err='';draw();
-X.send(id,'[[clip]]'+JSON.stringify(payload(SH.c,note)),function(ok){SH.busy='';if(ok)SH.sent[id]=1;else SH.err=o('Could not send. Try again.','ສົ່ງບໍ່ໄດ້. ລອງໃໝ່.');draw()})}
+X.send(id,'[[clip]]'+JSON.stringify(payload(SH.c,SH.i,note)),function(ok){SH.busy='';if(ok)SH.sent[id]=1;else SH.err=o('Could not send. Try again.','ສົ່ງບໍ່ໄດ້. ລອງໃໝ່.');draw()})}
 document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('[data-cs]');if(!el||!SH.open)return;var a=el.getAttribute('data-cs');
 if(a==='x')close();else if(a==='send')doSend(el.getAttribute('data-id'))});
 document.addEventListener('keydown',function(e){if(SH.open&&e.key==='Escape')close()});
@@ -4660,6 +4675,10 @@ var st9=document.createElement('style');st9.textContent=
 '.clsh{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;border:1px solid var(--bd);background:var(--gl);color:var(--fg);font:inherit;font-size:13px;font-weight:600;min-height:32px}'
 +'.clsh-zq{margin:6px 0 0 6px;padding:5px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--vr,#C8102E);font-weight:700;vertical-align:top}'
 +':root[data-theme="dark"] body.zqlp .clsh-zq{color:#FFC2D8}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .clsh-zq{color:#FFC2D8}}'
++'.zqsn{font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--vmut,#9A5870);margin-bottom:6px}.zqss{font-size:20px;font-weight:700;line-height:1.4;color:var(--vtx,#4A1230)}.zqsl{margin-top:6px;font-size:14px;color:var(--vmut,#9A5870)}.zqwk{color:var(--vr,#B3123F);text-decoration:underline wavy}'
++'.zqgot{padding:4px 12px;border-radius:999px;background:#FFE9A8;color:#6B4A00;font-size:13px;font-weight:700}'
++':root[data-theme="dark"] body.zqlp .zqss{color:#FFE3EE}:root[data-theme="dark"] body.zqlp .zqsn,:root[data-theme="dark"] body.zqlp .zqsl{color:#FFC2D8}:root[data-theme="dark"] body.zqlp .zqwk{color:#FF7A9E}'
++'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .zqss{color:#FFE3EE}:root:not([data-theme="light"]) body.zqlp .zqsn,:root:not([data-theme="light"]) body.zqlp .zqsl{color:#FFC2D8}:root:not([data-theme="light"]) body.zqlp .zqwk{color:#FF7A9E}}'
 +'#clsheet{position:fixed;inset:0;z-index:9990}.cls-ov{position:absolute;inset:0;background:rgba(0,0,0,.42);animation:clsf .2s both}'
 +'.cls-sh{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:82%;overflow-y:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));border-radius:28px 28px 0 0;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-bottom:0;box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:clsu .28s cubic-bezier(.2,.9,.3,1) both}'
 +'.cls-hd{display:flex;align-items:center;gap:12px}.cls-t{flex:1;min-width:0;display:flex;flex-direction:column}.cls-t b{font-size:18px}.cls-t span{font-size:14px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
