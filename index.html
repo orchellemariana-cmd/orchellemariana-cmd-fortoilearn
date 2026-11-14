@@ -4630,17 +4630,22 @@ function award(){var c=CL[sh.c],r=sh.res;if(!c||!r||S.view!=='shadow')return;if(
 st.sx=st.sx||{};var a=st.sx[c.id]=st.sx[c.id]||[];if(a.indexOf(sh.i)>=0)return;a.push(sh.i);sh.xpi=sh.i;bump('shs')}
 var ss0=shScore;shScore=function(){ss0.apply(this,arguments);try{award()}catch(e){}};
 /* ---- the shadowing page, same look as the video page ---- */
-function shZ(c){var s=c.s[sh.i],tg=s.split(/\s+/),r=sh.res,weak=r&&r.weak?r.weak:[],sp=sh.sp||.75,l=c.sl&&c.sl[sh.i]?c.sl[sh.i]:'',a=c.ts[sh.i],b=c.ts[sh.i+1]||a+6,step=sh.step||1,got=r&&sh.xpi===sh.i,
-chip=function(n,lab,on){return '<span class="chip'+(on?' on':'')+'">'+n+' '+lab+'</span>'};
-return '<div class="zql zqsh"><div class="zqh"><button class="round zqback" data-a="back" aria-label="'+t('back')+'">'+ic('back',20)+'</button><div class="zqhm"><h1>'+esc(c.t)+'</h1><span class="zqpill">'+((c.tp&&c.tp.en)?esc(c.tp.en):'')+'</span>'+shareBtn('clsh clsh-zq')+'</div><div class="zqmasc" aria-hidden="true"></div></div>'
-+ytCard(c,a,b,sh.ap)
-+'<div class="zqc"><div class="zqsn">'+t('rep')+' · '+(sh.i+1)+'/'+c.s.length+'</div><div class="zqss">'+tg.map(function(w,i){return weak.indexOf(i)>=0?'<b class="zqwk">'+esc(w)+'</b>':esc(w)}).join(' ')+'</div>'+(l?'<div class="zqsl">'+esc(l)+'</div>':'')+'</div>'
+function shZ(c){var s=c.s[sh.i],tg=s.split(/\s+/),r=sh.res,weak=r&&r.weak?r.weak:[],sp=sh.sp||.75,l=c.sl&&c.sl[sh.i]?c.sl[sh.i]:'',a=c.ts[sh.i],b=c.ts[sh.i+1]||a+6,step=sh.step||1,got=r&&sh.xpi===sh.i,m=YP.pref.sub,
+chip=function(n,lab,on){return '<span class="chip'+(on?' on':'')+'">'+n+' '+lab+'</span>'},
+v=ytCard(c,a,b,sh.ap),k=v.indexOf('</div>',v.indexOf('id="ytslot"')),slot=k>0?v.slice(0,k+6):v,
+rows=c.s.map(function(x,i){var ln=c.sl&&c.sl[i]?esc(c.sl[i]):'',en=esc(x),tx=m==='lo'&&ln?ln:en+((m==='both'&&ln)?'<small>'+ln+'</small>':'');
+return '<div class="zqrow '+(i===sh.i?'on':(i<sh.i?'past':''))+'"><button data-a="dline" data-i="'+i+'"><span class="zqtm">'+mmss(c.ts[i])+'</span><span class="zqtx">'+tx+'</span><span class="zqwave" aria-hidden="true"><b></b><b></b><b></b><b></b></span></button></div>'}).join('');
+return '<div class="zql zqsh"><div class="zqh"><button class="round zqback" data-a="back" aria-label="'+t('back')+'">'+ic('back',20)+'</button><div class="zqhm"><h1>'+esc(c.t)+'</h1><span class="zqpill">'+((c.tp&&c.tp.en)?esc(c.tp.en):'')+'</span></div><div class="zqmasc" aria-hidden="true"></div></div>'
++slot+ypBar(c,true,'detail')
++'<div class="zqc"><div class="row sp zqsn"><span>'+t('rep')+' · '+(sh.i+1)+'/'+c.s.length+'</span>'+shareBtn('clsh clsh-in')+'</div><div class="zqss">'+tg.map(function(w,i){return weak.indexOf(i)>=0?'<b class="zqwk">'+esc(w)+'</b>':esc(w)}).join(' ')+'</div>'+(l?'<div class="zqsl">'+esc(l)+'</div>':'')+'</div>'
 +'<div class="zqmodes" style="display:flex;gap:8px">'+chip(1,t('listen'),step===1)+chip(2,t('st2'),step===2)+chip(3,t('st3'),step===3)+'</div>'
 +'<div class="row" style="justify-content:space-evenly"><button class="round" style="width:52px;height:52px" data-a="shsay" data-r="'+sp+'" aria-label="'+t('play')+'">'+ic('play',20)+'</button><button class="mic" style="width:72px;height:72px" data-a="shrec" aria-label="'+t(S.recording?'tapstop':'taprec')+'">'+ic('mic',30)+'</button><button class="round" style="width:52px;height:52px;font-size:12px;font-weight:700" data-a="shspd" aria-label="Speed">'+sp+'×</button></div>'
 +(S.msg?'<div class="no" role="status">'+S.msg+'</div>':'')
 +(r?'<div class="zqc"><div class="row sp"><b style="font-size:20px">'+(r.na?t('noscore'):t('match')+' '+r.pct+'%')+'</b>'+(got?'<span class="zqgot">⭐ +10 XP</span>':'')+'</div>'+(r.na?'<div class="s" style="margin-top:8px">'+t('cmp')+'</div>':'<div class="s" style="margin-top:4px">'+t('weakul')+'</div>')+'</div>':'')
 +'<div class="zqxp"><span aria-hidden="true" style="font-size:26px">⭐</span><span>'+o('Earn <b>10 XP</b> for each sentence you shadow','ຮັບ <b>10 XP</b> ທຸກປະໂຫຍກທີ່ຮຽນແບບສຽງ')+'</span><span aria-hidden="true" style="font-size:26px">🎁</span></div>'
-+'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div></div>'}
++'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div>'
++(YP.pref.atr?'<div class="zqc"><div class="zqrows"><div class="zqin">'+rows+'</div></div></div>':'')+'</div>'}
+var dl9=A.dline;A.dline=function(d){var c=CL[sh.c];if(S.view==='shadow'&&isZ(c)){sh.i=+d.i;sh.seg=+d.i;sh.step=1;sh.res=null;sh.sc=null;sh.tx='';S.audio=null;sh.ap=1;return}return dl9.apply(this,arguments)};
 var sv9=shV;shV=function(){var c=CL[sh.c];if(isZ(c))return shZ(c);var h=sv9.apply(this,arguments),m='<div style="display:flex;gap:8px">',i=h.indexOf(m);
 return i<0?h:h.slice(0,i)+'<div class="row" style="justify-content:flex-end">'+shareBtn('clsh')+'</div>'+h.slice(i)};
 var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp')};
@@ -4675,7 +4680,8 @@ var st9=document.createElement('style');st9.textContent=
 '.clsh{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;border:1px solid var(--bd);background:var(--gl);color:var(--fg);font:inherit;font-size:13px;font-weight:600;min-height:32px}'
 +'.clsh-zq{margin:6px 0 0 6px;padding:5px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--vr,#C8102E);font-weight:700;vertical-align:top}'
 +':root[data-theme="dark"] body.zqlp .clsh-zq{color:#FFC2D8}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .clsh-zq{color:#FFC2D8}}'
-+'.zqsn{font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--vmut,#9A5870);margin-bottom:6px}.zqss{font-size:20px;font-weight:700;line-height:1.4;color:var(--vtx,#4A1230)}.zqsl{margin-top:6px;font-size:14px;color:var(--vmut,#9A5870)}.zqwk{color:var(--vr,#B3123F);text-decoration:underline wavy}'
++'.clsh-in{margin:0;padding:5px 12px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--vr,#C8102E);font-weight:700;letter-spacing:0;text-transform:none}:root[data-theme="dark"] body.zqlp .clsh-in{color:#FFC2D8}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .clsh-in{color:#FFC2D8}}'
++'.zqsn{align-items:center;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--vmut,#9A5870);margin-bottom:6px}.zqss{font-size:20px;font-weight:700;line-height:1.4;color:var(--vtx,#4A1230)}.zqsl{margin-top:6px;font-size:14px;color:var(--vmut,#9A5870)}.zqwk{color:var(--vr,#B3123F);text-decoration:underline wavy}'
 +'.zqgot{padding:4px 12px;border-radius:999px;background:#FFE9A8;color:#6B4A00;font-size:13px;font-weight:700}'
 +':root[data-theme="dark"] body.zqlp .zqss{color:#FFE3EE}:root[data-theme="dark"] body.zqlp .zqsn,:root[data-theme="dark"] body.zqlp .zqsl{color:#FFC2D8}:root[data-theme="dark"] body.zqlp .zqwk{color:#FF7A9E}'
 +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.zqlp .zqss{color:#FFE3EE}:root:not([data-theme="light"]) body.zqlp .zqsn,:root:not([data-theme="light"]) body.zqlp .zqsl{color:#FFC2D8}:root:not([data-theme="light"]) body.zqlp .zqwk{color:#FF7A9E}}'
