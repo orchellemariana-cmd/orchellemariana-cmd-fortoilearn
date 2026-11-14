@@ -4720,9 +4720,18 @@ return '<div class="zql zqsh"><div class="zqh"><button class="round zqback" data
 +togetherCard(c)+'<div class="zqact">'+(S.audio||r?'<button class="btn" style="flex:1" data-a="cgo">'+t('st3')+'</button>':'')+'<button class="go" data-a="shnext">'+t('next')+'</button></div>'
 +(YP.pref.atr?'<div class="zqc"><div class="zqrows"><div class="zqin">'+rows+'</div></div></div>':'')+'</div>'}
 var dl9=A.dline;A.dline=function(d){var c=CL[sh.c];if(S.view==='shadow'&&isZ(c)){sh.i=+d.i;sh.seg=+d.i;sh.step=1;sh.res=null;sh.sc=null;sh.tx='';S.audio=null;sh.ap=1;return}return dl9.apply(this,arguments)};
+/* ---- dictation page, same look as the video page ---- */
+function dcZ(c){var n=c.s.length,i=ls.i%n,r=ls.res,a=c.ts[i],b=c.ts[i+1]||a+8,v=ytCard(c,a,b,ls.ap?1:0),k=v.indexOf('</div>',v.indexOf('id="ytslot"')),slot=k>0?v.slice(0,k+6):v;
+return '<div class="zql zqdc"><div class="zqh"><button class="round zqback" data-a="back" aria-label="'+t('back')+'">'+ic('back',20)+'</button><div class="zqhm"><h1>'+esc(c.t)+'</h1><span class="zqpill">'+((c.tp&&c.tp.en)?esc(c.tp.en):'')+'</span></div><div class="zqmasc" aria-hidden="true"></div></div>'
++slot+ypBar(c,true,'detail')
++'<div class="zqc"><div class="row sp zqsn"><span>'+t('yans')+' · '+other('yans')+' · '+(i+1)+'/'+n+'</span><button class="round" style="width:40px;height:40px;flex:none" data-a="lsay" data-r="1" aria-label="'+t('play')+'">'+ic('play',16)+'</button></div>'
++(r?'<div class="zqss" style="font-size:19px">'+ls.marks.map(function(m){return m.ok?esc(m.u):'<span '+AM+'>'+esc(m.u)+'</span>'}).join(' ')+'</div>':'<textarea id="lv" rows="3" aria-label="'+t('yans')+'">'+esc(ls.v||'')+'</textarea>'+(ls.hint?'<div class="s" style="margin-top:6px">'+t('hint')+': '+esc(ls.hint)+'</div>':''))+'</div>'
++(r?'<div class="zqc"><div style="font-size:20px;font-weight:700" class="'+(r.n===r.m?'ok':'')+'">'+(S.lang==='lo'?r.n+'/'+r.m+' '+t('wc'):r.n+' of '+r.m+' words correct')+'</div>'+(r.wr.length?'<div class="s" style="margin-top:4px">'+t('cspell')+' <b style="color:var(--fg)">'+esc(r.wr.join(', '))+'</b></div>':'')+'</div>':'')
++'<div class="zqact"><button class="btn" style="flex:1" data-a="lhint">'+t('hint')+'</button><button class="go" data-a="'+(r?'lnext':'lcheck')+'">'+t(r?'nexts':'check')+'</button></div></div>'}
+var lv9=lisV;lisV=function(){var c=ls&&ls.yc;if(c&&isZ(c)&&c.s.length)return dcZ(c);return lv9.apply(this,arguments)};
 var sv9=shV;shV=function(){var c=CL[sh.c];if(isZ(c))return shZ(c);var h=sv9.apply(this,arguments),m='<div style="display:flex;gap:8px">',i=h.indexOf(m);
 return i<0?h:h.slice(0,i)+'<div class="row" style="justify-content:flex-end">'+shareBtn('clsh')+'</div>'+h.slice(i)};
-var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp');try{maybeSend()}catch(e){}};
+var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&((S.view==='shadow'&&isZ(CL[sh.c]))||(S.view==='listen'&&ls&&ls.yc&&isZ(ls.yc))))document.body.classList.add('zqlp');try{maybeSend()}catch(e){}};
 /* ---- share the sentence you are on ---- */
 function payload(c,i,note){var p={t:String(c.t).slice(0,120),id:cid(c),i:i,q:String(c.s[i]||'').slice(0,300)};var ql=c.sl&&c.sl[i];if(ql)p.ql=String(ql).slice(0,300);
 if(c.yt&&c.ts){p.yt=c.yt;if(c.v)p.v=1;if(c.lo)p.lo=c.lo;p.tp=c.tid;p.b=c.b;p.d=c.d;p.l=c.ts.map(function(s,k){return [s,c.s[k]]})}
