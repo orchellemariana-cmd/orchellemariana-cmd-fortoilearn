@@ -4562,10 +4562,9 @@ render();
 <script>
 (function(){
 var X=window.KX;if(!X)return;var sp=X.sp,ding=X.ding,P=X.P;P.N=P.N||{};
-var NW=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty'];
-var EM=['🍎','🐥','⭐','🎈','🍓','🦋','🌸','🐠','🍪','🚗'];
+var NW=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty']; var NT=['Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'],WL=[];for(var q1=1;q1<=30;q1++)WL.push(q1);for(var q2=40;q2<=100;q2+=10)WL.push(q2); function nwd(n){return n<=20?NW[n-1]:n>=100?'One hundred':NT[(n/10|0)-2]+(n%10?'-'+NW[n%10-1].toLowerCase():'')} var EM=['🍎','🐥','⭐','🎈','🍓','🦋','🌸','🐠','🍪','🚗'];
 var N={m:'hub',i:0,lit:{},c:0},LO=function(){return S.lang==='lo'};
-var UI={en:{eng:'Numbers',lesson:'Number',act:'Activities',cn:'Count',cns:'Tap and count along',wd:'Number words',wds:'Learn how to say them',pl:'Play',pls:'Match the number',qz:'Quiz',qzs:'Test what you learned',qcnt:'How many are there?',qwrd:'Which word is {L}?',qlis:'Listen and tap the number',tap:'Tap each one to count',done:'Lesson complete',again:'Play again',nl:'Next number',back:'Back to lesson',stars:'stars',next:'Next',isfor:'This is'},
+var cW=document.createElement('style');cW.textContent='.grid.g3{grid-template-columns:repeat(3,1fr);gap:8px}.kxw.sm{padding:10px 4px 10px;gap:2px;border-radius:18px}.kxw.sm .w{word-break:break-word}';document.head.appendChild(cW); var UI={en:{eng:'Numbers',lesson:'Number',act:'Activities',cn:'Count',cns:'Tap and count along',wd:'Number words',wds:'Learn how to say them',pl:'Play',pls:'Match the number',qz:'Quiz',qzs:'Test what you learned',qcnt:'How many are there?',qwrd:'Which word is {L}?',qlis:'Listen and tap the number',tap:'Tap each one to count',done:'Lesson complete',again:'Play again',nl:'Next number',back:'Back to lesson',stars:'stars',next:'Next',isfor:'This is'},
 lo:{eng:'ຕົວເລກ',lesson:'ເລກ',act:'ກິດຈະກຳ',cn:'ນັບ',cns:'ກົດແລ້ວນັບນຳກັນ',wd:'ຄຳສັບຕົວເລກ',wds:'ຮຽນວິທີອ່ານ',pl:'ຫຼິ້ນ',pls:'ຈັບຄູ່ຕົວເລກ',qz:'ທົດສອບ',qzs:'ທົດສອບສິ່ງທີ່ຮຽນ',qcnt:'ມີຈັກອັນ?',qwrd:'ຄຳໃດແມ່ນ {L}?',qlis:'ຟັງແລ້ວກົດໃສ່ຕົວເລກ',tap:'ກົດແຕ່ລະອັນເພື່ອນັບ',done:'ຈົບບົດຮຽນແລ້ວ',again:'ຫຼິ້ນອີກ',nl:'ເລກຕໍ່ໄປ',back:'ກັບໄປບົດຮຽນ',stars:'ດາວ',next:'ຕໍ່ໄປ',isfor:'ນີ້ແມ່ນ'}};
 function u(k,a){var s=(LO()&&UI.lo[k])||UI.en[k];return s.replace('{L}',a||'')}
 function sh(a){return a.slice().sort(function(){return Math.random()-.5})}
@@ -4573,9 +4572,9 @@ function em(n){return EM[(n-1)%EM.length]}
 function objs(n,cls){var h='';for(var i=0;i<n;i++)h+='<span>'+em(n)+'</span>';return '<div class="kng '+(cls||'')+(n>10?' sm':'')+'">'+h+'</div>'}
 var OV=null;
 function over(n,cb,quiet){closeO(1);var el=document.createElement('div');el.id='kno';el.className='kxo a-b';var cf='',C=['#E5174F','#FF6B93','#D9A441','#fff','#FFB0C4'];for(var i=0;i<26;i++)cf+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+C[i%5]+';animation-duration:'+(3+Math.random()*2.5).toFixed(1)+'s;animation-delay:'+(Math.random()*1.4).toFixed(1)+'s"></i>';
-var it='';for(var j=0;j<n;j++)it+='<span style="animation-delay:'+(j*.09).toFixed(2)+'s">'+em(n)+'</span>';
-el.innerHTML='<div class="kxo-rays"></div>'+cf+'<div class="kxo-st" style="height:34vh"><div class="kxo-in"><div class="kno-num" data-kn="re">'+n+'</div></div></div><div class="kno-row'+(n>10?' sm':'')+'">'+it+'</div><div class="kxo-c">'+u('isfor')+'</div><div class="kxo-w" style="font-size:min(15vw,64px)">'+NW[n-1]+'</div><div class="kxo-b"><button class="r" data-kn="re" aria-label="Listen">'+ic('play',24)+'</button><button class="nx" data-kn="ov">'+u('next')+'</button></div>';
-document.body.appendChild(el);OV={cb:cb,n:n};ding(1);if(!quiet)sp(NW[n-1])}
+var it='';for(var j=0;j<Math.min(n,30);j++)it+='<span style="animation-delay:'+(j*.09).toFixed(2)+'s">'+em(n)+'</span>';
+el.innerHTML='<div class="kxo-rays"></div>'+cf+'<div class="kxo-st" style="height:34vh"><div class="kxo-in"><div class="kno-num" data-kn="re">'+n+'</div></div></div><div class="kno-row'+(n>10?' sm':'')+'">'+it+'</div><div class="kxo-c">'+u('isfor')+'</div><div class="kxo-w" style="font-size:min(15vw,64px)">'+nwd(n)+'</div><div class="kxo-b"><button class="r" data-kn="re" aria-label="Listen">'+ic('play',24)+'</button><button class="nx" data-kn="ov">'+u('next')+'</button></div>';
+document.body.appendChild(el);OV={cb:cb,n:n};ding(1);if(!quiet)sp(nwd(n))}
 function closeO(q){var el=document.getElementById('kno');if(el)el.remove();var o=OV;OV=null;if(!q&&o&&o.cb)o.cb()}
 function ttl(t){return head(t,1,LO()?'Numbers':'ຕົວເລກ')}
 function rowB(m,i,t,s){return '<button class="lr" data-kn="md" data-m="'+m+'"><span class="ic">'+ic(i,20)+'</span><span style="flex:1"><b style="font-size:15px">'+u(t)+'</b><br><span class="s">'+u(s)+'</span></span><span class="s">›</span></button>'}
@@ -4585,8 +4584,7 @@ return ttl(u('eng'))+'<div class="row" style="overflow-x:auto;padding-bottom:6px
 +'<div class="g" style="padding:16px">'+objs(n)+'</div><div class="sec">'+u('act')+'</div><div class="g list">'+rowB('count','pen','cn','cns')+rowB('words','book','wd','wds')+rowB('play','game','pl','pls')+rowB('quiz','star','qz','qzs')+'</div>'}
 function countV(){var n=N.i+1,h='';for(var j=0;j<n;j++)h+='<button class="kno'+(N.lit[j]?' on':'')+'" data-kn="ct" data-j="'+j+'" aria-label="'+(j+1)+'">'+em(n)+'</button>';
 return ttl(u('cn'))+'<div class="s" style="text-align:center">'+u('tap')+'</div><div class="g kxs"><div class="kxL" style="font-size:88px">'+N.c+'</div><div class="w" style="font-size:24px;min-height:30px">'+(N.c?NW[N.c-1]:'')+'</div></div><div class="g" style="padding:16px"><div class="kng '+(n>10?'sm':'')+'">'+h+'</div></div>'}
-function wordsV(){return ttl(u('wd'))+'<div class="grid">'+NW.map(function(w,i){return '<button class="g kxw" data-kn="sw" data-i="'+i+'"><div class="kxL" style="font-size:54px">'+(i+1)+'</div><div class="w" style="font-size:20px">'+w+'</div><span class="round" style="margin-top:2px">'+ic('play',14)+'</span></button>'}).join('')+'</div>'}
-function opts(t,mx){var o=[t],m=Math.min(20,Math.max(mx,6));while(o.length<3){var x=1+Math.random()*m|0;if(o.indexOf(x)<0)o.push(x)}return sh(o)}
+function wordsV(){return ttl(u('wd'))+'<div class="grid g3">'+WL.map(function(n){return '<button class="g kxw sm" data-kn="sw" data-n="'+n+'" aria-label="'+nwd(n)+'"><div class="kxL" style="font-size:'+(n>99?28:34)+'px">'+n+'</div><div class="w" style="font-size:14px;line-height:1.2">'+nwd(n)+'</div><span class="round" style="margin-top:2px;width:30px;height:30px">'+ic('play',11)+'</span></button>'}).join('')+'</div>'} function opts(t,mx){var o=[t],m=Math.min(20,Math.max(mx,6));while(o.length<3){var x=1+Math.random()*m|0;if(o.indexOf(x)<0)o.push(x)}return sh(o)}
 function mk(q){var n=N.i+1,mx=Math.max(n+2,6),R=[];for(var r=0;r<5;r++){var t=q?1+Math.random()*Math.max(n,6)|0:(r%2?1+Math.random()*Math.min(20,mx)|0:n);R.push({t:t,y:q?(r%2?'cnt':'lis'):(r%2?'wrd':'cnt'),o:opts(t,mx)})}return R}
 function ask(){var g=N.g,r=g&&g.r[g.i];if(r&&r.y==='lis')setTimeout(function(){if(N.g===g&&!g.fin&&!OV)sp(NW[r.t-1])},350)}
 function start(m){N.m=m;N.g=null;N.lit={};N.c=0;if(m==='play'||m==='quiz'){N.g={r:mk(m==='quiz'),i:0,bad:0,no:{},lock:0,k:m};ask()}}
@@ -4602,12 +4600,12 @@ function finish(){var g=N.g,s=g.bad===0?3:g.bad<=2?2:1;g.fin=s;P.s+=s;if(g.k==='
 function adv(){var g=N.g;if(!g)return;g.lock=0;g.no={};g.ok=null;g.i++;if(g.i>=g.r.length)finish();else ask();render()}
 function page(){return (N.m==='count'?countV():N.m==='words'?wordsV():N.m==='play'||N.m==='quiz'?game():hub())+nav5()}
 document.addEventListener('click',function(e){var el=e.target.closest('[data-kn]');if(!el)return;var a=el.getAttribute('data-kn'),d=el.dataset,g=N.g;
-if(a==='re'){OV&&sp(NW[OV.n-1]);return}if(a==='ov'){closeO();return}
+if(a==='re'){OV&&sp(nwd(OV.n));return}if(a==='ov'){closeO();return}
 if(S.tab!=='study'||S.view!=='kn')return;var up=1,n=N.i+1;
 if(a==='md'){start(d.m)}
 else if(a==='pv'){N.i=(N.i+19)%20}else if(a==='nx'){N.i=(N.i+1)%20}else if(a==='lt'){N.i=+d.i}
 else if(a==='nl'){N.i=(N.i+1)%20;N.m='hub';N.g=null}
-else if(a==='sw'){over(+d.i+1,null);return}
+else if(a==='sw'){over(+d.n,null);return}
 else if(a==='sr'){var r0=g.r[g.i];sp(NW[r0.t-1]);return}
 else if(a==='ct'){up=0;var j=+d.j;if(N.lit[j])return;N.lit[j]=1;N.c++;sp(NW[N.c-1]);if(N.c===n){P.s+=1;X.save();try{bump('kids')}catch(_){}setTimeout(function(){if(S.view==='kn'&&N.m==='count')over(n,function(){N.m='hub';render()},1)},900)}}
 else if(a==='pk'){up=0;if(g.lock)return;var r=g.r[g.i],ok=r.o[+d.i]===r.t;if(!ok){g.bad++;g.no[d.i]=1;ding(0)}else{g.lock=1;g.ok=+d.i;ding(1);sp(NW[r.t-1]);setTimeout(function(){if(N.g!==g)return;if(g.k==='play')over(r.t,adv,1);else adv()},g.k==='play'?380:800)}}
