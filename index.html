@@ -3051,7 +3051,7 @@ var r={t:o_.t.slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),n:typeof o
 if(!r.id)return null;
 if(audOk(o_.a)){r.a=o_.a;r.d=Math.max(0,Math.min(600,Math.round(+o_.d||0)))}
 if(typeof o_.s==='number'&&isFinite(o_.s))r.s=Math.max(0,Math.min(100,Math.round(o_.s)));
-if(typeof o_.i==='number'&&isFinite(o_.i)){r.i=Math.max(0,Math.min(199,Math.round(o_.i)));r.q=typeof o_.q==='string'?o_.q.slice(0,300):''}
+if(typeof o_.i==='number'&&isFinite(o_.i)){r.i=Math.max(0,Math.min(199,Math.round(o_.i)));r.q=typeof o_.q==='string'?o_.q.slice(0,300):'';r.ql=typeof o_.ql==='string'?o_.ql.slice(0,300):''}
 if(o_.yt!=null){if(typeof o_.yt!=='string'||!/^[\w-]{11}$/.test(o_.yt)||!Array.isArray(o_.l)||!o_.l.length||o_.l.length>80)return null;
 var ls=[],i,p;for(i=0;i<o_.l.length;i++){p=o_.l[i];if(!Array.isArray(p)||typeof p[1]!=='string'||!isFinite(+p[0]))return null;ls.push({s:Math.max(0,Math.min(86400,Math.round(+p[0]))),e:p[1].slice(0,300)})}
 ls.sort(function(a,b){return a.s-b.s});
@@ -3061,7 +3061,7 @@ var CLR={},RA=null,RK='',RL=0;
 function audOk(a){return typeof a==='string'&&a.length<1200000&&/^data:audio\/[\w.+-]+(;codecs=[\w.,-]+)?;base64,[A-Za-z0-9+\/=]+$/.test(a)}
 function resParse(v){var o_;try{o_=JSON.parse(v)}catch(e){return null}
 if(!o_||typeof o_!=='object'||typeof o_.id!=='string'||!isFinite(+o_.i))return null;
-return {t:String(o_.t||'').slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),i:Math.max(0,Math.min(199,Math.round(+o_.i))),q:String(o_.q||'').slice(0,300),p:(o_.p!=null&&isFinite(+o_.p))?Math.max(0,Math.min(100,Math.round(+o_.p))):null,d:Math.max(0,Math.min(600,Math.round(+o_.d||0))),a:audOk(o_.a)?o_.a:''}}
+return {t:String(o_.t||'').slice(0,120),id:o_.id.replace(/[^\w-]/g,'').slice(0,40),i:Math.max(0,Math.min(199,Math.round(+o_.i))),q:String(o_.q||'').slice(0,300),ql:String(o_.ql||'').slice(0,300),p:(o_.p!=null&&isFinite(+o_.p))?Math.max(0,Math.min(100,Math.round(+o_.p))):null,d:Math.max(0,Math.min(600,Math.round(+o_.d||0))),a:audOk(o_.a)?o_.a:''}}
 function resLbl(v){var m=/"p":(\d+)/.exec(String(v));return o('Shadow result','ຜົນຮຽນແບບສຽງ')+(m?' · '+m[1]+'%':'')}
 var PLY1='<svg class="fx-ply" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.2v9.6L10.5 6z" fill="currentColor"/></svg>',STP1='<svg class="fx-ply" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1" fill="currentColor"/></svg>';
 /* latest score of each person for one sentence, read from this conversation */
@@ -3071,12 +3071,14 @@ if(x.t==='clip'){p=clipParse(x.v);if(p&&p.id===id&&p.i===i&&p.s!=null)sc=p.s}
 else if(x.t==='clipres'){p=resParse(x.v);if(p&&p.id===id&&p.i===i&&p.p!=null)sc=p.p}
 if(sc!=null)r[m.a===me()?'me':'them']=sc});
 return r}
+function laoOf(p){if(p.ql)return p.ql;var i,c;for(i=0;i<CL.length;i++){c=CL[i];if(c.id===p.id||c.id==='sh-'+p.id)return c.sl&&p.i!=null&&c.sl[p.i]?String(c.sl[p.i]):''}return ''}
+function bi(en,lo){return en+(lo?'<span class="fx-lo">'+lo+'</span>':'')}
 function peerNm(){return (F.names&&F.names[F.peer])||o('Friend','ໝູ່')}
 function scoreLine(id,i){var sc=clipScores(id,i);if(sc.me==null&&sc.them==null)return '';
 var col=function(l,v){return '<div><small>'+l+'</small><b>'+(v==null?'—':v+'<i>%</i>')+'</b></div>'};
 return '<div class="fx-clsc">'+col(o('You','ເຈົ້າ'),sc.me)+col(esc(peerNm()),sc.them)+'</div>'}
 function resCard(m,v){var p=resParse(v);if(!p)return o('Shadow result','ຜົນຮຽນແບບສຽງ');var mine=m.a===me(),nm=esc(peerNm());
-return '<div class="fx-clip"><div class="fx-clh">'+(mine?o('You took the challenge','ເຈົ້າຮັບຄວາມທ້າທາຍແລ້ວ'):nm+' '+o('took the challenge','ຮັບຄວາມທ້າທາຍແລ້ວ'))+'</div><div class="fx-clq">'+esc(p.q)+'</div><div class="fx-cls">'+esc(p.t)+' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1)+'</div>'+scoreLine(p.id,p.i)
+return '<div class="fx-clip"><div class="fx-clh">'+bi(mine?'You took the challenge':nm+' took the challenge',mine?'ເຈົ້າຮັບຄວາມທ້າທາຍແລ້ວ':nm+' ຮັບຄວາມທ້າທາຍແລ້ວ')+'</div><div class="fx-clq">'+bi(esc(p.q),esc(laoOf(p)))+'</div><div class="fx-cls">'+esc(p.t)+' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1)+'</div>'+scoreLine(p.id,p.i)
 +(p.a?'<div class="fx-clb"><button class="fx-cllk" data-a="fres" data-i="'+esc(m.id)+'">'+(RK==='m'+m.id?STP1:PLY1)+(mine?o('Hear your try','ຟັງສຽງຂອງເຈົ້າ'):o('Hear '+nm,'ຟັງສຽງ '+nm))+(p.d?' <span class="fx-cld">'+mmss(p.d)+'</span>':'')+'</button></div>':'')+'</div>'}
 /* remember who a sentence was shared with, so results can be sent back */
 function regShare(id,i,peer){st.shr=st.shr||{};var k=id+':'+i,a=st.shr[k]=st.shr[k]||[];if(a.indexOf(peer)<0&&a.length<20){a.push(peer);sv('st',st)}}
@@ -3097,8 +3099,9 @@ A.tplay=function(d){var r=(CLR[d.k]||{})[d.w];if(!r||!r.a)return;vpStop();playAu
 function clipLbl(v){var s=String(v);if(/"i":\d/.test(s))return o('You’re invited to a shadowing challenge','ເຈົ້າຖືກເຊີນເຂົ້າຮ່ວມການທ້າທາຍຮຽນແບບສຽງ');var m=/"t":"((?:[^"\\]|\\.)*)"/.exec(s),n='';if(m){try{n=JSON.parse('"'+m[1]+'"')}catch(e){}}return o('Shadow clip','ຄລິບຮຽນແບບສຽງ')+(n?' · '+n.slice(0,40):'')}
 function clipCard(m,v){var p=clipParse(v);if(!p)return o('Shadowing challenge','ຄວາມທ້າທາຍຮຽນແບບສຽງ');
 var sen=p.i!=null,mine=m.a===me(),nm=esc(peerNm()),
-head=!sen?o('A clip to shadow','ຄລິບໃຫ້ຮຽນແບບສຽງ'):mine?o('You invited '+nm+' to a shadowing challenge','ເຈົ້າເຊີນ '+nm+' ມາທ້າທາຍຮຽນແບບສຽງ'):o('You’re invited to a shadowing challenge','ເຈົ້າຖືກເຊີນເຂົ້າຮ່ວມການທ້າທາຍຮຽນແບບສຽງ');
-return '<div class="fx-clip"><div class="fx-clh">'+head+'</div><div class="fx-clq">'+esc(sen&&p.q?p.q:p.t)+'</div><div class="fx-cls">'+esc(p.t)+(sen?' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1):'')+'</div>'
+hEn=!sen?'A clip to shadow':mine?'You invited '+nm+' to a shadowing challenge':'You’re invited to a shadowing challenge',
+hLo=!sen?'ຄລິບໃຫ້ຮຽນແບບສຽງ':mine?'ເຈົ້າເຊີນ '+nm+' ມາທ້າທາຍຮຽນແບບສຽງ':'ເຈົ້າຖືກເຊີນເຂົ້າຮ່ວມການທ້າທາຍຮຽນແບບສຽງ';
+return '<div class="fx-clip"><div class="fx-clh">'+bi(hEn,hLo)+'</div><div class="fx-clq">'+bi(esc(sen&&p.q?p.q:p.t),sen?esc(laoOf(p)):'')+'</div><div class="fx-cls">'+esc(p.t)+(sen?' · '+o('Sentence','ປະໂຫຍກ')+' '+(p.i+1):'')+'</div>'
 +(p.n?'<div class="fx-cln">“'+esc(p.n)+'”<span> — '+(mine?o('you','ເຈົ້າ'):nm)+'</span></div>':'')+(sen?scoreLine(p.id,p.i):'')
 +'<div class="fx-clb"><button class="fx-clgo" data-a="fclip" data-i="'+esc(m.id)+'">'+(sen?o('Take the challenge','ຮັບຄວາມທ້າທາຍ'):o('Open clip','ເປີດຄລິບ'))+'</button>'
 +(p.a?'<button class="fx-cllk" data-a="fres" data-i="'+esc(m.id)+'">'+(RK==='m'+m.id?STP1:PLY1)+(mine?o('Your try','ສຽງຂອງເຈົ້າ'):o('Hear '+nm,'ຟັງສຽງ '+nm))+'</button>':'')+'</div></div>'}
@@ -3119,15 +3122,16 @@ av:function(id,z){return avImg(id,z)},
 load:function(cb){loadList();if((F.list||[]).length||!F.ld){cb();return}var n=0,iv=setInterval(function(){if(!F.ld||++n>25){clearInterval(iv);cb()}},300)},
 send:function(to,body,cb){var s=sb();if(!s||!me()){cb(false);return}
 s.from('dm').insert({a:me(),b:to,kind:'text',body:body}).select().single().then(function(r){if(r.error){cb(false);return}if(to===F.peer)F.msgs.push(r.data);bump(r.data);cb(true)}).catch(function(){cb(false)})}};
-var cs9=document.createElement('style');cs9.textContent='.fx-clip{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:220px;max-width:100%;padding:14px 16px;border-radius:12px 12px 12px 4px;background:#FBF5EA;color:#3B2A25;border:1px solid rgba(110,70,50,.18)}'
-+'.fx-clh{font-family:Newsreader,Georgia,serif;font-size:17px;font-weight:600;line-height:1.25}'
-+'.fx-clq{font-family:Newsreader,Georgia,serif;font-size:20px;font-weight:600;line-height:1.3;padding-left:12px;border-left:3px solid #B3304F}'
-+'.fx-cls{font-size:12.5px;color:#7A6258}.fx-cln{font-size:14px;color:#4E3A33}.fx-cln span{color:#8B7167}'
-+'.fx-clsc{display:flex;align-self:stretch;border-top:1px solid rgba(110,70,50,.18);border-bottom:1px solid rgba(110,70,50,.18);margin:2px 0}.fx-clsc>div{flex:1;padding:6px 0;display:flex;flex-direction:column}.fx-clsc>div+div{padding-left:14px;border-left:1px solid rgba(110,70,50,.18)}'
-+'.fx-clsc small{font-size:12px;color:#7A6258}.fx-clsc b{font-family:Newsreader,Georgia,serif;font-size:26px;line-height:1.1}.fx-clsc i{font-style:normal;font-size:14px;margin-left:1px}'
-+'.fx-clb{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:2px}'
-+'.fx-clgo{border:0;border-radius:8px;padding:9px 14px;font:inherit;font-size:14px;font-weight:700;background:#9E1B3A;color:#fff;min-height:38px}'
-+'.fx-cllk{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:6px 0;font:inherit;font-size:14px;font-weight:700;color:#9E1B3A;text-decoration:underline;text-underline-offset:3px}.fx-cld{font-weight:400;color:#7A6258}';
+var cs9=document.createElement('style');cs9.textContent='.fx-clip{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:200px;max-width:100%;margin:-4px;padding:10px 12px;border-radius:10px 10px 10px 3px;background:#FBF5EA;color:#3B2A25;border:1px solid rgba(110,70,50,.18)}'
++'.fx-clh{font-family:Newsreader,Georgia,serif;font-size:15px;font-weight:600;line-height:1.25}'
++'.fx-clq{font-family:Newsreader,Georgia,serif;font-size:17px;font-weight:600;line-height:1.3;padding-left:10px;border-left:3px solid #B3304F}'
++'.fx-lo{display:block;font-family:"Noto Sans Lao","Atkinson Hyperlegible",sans-serif;font-size:12.5px;font-weight:400;line-height:1.4;color:#7A6258;margin-top:1px}.fx-clq .fx-lo{font-size:13.5px}'
++'.fx-cls{font-size:11.5px;color:#7A6258}.fx-cln{font-size:13px;color:#4E3A33}.fx-cln span{color:#8B7167}'
++'.fx-clsc{display:flex;align-self:stretch;border-top:1px solid rgba(110,70,50,.18);border-bottom:1px solid rgba(110,70,50,.18)}.fx-clsc>div{flex:1;padding:4px 0;display:flex;flex-direction:column}.fx-clsc>div+div{padding-left:12px;border-left:1px solid rgba(110,70,50,.18)}'
++'.fx-clsc small{font-size:11.5px;color:#7A6258}.fx-clsc b{font-family:Newsreader,Georgia,serif;font-size:21px;line-height:1.1}.fx-clsc i{font-style:normal;font-size:12px;margin-left:1px}'
++'.fx-clb{display:flex;align-items:center;gap:14px;flex-wrap:wrap}'
++'.fx-clgo{border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:13px;font-weight:700;background:#9E1B3A;color:#fff;min-height:34px}'
++'.fx-cllk{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:4px 0;font:inherit;font-size:13px;font-weight:700;color:#9E1B3A;text-decoration:underline;text-underline-offset:3px}.fx-cld{font-weight:400;color:#7A6258}';
 document.head.appendChild(cs9);
 })();
 </script>
@@ -4690,7 +4694,7 @@ var r=sh.res,pct=r.na?null:Math.round(+r.pct),best=(st.shb||{})[key];sh.sa=S.aud
 if(best!=null&&(pct==null||pct<=best))return;
 st.shb=st.shb||{};st.shb[key]=pct==null?-1:pct;sv('st',st);
 var au=S.audio,idx=sh.i,X=window.FXS;
-audDur(au,function(d){d=Math.round(d||0);var obj={id:cid(c),i:idx,p:pct,d:d,t:String(c.t).slice(0,120),q:String(c.s[idx]).slice(0,300),a:au.length<=900000?au:''},body='[[clipres]]'+JSON.stringify(obj);
+audDur(au,function(d){d=Math.round(d||0);var obj={id:cid(c),i:idx,p:pct,d:d,t:String(c.t).slice(0,120),q:String(c.s[idx]).slice(0,300),ql:(c.sl&&c.sl[idx])?String(c.sl[idx]).slice(0,300):'',a:au.length<=900000?au:''},body='[[clipres]]'+JSON.stringify(obj);
 fr.forEach(function(f){X.send(f,body,function(){})});(X.res[key]=X.res[key]||{})[X.me()]={p:pct,d:d,a:obj.a,ts:new Date().toISOString()};render()})}
 var ss0=shScore;shScore=function(){ss0.apply(this,arguments);try{award()}catch(e){}};
 /* ---- the shadowing page, same look as the video page ---- */
@@ -4720,7 +4724,7 @@ var sv9=shV;shV=function(){var c=CL[sh.c];if(isZ(c))return shZ(c);var h=sv9.appl
 return i<0?h:h.slice(0,i)+'<div class="row" style="justify-content:flex-end">'+shareBtn('clsh')+'</div>'+h.slice(i)};
 var rd9=render;render=function(){rd9.apply(this,arguments);if(S.tab==='practice'&&S.view==='shadow'&&isZ(CL[sh.c]))document.body.classList.add('zqlp');try{maybeSend()}catch(e){}};
 /* ---- share the sentence you are on ---- */
-function payload(c,i,note){var p={t:String(c.t).slice(0,120),id:cid(c),i:i,q:String(c.s[i]||'').slice(0,300)};
+function payload(c,i,note){var p={t:String(c.t).slice(0,120),id:cid(c),i:i,q:String(c.s[i]||'').slice(0,300)};var ql=c.sl&&c.sl[i];if(ql)p.ql=String(ql).slice(0,300);
 if(c.yt&&c.ts){p.yt=c.yt;if(c.v)p.v=1;if(c.lo)p.lo=c.lo;p.tp=c.tid;p.b=c.b;p.d=c.d;p.l=c.ts.map(function(s,k){return [s,c.s[k]]})}
 var b=(st.shb||{})[cid(c)+':'+i];if(b!=null&&b>=0)p.s=b;
 if(note)p.n=note;return p}
