@@ -1742,8 +1742,9 @@ A.setAttribute('d',p.arm);H.setAttribute('cx',p.hx);H.setAttribute('cy',p.hy);P.
 var dx=Math.max(-1.6,Math.min(1.6,(st.x-100)/28)).toFixed(2);
 ['agp1','agp2'].forEach(function(id){var e=G(id);if(e)e.setAttribute('transform','translate('+dx+' 1.5)')});
 if(ts<st.until||Math.abs(st.tx-st.x)>.3||Math.abs(st.ty-st.y)>.3)go()}
+function agCl(v){var o=[];Array.from(v).forEach(function(c){if(o.length&&/^\p{M}$/u.test(c))o[o.length-1]+=c;else o.push(c)});return o}
 function paint(inp,anim,grew){var tx=G('agtx');if(!tx)return;
-var pw=inp.type==='password',ch=Array.from(inp.value||''),idle=G('agidle'),vis=ch.slice(-AG.MAXC),h='';
+var pw=inp.type==='password',ch=agCl(inp.value||''),idle=G('agidle'),vis=ch.slice(-AG.MAXC),h='';
 if(idle)idle.style.display=ch.length?'none':'';
 vis.forEach(function(c,i){var last=anim&&grew&&i===vis.length-1;
 h+='<text class="agc'+(pw?' agpw':'')+(last?' agw':'')+'" x="'+(AG.X0+i*AG.ADV+5)+'" y="'+AG.BASE+'" text-anchor="middle">'+(pw?'\u2605':esc(c))+'</text>'});
@@ -1752,8 +1753,8 @@ if(vis.length){st.tx=AG.X0+(vis.length-1)*AG.ADV+5;st.ty=AG.BASE-3}else{st.tx=AG
 if(anim){st.until=performance.now()+(grew?460:320)}
 go()}
 document.addEventListener('input',function(e){var t=e.target;if(!t||!F[t.id]||S.tab!=='auth')return;
-Promise.resolve().then(function(){var n=Array.from(t.value||'').length,grew=n>(st.len[t.id]||0);st.len[t.id]=n;paint(t,1,grew)})});
-document.addEventListener('focusin',function(e){var t=e.target;if(!t||!F[t.id]||S.tab!=='auth')return;st.len[t.id]=Array.from(t.value||'').length;paint(t,0,0)});
+Promise.resolve().then(function(){var n=agCl(t.value||'').length,grew=n>(st.len[t.id]||0);st.len[t.id]=n;paint(t,1,grew)})});
+document.addEventListener('focusin',function(e){var t=e.target;if(!t||!F[t.id]||S.tab!=='auth')return;st.len[t.id]=agCl(t.value||'').length;paint(t,0,0)});
 })();
 var pf=profV;profV=function(){var h=pf();if(!UID)return h;var u=ld('acc',{})[UID]||{};return h+'<div class="g" style="padding:14px 18px"><div class="s">'+o('Signed in as','ເຂົ້າສູ່ລະບົບດ້ວຍ')+(u.g?' · Google':'')+'</div><b>'+esc(UID)+'</b></div>'};
 var rdA=render;render=function(){if(S.tab==='auth'){document.documentElement.lang=lo()?'lo':'en';document.documentElement.classList.remove('cloud');$('#app').innerHTML=authV();if(GCID)loadG().catch(function(){});return}rdA()};
