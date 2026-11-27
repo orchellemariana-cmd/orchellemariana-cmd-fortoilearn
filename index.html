@@ -3832,7 +3832,7 @@ var eye='<b class="gw-e" style="left:%L%;top:%T%;width:%W%;height:%H%"><s></s></
 var on=gwSnd(),ic0=gwIc(on),sp=' data-e1="'+esc('Welcome'+(nm?', '+nm:''))+'" data-l1="'+esc(w+(nm?', '+nm:''))+'" data-e2="Are you ready to learn with me?" data-l2="'+esc(a)+'" data-e3="Let\u2019s start with" data-l3="ເລີ່ມຈາກ" data-e4="Today\u2019s plan" data-l4="'+esc(ti||'')+'"';
 return '<div class="gw"'+sp+' aria-label="'+esc(w+(nm?', '+nm:'')+'. '+a+' '+b+' '+(ti||''))+'"><div class="gw-w"><div class="gw-tx" aria-hidden="true"><div class="r1 w"><span class="rw">'+L(w)+'</span>'+(nm?'<span class="rn">'+L(', '+nm)+'</span>':'')+'</div><div class="r2">'+L(a)+'</div><div class="r3">'+L(b)+'</div></div><div class="gw-g"><div class="gw-f"><img src="'+IMG.grad+'" alt="">'
 +eye.replace('%L',37.4).replace('%T',43.4).replace('%W',15).replace('%H',12.6)+eye.replace('%L',56).replace('%T',41.6).replace('%W',13).replace('%H',12.4)
-+'</div><u class="gw-sh"></u></div><div class="gw-ti"><h1 class="w">'+esc(ti||'')+'</h1></div><button type="button" class="gw-snd" aria-label="Sound">'+ic0+'</button></div></div>'}
++'</div><u class="gw-sh"></u></div><div class="gw-ti"><h1 class="w">'+L(ti||'')+'</h1></div><button type="button" class="gw-snd" aria-label="Sound">'+ic0+'</button></div></div>'}
 function gwIc(on){return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/>'+(on?'<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>':'<path d="M16 9l5 6M21 9l-5 6"/>')+'</svg>'}
 function gwSnd(){var v=window.__gwSnd;if(v===undefined){try{v=localStorage.getItem('gwsnd')!=='0'}catch(e){v=true}window.__gwSnd=v}return v}
 var GWV=[];function gwLoadV(){try{GWV=speechSynthesis.getVoices()||[]}catch(e){}}
@@ -4952,4 +4952,10 @@ html.gmh .rh .stt>div{background:none;border-radius:0}html.gmh .rh .stt>div+div{
 /* same letters as the other headings */
 #app .sec{font-family:'Newsreader','Noto Serif Lao',Georgia,serif;font-size:19px!important;font-weight:700}
 #app .list .lr b{font-family:'Newsreader','Noto Serif Lao',Georgia,serif;font-size:16.5px!important;font-weight:700}
+/* title types in like the other lines */
+.gw-ti{transform:none!important;transition:opacity .2s}
+.gw-ti i{display:inline-block;font-style:normal;opacity:0}
+.gw.s5 .gw-ti i{animation:gwpop .2s var(--d) linear both}
+.gw.done .gw-ti i{opacity:1;animation:none}
+@media(prefers-reduced-motion:reduce){.gw-ti i{opacity:1!important}}
 </style>
