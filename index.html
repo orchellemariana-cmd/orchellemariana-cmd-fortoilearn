@@ -4992,10 +4992,16 @@ html.gmh .rdmap .gmban{margin-top:12px}
 /* compact clip-detail header: back button inline, smaller mascot, less top gap */
 .zql{margin-top:-20px}
 .zql .zqh{display:flex!important;align-items:center;gap:10px;min-height:74px!important;padding:0 84px 0 0!important;margin-bottom:2px!important}
-.zql .zqh .zqback{margin:0!important;width:40px;height:40px;flex:none}
+.zql .zqh{align-items:flex-start!important}
+.zql .zqh .zqback{margin:-8px 0 0!important;width:40px;height:40px;flex:none}
 .zql .zqhm{padding:0!important;min-height:0!important;flex:1;min-width:0}
 .zql .zqh h1{font-size:20px;line-height:1.15}
 .zql .zqpill{margin-top:4px;padding:3px 12px;font-size:12px}
 .zql .zqmasc{top:50%!important;transform:translateY(-50%);right:-6px!important;width:90px!important;height:76px!important}
 .zql>*{margin-bottom:10px!important}
+/* transcript: no dots/timestamps, text fills the frame */
+.zql .zqrow::before,.zql .zqin::before,.zql .zqrows::before{display:none!important}
+.zql .zqrow .zqtm{display:none!important}
+.zql .zqrow button[data-a=dline]{padding:10px 12px!important;gap:8px}
+.zql .zqc{padding:8px!important}
 </style>
